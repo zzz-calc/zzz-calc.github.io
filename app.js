@@ -1,13 +1,13 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v0.9-public-roster-3.0";
+  const DATA_VERSION = "2026-07-06-v1.0-ko-names-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
     agents: 56,
     wEngines: 93,
     driveDiscs: 28,
-    naming: "에이전트 이름과 W-Engine 이름은 영어로 유지하고, 나머지 UI와 데이터 라벨은 한국어로 표시합니다.",
+    naming: "에이전트 이름과 W-Engine 이름은 API 한국어명을 우선 표시하고, 영어명은 검색과 DB 식별용으로 유지합니다.",
   };
   const STATE_STORAGE_KEY = "zzz-calc-state";
   const EFFECT_DB_URL = "data/effects.mock.json";
@@ -719,6 +719,15 @@
     };
   }
 
+  function apiLookupKey(value) {
+    return String(value || "")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/gi, "")
+      .toLowerCase();
+  }
+
   function extraValues(detail) {
     return Object.values(detail.extra_level?.["6"]?.extra || {});
   }
@@ -837,6 +846,22 @@
     } catch (error) {
       console.warn("Could not load API agent roster; using embedded fallback.", error);
       updateProfileBadge();
+    }
+  }
+
+  async function loadApiEngineNames() {
+    try {
+      const index = await fetchJson(`${AGENT_API_BASE}/weapon.json`);
+      const lookup = new Map(
+        Object.values(index).map((entry) => [apiLookupKey(entry.en), entry]),
+      );
+      engines.forEach((engine) => {
+        if (engine.id === "manual") return;
+        const entry = lookup.get(apiLookupKey(engine.en));
+        if (entry?.ko) engine.kr = entry.ko;
+      });
+    } catch (error) {
+      console.warn("Could not load API W-Engine Korean names; using embedded fallback.", error);
     }
   }
 
@@ -1330,9 +1355,26 @@
     }, value);
   }
 
+  function localizeEngineCombo(value) {
+    return engines.reduce((label, engine) => {
+      if (engine.id === "manual") return label;
+      return label.replaceAll(engine.en, engine.kr || engine.en);
+    }, value);
+  }
+
   function applyDisplayData() {
+    engines.forEach((engine) => {
+      if (engine.id === "manual") {
+        engine.kr = "수동 입력";
+        engine.effect = "수동 입력값만 반영합니다.";
+        return;
+      }
+      if (needsEnglishText(engine.effect)) {
+        engine.effect = "효과 설명은 검증 대기 중이며, 계산기는 구조화된 스탯 필드를 사용합니다.";
+      }
+    });
+
     agents.forEach((agent) => {
-      agent.kr = agent.en;
       const recommendation = englishAgentRecommendations[agent.id];
       if (recommendation) {
         agent.faction = recommendation.faction;
@@ -1352,19 +1394,8 @@
         name: needsEnglishText(team.name) ? `${agent.en} 코어` : team.name,
         note: needsEnglishText(team.note) ? "초안 추천 구성입니다. 최신 엔드게임 데이터 기준으로 검증이 필요합니다." : team.note,
       }));
+      agent.engines = agent.engines.map(localizeEngineCombo);
       agent.discs = agent.discs.map(localizeDiscCombo);
-    });
-
-    engines.forEach((engine) => {
-      if (engine.id === "manual") {
-        engine.kr = "수동 입력";
-        engine.effect = "수동 입력값만 반영합니다.";
-        return;
-      }
-      engine.kr = engine.en;
-      if (needsEnglishText(engine.effect)) {
-        engine.effect = "효과 설명은 검증 대기 중이며, 계산기는 구조화된 스탯 필드를 사용합니다.";
-      }
     });
 
     driveDiscs.forEach((disc) => {
@@ -2378,6 +2409,7 @@
 
   async function init() {
     await loadApiAgentRoster();
+    await loadApiEngineNames();
     applyDisplayData();
     initSelects();
     await loadEffectDb();

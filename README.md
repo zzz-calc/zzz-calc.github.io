@@ -1,6 +1,6 @@
 # zzz-calc
 
-Zenless Zone Zero 계산기입니다. 에이전트 이름과 W-Engine 이름은 정확성을 위해 영어로 유지하고, 나머지 UI와 데이터 라벨은 한국어로 표시합니다.
+Zenless Zone Zero 계산기입니다. 에이전트 이름과 W-Engine 이름은 API 한국어명을 우선 표시하고, 영어명은 검색과 DB 식별용으로 유지합니다.
 
 ## Scope
 
@@ -29,7 +29,7 @@ gh repo create zzz-calc --public --source . --remote origin --push
 
 ## 데이터 메모
 
-GitHub Pages에서 빌드 없이 제공할 수 있도록 데이터는 `app.js`에 포함되어 있습니다. 현재 프로필은 에이전트 이름과 W-Engine 이름을 영어로 유지하고, UI/데이터 라벨은 한국어로 표시합니다.
+GitHub Pages에서 빌드 없이 제공할 수 있도록 데이터는 `app.js`에 포함되어 있습니다. 현재 프로필은 에이전트 이름과 W-Engine 이름을 API 한국어명으로 표시하고, 영어명은 검색과 DB 식별용으로 유지합니다.
 
 3.0 live 데이터는 Nanoka static API의 `character.json`, `weapon.json`, `equipment.json` 기준으로 동기화합니다. 에이전트 로스터는 페이지 로드 시 API 스냅샷을 읽어 공개 아이콘이 있는 56명으로 구성하고, 실패 시 내장 fallback 데이터를 사용합니다.
 
