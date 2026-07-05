@@ -23,6 +23,10 @@
   --pill-bg: rgba(26, 163, 156, 0.12);
   --pill-ink: #116d68;
   --badge-shadow: rgba(17, 17, 17, 0.18);
+  --tooltip-bg: #17191d;
+  --tooltip-ink: #ffffff;
+  --help-dot-bg: rgba(26, 163, 156, 0.12);
+  --help-dot-ink: #116d68;
 }
 
 :root[data-theme="dark"] {
@@ -50,6 +54,10 @@
   --pill-bg: rgba(50, 194, 184, 0.16);
   --pill-ink: #8ee5dd;
   --badge-shadow: rgba(0, 0, 0, 0.34);
+  --tooltip-bg: #f1f4ef;
+  --tooltip-ink: #111312;
+  --help-dot-bg: rgba(244, 204, 93, 0.16);
+  --help-dot-ink: #f4cc5d;
 }
 
 * {
@@ -241,6 +249,57 @@ label {
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
+}
+
+#damage-form label[data-help] {
+  position: relative;
+  padding-right: 24px;
+}
+
+#damage-form label[data-help]::after {
+  content: "?";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--help-dot-bg);
+  color: var(--help-dot-ink);
+  font-size: 11px;
+  font-weight: 950;
+}
+
+#damage-form .checkbox-label[data-help] {
+  padding-right: 38px;
+}
+
+#damage-form .checkbox-label[data-help]::after {
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+.field-help-tip {
+  position: fixed;
+  z-index: 1000;
+  max-width: min(340px, calc(100vw - 24px));
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-ink);
+  box-shadow: var(--shadow);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.field-help-tip[hidden] {
+  display: none;
 }
 
 input,

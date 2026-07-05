@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v1.1-dark-mode-3.0";
+  const DATA_VERSION = "2026-07-06-v1.2-damage-tooltips-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
     agents: 56,
@@ -1527,6 +1527,90 @@
     });
   }
 
+  let fieldHelpTip = null;
+  let activeHelpLabel = null;
+
+  function getFieldHelpTip() {
+    if (!fieldHelpTip) {
+      fieldHelpTip = document.createElement("div");
+      fieldHelpTip.className = "field-help-tip";
+      fieldHelpTip.id = "field-help-tip";
+      fieldHelpTip.hidden = true;
+      fieldHelpTip.setAttribute("role", "tooltip");
+      document.body.append(fieldHelpTip);
+    }
+    return fieldHelpTip;
+  }
+
+  function positionFieldHelpTip(label) {
+    const tip = getFieldHelpTip();
+    tip.hidden = false;
+    const margin = 12;
+    const labelRect = label.getBoundingClientRect();
+    const tipRect = tip.getBoundingClientRect();
+    const maxLeft = Math.max(margin, window.innerWidth - tipRect.width - margin);
+    let left = Math.min(Math.max(labelRect.left, margin), maxLeft);
+    let top = labelRect.top - tipRect.height - 10;
+
+    if (top < margin) {
+      top = labelRect.bottom + 10;
+    }
+    if (top + tipRect.height > window.innerHeight - margin) {
+      top = Math.max(margin, window.innerHeight - tipRect.height - margin);
+    }
+
+    tip.style.left = `${Math.round(left)}px`;
+    tip.style.top = `${Math.round(top)}px`;
+  }
+
+  function showFieldHelp(event) {
+    const label = event.currentTarget;
+    const help = label.dataset.help;
+    if (!help) return;
+
+    activeHelpLabel = label;
+    const tip = getFieldHelpTip();
+    tip.textContent = help;
+    positionFieldHelpTip(label);
+  }
+
+  function hideFieldHelp(event) {
+    if (event.type === "focusout" && event.currentTarget.contains(document.activeElement)) return;
+    if (activeHelpLabel === event.currentTarget) {
+      activeHelpLabel = null;
+    }
+    if (!activeHelpLabel && fieldHelpTip) {
+      fieldHelpTip.hidden = true;
+    }
+  }
+
+  function initFieldHelp() {
+    $$("#damage-form label[data-help]").forEach((label) => {
+      label.addEventListener("mouseenter", showFieldHelp);
+      label.addEventListener("mouseleave", hideFieldHelp);
+      label.addEventListener("focusin", showFieldHelp);
+      label.addEventListener("focusout", hideFieldHelp);
+    });
+
+    window.addEventListener("resize", () => {
+      if (activeHelpLabel) positionFieldHelpTip(activeHelpLabel);
+    });
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (activeHelpLabel) positionFieldHelpTip(activeHelpLabel);
+      },
+      true,
+    );
+    document.addEventListener("pointerdown", (event) => {
+      if (!activeHelpLabel || activeHelpLabel.contains(event.target)) return;
+      activeHelpLabel = null;
+      if (fieldHelpTip) {
+        fieldHelpTip.hidden = true;
+      }
+    });
+  }
+
   let selectedAgentId = agents[0].id;
   let effectDb = { mindscapes: {}, wEngines: {}, status: "unloaded" };
   let effectDbLoadStatus = "unloaded";
@@ -2450,6 +2534,7 @@
 
   async function init() {
     initThemeToggle();
+    initFieldHelp();
     await loadApiAgentRoster();
     await loadApiEngineNames();
     applyDisplayData();

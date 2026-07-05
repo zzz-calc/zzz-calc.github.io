@@ -92,28 +92,28 @@
                   <h2>에이전트</h2>
                   <span id="agent-meta">-</span>
                 </div>
-                <label>
+                <label data-help="딜을 계산할 에이전트를 고르세요. 선택하면 역할군, 기초 스탯, 추천 파티가 같이 바뀝니다.">
                   에이전트
                   <select id="agent-select"></select>
                 </label>
-                <label>
+                <label data-help="게임 장비 화면에서 착용 중인 W-Engine을 고르세요. 직접 입력하려면 수동 입력을 선택하세요.">
                   W-Engine
                   <select id="engine-select"></select>
                 </label>
                 <div class="inline-grid">
-                  <label>
+                  <label data-help="W-Engine 상세의 재련 단계입니다. 기본은 R1, 최대는 R5입니다.">
                     W-Engine 재련
                     <select id="engine-refinement"></select>
                   </label>
-                  <label class="checkbox-label">
+                  <label class="checkbox-label" data-help="켜두면 선택한 W-Engine의 DB 효과를 자동으로 더합니다. 실제 발동 조건이 다르면 끄고 수동 버프에 입력하세요.">
                     <input id="auto-engine-buffs" type="checkbox" checked />
                     W-Engine DB 자동 적용
                   </label>
-                  <label>
+                  <label data-help="딜을 넣는 에이전트의 현재 레벨입니다. 만렙이면 60을 입력하세요.">
                     공격자 레벨
                     <input id="attacker-level" type="number" min="1" max="60" value="60" />
                   </label>
-                  <label>
+                  <label data-help="스킬 설명에 적힌 피해 배율 합계입니다. 예를 들어 600% 계수면 600을 입력하세요.">
                     스킬 계수 %
                     <input id="skill-multiplier" type="number" min="1" step="0.1" value="600" />
                   </label>
@@ -131,27 +131,27 @@
                   <span id="mindscape-summary">M0</span>
                 </div>
                 <div class="inline-grid">
-                  <label>
+                  <label data-help="캐릭터 돌파 단계입니다. 명함은 M0, 풀돌은 M6입니다.">
                     단계
                     <select id="mindscape-level"></select>
                   </label>
-                  <label>
+                  <label data-help="돌파 효과로 피해 보너스가 생길 때만 입력하세요. DB 자동 적용이 켜져 있으면 중복 입력하지 마세요.">
                     돌파 피해 보너스 %
                     <input id="mindscape-dmg-buff" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="돌파 효과의 공격력 % 증가량입니다. 인게임 표기가 20%면 20을 입력하세요.">
                     돌파 공격력 %
                     <input id="mindscape-atk-buff" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="돌파 효과의 치명타 확률 증가량입니다. 예: +12%면 12를 입력하세요.">
                     돌파 치명타 확률 %
                     <input id="mindscape-crit-rate-buff" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="돌파 효과의 치명타 피해 증가량입니다. 예: +30%면 30을 입력하세요.">
                     돌파 치명타 피해 %
                     <input id="mindscape-crit-dmg-buff" type="number" step="0.1" value="0" />
                   </label>
-                  <label class="checkbox-label">
+                  <label class="checkbox-label" data-help="켜두면 선택한 돌파 단계까지의 DB 효과를 자동으로 더합니다. 조건부 효과가 안 켜진 상황이면 끄고 직접 조정하세요.">
                     <input id="auto-mindscape-buffs" type="checkbox" checked />
                     돌파 DB 자동 적용
                   </label>
@@ -165,51 +165,51 @@
                   <button class="ghost-button" id="reset-stats" type="button">초기화</button>
                 </div>
                 <div class="inline-grid">
-                  <label>
+                  <label data-help="게임 상세 스탯의 총 공격력이 아니라 공격력 % 옵션 합계를 넣으세요. 디스크 메인옵, 부옵, 2세트 등 % 공격력이 여기에 해당합니다.">
                     공격력 %
                     <input id="atk-percent" type="number" step="0.1" value="70" />
                   </label>
-                  <label>
+                  <label data-help="디스크 부옵이나 고정 공격력 옵션처럼 숫자로 더해지는 공격력입니다. 총 공격력 값을 그대로 넣는 칸이 아닙니다.">
                     고정 공격력
                     <input id="flat-atk" type="number" step="1" value="316" />
                   </label>
-                  <label>
+                  <label data-help="명파 캐릭터용 보정값입니다. 에이전트 기초 HP 외에 추가로 계산해야 하는 기초 HP가 있을 때만 입력하세요. 일반 딜러는 0이면 됩니다.">
                     기초 HP 보정
                     <input id="base-hp" type="number" step="1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="HP % 옵션 합계입니다. 명파 캐릭터의 HP 기반 계산에 주로 사용합니다.">
                     HP %
                     <input id="hp-percent" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="숫자로 더해지는 고정 HP 옵션 합계입니다. 총 HP를 그대로 넣는 칸이 아닙니다.">
                     고정 HP
                     <input id="flat-hp" type="number" step="1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="명파 캐릭터용 수치입니다. W-Engine이나 버프가 명파력을 고정값으로 올릴 때 입력하세요.">
                     고정 명파력
                     <input id="flat-sheer-force" type="number" step="1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="상세 스탯의 치명타 확률에서 기본/장비 자동 적용분을 제외하고 추가로 넣을 값입니다. 60%면 60을 입력하세요.">
                     치명타 확률 %
                     <input id="crit-rate" type="number" step="0.1" value="60" />
                   </label>
-                  <label>
+                  <label data-help="상세 스탯의 치명타 피해에서 기본/장비 자동 적용분을 제외하고 추가로 넣을 값입니다. 120%면 120을 입력하세요.">
                     치명타 피해 %
                     <input id="crit-dmg" type="number" step="0.1" value="120" />
                   </label>
-                  <label>
+                  <label data-help="속성 피해 보너스, 모든 피해 증가, 스킬 피해 증가처럼 피해 배율에 곱해지는 보너스 합계입니다.">
                     피해 보너스 %
                     <input id="dmg-bonus" type="number" step="0.1" value="46.6" />
                   </label>
-                  <label>
+                  <label data-help="상세 스탯의 관통률 % 또는 버프 관통률을 입력하세요. 관통 수치와는 별도입니다.">
                     관통률 %
                     <input id="pen-ratio" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="고정 관통 수치입니다. %가 아니라 숫자로 표시되는 관통 옵션을 입력하세요.">
                     관통 수치
                     <input id="flat-pen" type="number" step="1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="이상 피해 계산용입니다. 인게임 상세 스탯의 이상 숙련 값을 입력하세요. 이상 딜을 보지 않으면 0이어도 됩니다.">
                     이상 숙련
                     <input id="anomaly-proficiency" type="number" step="1" value="0" />
                   </label>
@@ -222,19 +222,19 @@
                   <span id="disc-summary">-</span>
                 </div>
                 <div class="inline-grid">
-                  <label>
+                  <label data-help="딜러가 장착한 4세트 디스크를 고르세요. 자동 적용이 켜져 있으면 DB에 등록된 4세트 효과가 더해집니다.">
                     4세트
                     <select id="disc-four"></select>
                   </label>
-                  <label>
+                  <label data-help="딜러가 장착한 2세트 디스크를 고르세요. 2세트 기본 스탯 보너스가 자동 반영됩니다.">
                     2세트
                     <select id="disc-two"></select>
                   </label>
-                  <label>
+                  <label data-help="디스크 조건부 효과를 직접 더할 때 쓰는 칸입니다. 예: 특정 조건에서 피해 +15%면 15를 입력하세요.">
                     수동 디스크 피해 %
                     <input id="disc-conditional" type="number" step="0.1" value="0" />
                   </label>
-                  <label class="checkbox-label">
+                  <label class="checkbox-label" data-help="켜두면 선택한 4세트의 프리셋 효과를 자동 적용합니다. 조건이 발동하지 않는 상황이면 끄세요.">
                     <input id="auto-disc-buffs" type="checkbox" checked />
                     4세트 프리셋 적용
                   </label>
@@ -247,47 +247,47 @@
                   <span id="party-buff-summary">-</span>
                 </div>
                 <div class="inline-grid">
-                  <label>
+                  <label data-help="같이 편성할 첫 번째 파티원을 고르세요. 자동 적용 시 해당 캐릭터의 대표 버프가 더해집니다.">
                     파티원 1
                     <select id="party-slot-1"></select>
                   </label>
-                  <label>
+                  <label data-help="같이 편성할 두 번째 파티원을 고르세요. 중복 캐릭터는 계산에서 제외됩니다.">
                     파티원 2
                     <select id="party-slot-2"></select>
                   </label>
-                  <label>
+                  <label data-help="파티원 1이 착용한 4세트 디스크입니다. 서포터의 4세트 파티 버프를 계산할 때 사용합니다.">
                     파티원 1 4세트
                     <select id="party-disc-1"></select>
                   </label>
-                  <label>
+                  <label data-help="파티원 2가 착용한 4세트 디스크입니다. 서포터의 4세트 파티 버프를 계산할 때 사용합니다.">
                     파티원 2 4세트
                     <select id="party-disc-2"></select>
                   </label>
-                  <label class="checkbox-label">
+                  <label class="checkbox-label" data-help="켜두면 선택한 파티원의 대표 버프를 자동으로 더합니다. 실제 전투에서 발동하지 않는 버프는 끄고 수동값으로 조정하세요.">
                     <input id="auto-team-buffs" type="checkbox" checked />
                     파티 프리셋 적용
                   </label>
-                  <label class="checkbox-label">
+                  <label class="checkbox-label" data-help="켜두면 파티원이 착용한 4세트 디스크의 파티 버프를 자동으로 더합니다.">
                     <input id="auto-party-disc-buffs" type="checkbox" checked />
                     파티원 디스크 적용
                   </label>
-                  <label>
+                  <label data-help="파티원, 방부, 전투 조건 등으로 받는 추가 피해 보너스를 직접 입력하세요.">
                     수동 피해 보너스 %
                     <input id="team-bonus" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="파티 버프나 음식/이벤트 효과처럼 공격력 %를 올리는 값을 직접 입력하세요.">
                     수동 공격력 %
                     <input id="manual-atk-buff" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="파티 버프 등으로 추가되는 치명타 확률을 입력하세요. 예: +10%면 10입니다.">
                     수동 치명타 확률 %
                     <input id="manual-crit-rate-buff" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="파티 버프 등으로 추가되는 치명타 피해를 입력하세요. 예: +25%면 25입니다.">
                     수동 치명타 피해 %
                     <input id="manual-crit-dmg-buff" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="파티 버프 등으로 추가되는 관통률 %를 입력하세요. 고정 관통 수치와는 별도입니다.">
                     수동 관통률 %
                     <input id="manual-pen-ratio-buff" type="number" step="0.1" value="0" />
                   </label>
@@ -301,27 +301,27 @@
                   <span>방어/저항</span>
                 </div>
                 <div class="inline-grid">
-                  <label>
+                  <label data-help="전투 중 상대하는 적의 레벨입니다. 시뮬레이션하려는 콘텐츠의 적 레벨을 넣으세요.">
                     적 레벨
                     <input id="enemy-level" type="number" min="1" max="100" value="70" />
                   </label>
-                  <label>
+                  <label data-help="적의 기본 속성 저항입니다. 일반적으로 10%를 기준으로 두고, 약점/내성 적은 값이 달라질 수 있습니다.">
                     적 저항 %
                     <input id="enemy-res" type="number" step="0.1" value="10" />
                   </label>
-                  <label>
+                  <label data-help="캐릭터나 디스크 효과로 적 저항을 깎는 수치입니다. 예: 저항 -20% 효과면 20을 입력하세요.">
                     저항 감소 %
                     <input id="res-shred" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="적이 받는 피해 증가 효과입니다. 피해 보너스와 별도로 곱해지는 디버프 계열 값을 입력하세요.">
                     받는 피해 증가 %
                     <input id="vulnerability" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
+                  <label data-help="적이 그로기 상태일 때 적용되는 배율입니다. 기본 그로기 150%면 150을 입력하세요.">
                     그로기 배율 %
                     <input id="stun-multiplier" type="number" step="1" value="150" />
                   </label>
-                  <label class="checkbox-label">
+                  <label class="checkbox-label" data-help="체크하면 위 그로기 배율을 딜 계산에 곱합니다. 적이 그로기 상태가 아니라면 끄세요.">
                     <input id="enemy-stunned" type="checkbox" />
                     그로기
                   </label>
