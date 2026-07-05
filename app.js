@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v1.4-autocomplete-selects-3.0";
+  const DATA_VERSION = "2026-07-06-v1.5-rupture-sheer-force-input-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
     agents: 56,
@@ -941,7 +941,7 @@
     { id: "peacekeeper-specialized", kr: "Peacekeeper - Specialized", en: "Peacekeeper - Specialized", rank: "A", role: "defense", baseAtk: 624, stats: { atkPct: 25 }, effect: "실드 중 에너지/이상 축적 보정" },
     { id: "precious-fossilized-core", kr: "Precious Fossilized Core", en: "Precious Fossilized Core", rank: "A", role: "stun", baseAtk: 594, stats: { impact: 15 }, effect: "적 HP 조건 그로기 보정" },
     { id: "puzzle-sphere", kr: "Puzzle Sphere", en: "Puzzle Sphere", rank: "A", role: "rupture", baseAtk: 594, stats: { atkPct: 25 }, effect: "EX 치명 피해/저HP 피해 보정" },
-    { id: "radiowave-journey", kr: "Radiowave Journey", en: "Radiowave Journey", rank: "A", role: "rupture", baseAtk: 594, stats: { hpPct: 25 }, effect: "체인/궁극기 후 명파력 보정" },
+    { id: "radiowave-journey", kr: "Radiowave Journey", en: "Radiowave Journey", rank: "A", role: "rupture", baseAtk: 594, stats: { hpPct: 25 }, effect: "체인/궁극기 후 관입력 보정" },
     { id: "rainforest-gourmet", kr: "Rainforest Gourmet", en: "Rainforest Gourmet", rank: "A", role: "anomaly", baseAtk: 594, stats: { anomalyProficiency: 75 }, effect: "에너지 소모 공격력 보정" },
     { id: "reel-projector", kr: "Reel Projector", en: "Reel Projector", rank: "A", role: "defense", baseAtk: 594, stats: { impact: 15 }, effect: "HP 조건 피해 감소/미아즈마 감소" },
     { id: "roaring-ride", kr: "Roaring Ride", en: "Roaring Ride", rank: "A", role: "anomaly", baseAtk: 624, stats: { atkPct: 25 }, effect: "EX 명중 후 무작위 이상 보정" },
@@ -1819,7 +1819,7 @@
     const labels = {
       atkPct: "공격력",
       hpPct: "HP",
-      sheerForce: "명파력",
+      sheerForce: "관입력",
       dmgBonus: "피해",
       critRate: "치명타 확률",
       critDmg: "치명타 피해",
@@ -2324,10 +2324,12 @@
     const flatHp = number("#flat-hp");
     const totalHp = baseHp * (1 + hpPct / 100) + flatHp;
     const usesHpScaling = agent.role === "rupture";
-    const flatSheerForce = number("#flat-sheer-force") + buffTotals.sheerForce;
-    const totalSheerForce = usesHpScaling ? totalAtk * 0.3 + totalHp * 0.1 + flatSheerForce : 0;
+    const manualSheerForce = number("#sheer-force");
+    const extraSheerForce = number("#flat-sheer-force") + buffTotals.sheerForce;
+    const estimatedSheerForce = totalAtk * 0.3 + totalHp * 0.1 + extraSheerForce;
+    const totalSheerForce = usesHpScaling ? (manualSheerForce > 0 ? manualSheerForce + extraSheerForce : estimatedSheerForce) : 0;
     const damageBase = usesHpScaling ? totalSheerForce : totalAtk;
-    const damageBaseLabel = usesHpScaling ? "명파력 기반" : "공격력 기반";
+    const damageBaseLabel = usesHpScaling ? (manualSheerForce > 0 ? "관입력 기반(직접 입력)" : "관입력 기반(자동 추정)") : "공격력 기반";
 
     const critRate = clamp(
       agent.stats.critRate + (engine.stats.critRate || 0) + sumStatFromDiscs(discs, "critRate") + number("#crit-rate") + buffTotals.critRate,
@@ -2383,7 +2385,9 @@
       totalAtk,
       totalHp,
       hpPct,
-      flatSheerForce,
+      manualSheerForce,
+      extraSheerForce,
+      estimatedSheerForce,
       totalSheerForce,
       damageBase,
       damageBaseLabel,
@@ -2443,12 +2447,18 @@
 
     const lines = [
       ["피해 기준", result.damageBaseLabel],
-      ...(result.usesHpScaling ? [["총 명파력", fmt.format(result.totalSheerForce)]] : []),
+      ...(result.usesHpScaling
+        ? [
+            ["관입력", fmt.format(result.totalSheerForce)],
+            ["입력 관입력", result.manualSheerForce > 0 ? fmt.format(result.manualSheerForce) : "자동 추정"],
+            ["자동 추정 관입력", fmt.format(result.estimatedSheerForce)],
+          ]
+        : []),
       ["총 공격력", fmt.format(result.totalAtk)],
       ["총 HP", fmt.format(result.totalHp)],
       ["치명타", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
       ["HP 보너스", `${fmt1.format(result.hpPct)}%`],
-      ...(result.usesHpScaling ? [["고정 명파력", fmt.format(result.flatSheerForce)]] : []),
+      ...(result.usesHpScaling ? [["추가 관입력", fmt.format(result.extraSheerForce)]] : []),
       ["피해 보너스", `${fmt1.format(result.baseDmgBonus)}%`],
       ["관통 / 방어 감소", `${fmt1.format(result.penRatio)}% / ${fmt1.format(result.defReduction)}%`],
       ["저항 감소", `${fmt1.format(result.buffTotals.resShred)}%`],
@@ -2641,6 +2651,7 @@
     $("#base-hp").value = 0;
     $("#hp-percent").value = agent.role === "rupture" ? 30 : 0;
     $("#flat-hp").value = 0;
+    $("#sheer-force").value = 0;
     $("#flat-sheer-force").value = 0;
     $("#dmg-bonus").value = 46.6;
     $("#pen-ratio").value = 0;

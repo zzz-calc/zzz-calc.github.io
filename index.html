@@ -189,8 +189,12 @@
                     고정 HP
                     <input id="flat-hp" type="number" step="1" value="0" />
                   </label>
-                  <label data-help="명파 캐릭터용 수치입니다. W-Engine이나 버프가 명파력을 고정값으로 올릴 때 입력하세요.">
-                    고정 명파력
+                  <label data-help="명파 캐릭터의 인게임 상세 스탯에 표시되는 관입력입니다. 값을 넣으면 명파 딜은 이 수치를 기준으로 계산하고, 0이면 공격력 30% + HP 10%로 자동 추정합니다.">
+                    관입력
+                    <input id="sheer-force" type="number" step="1" value="0" />
+                  </label>
+                  <label data-help="전투 중 조건부 효과로 추가되는 관입력만 입력하세요. 관입력 칸에 이미 포함된 값이면 중복 입력하지 마세요.">
+                    추가 관입력
                     <input id="flat-sheer-force" type="number" step="1" value="0" />
                   </label>
                   <label data-help="상세 스탯의 치명타 확률에서 기본/장비 자동 적용분을 제외하고 추가로 넣을 값입니다. 60%면 60을 입력하세요.">
