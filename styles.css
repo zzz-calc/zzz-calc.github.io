@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: light;
   --bg: #f5f6f8;
   --surface: #ffffff;
@@ -420,6 +420,46 @@ button:focus-visible {
   gap: 12px;
 }
 
+.field-span-full {
+  grid-column: 1 / -1;
+}
+
+.enemy-meta {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.enemy-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.enemy-warning {
+  display: block;
+  margin-top: 6px;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.field-note {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.enemy-filter-row {
+  margin-bottom: 12px;
+}
+
 .inline-grid.three,
 .filter-row {
   display: grid;
@@ -450,6 +490,50 @@ button:focus-visible {
 .checkbox-label input {
   width: 18px;
   min-height: 18px;
+}
+
+.mode-toggle-row {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mode-toggle {
+  width: fit-content;
+  min-width: min(100%, 280px);
+  padding-right: 42px;
+}
+
+.mode-badge {
+  margin-left: auto;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.mode-helper,
+.advanced-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.advanced-fields {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+
+.advanced-fields[hidden] {
+  display: none;
 }
 
 .ghost-button {

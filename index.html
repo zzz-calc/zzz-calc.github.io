@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -168,6 +168,17 @@
                   <h2>스탯</h2>
                   <button class="ghost-button" id="reset-stats" type="button">초기화</button>
                 </div>
+                <div class="mode-toggle-row">
+                  <label
+                    class="checkbox-label mode-toggle"
+                    data-help="기본 입력으로 부족할 때 여는 상세 계산 모드입니다. 관입 피해 증가, 추가 관입력, 관통 수치처럼 검산용 세부 수치를 직접 넣을 수 있습니다."
+                  >
+                    <input id="advanced-damage-mode" type="checkbox" />
+                    상세모드
+                    <span class="mode-badge">악귀용</span>
+                  </label>
+                  <p class="mode-helper" id="advanced-damage-mode-status">기본 입력만 표시 중</p>
+                </div>
                 <div class="inline-grid">
                   <label data-help="게임 상세 스탯의 총 공격력이 아니라 공격력 % 옵션 합계를 넣으세요. 디스크 메인옵, 부옵, 2세트 등 % 공격력이 여기에 해당합니다.">
                     공격력 %
@@ -176,10 +187,6 @@
                   <label data-help="디스크 부옵이나 고정 공격력 옵션처럼 숫자로 더해지는 공격력입니다. 총 공격력 값을 그대로 넣는 칸이 아닙니다.">
                     고정 공격력
                     <input id="flat-atk" type="number" step="1" value="316" />
-                  </label>
-                  <label data-help="명파 캐릭터용 보정값입니다. 에이전트 기초 HP 외에 추가로 계산해야 하는 기초 HP가 있을 때만 입력하세요. 일반 딜러는 0이면 됩니다.">
-                    기초 HP 보정
-                    <input id="base-hp" type="number" step="1" value="0" />
                   </label>
                   <label data-help="HP % 옵션 합계입니다. 명파 캐릭터의 HP 기반 계산에 주로 사용합니다.">
                     HP %
@@ -193,10 +200,6 @@
                     관입력
                     <input id="sheer-force" type="number" step="1" value="0" />
                   </label>
-                  <label data-help="전투 중 조건부 효과로 추가되는 관입력만 입력하세요. 관입력 칸에 이미 포함된 값이면 중복 입력하지 마세요.">
-                    추가 관입력
-                    <input id="flat-sheer-force" type="number" step="1" value="0" />
-                  </label>
                   <label data-help="상세 스탯의 치명타 확률에서 기본/장비 자동 적용분을 제외하고 추가로 넣을 값입니다. 60%면 60을 입력하세요.">
                     치명타 확률 %
                     <input id="crit-rate" type="number" step="0.1" value="60" />
@@ -209,22 +212,37 @@
                     피해 보너스 %
                     <input id="dmg-bonus" type="number" step="0.1" value="46.6" />
                   </label>
-                  <label data-help="명파/관입 피해만 증가시키는 보너스입니다. 표의 관입피해증가 1.45는 여기에 45를 입력하면 됩니다. 일반 강공 딜에는 적용하지 않습니다.">
-                    관입 피해 증가 %
-                    <input id="sheer-dmg-bonus" type="number" step="0.1" value="0" />
-                  </label>
-                  <label data-help="상세 스탯의 관통률 % 또는 버프 관통률을 입력하세요. 관통 수치와는 별도입니다.">
-                    관통률 %
-                    <input id="pen-ratio" type="number" step="0.1" value="0" />
-                  </label>
-                  <label data-help="고정 관통 수치입니다. %가 아니라 숫자로 표시되는 관통 옵션을 입력하세요.">
-                    관통 수치
-                    <input id="flat-pen" type="number" step="1" value="0" />
-                  </label>
-                  <label data-help="이상 피해 계산용입니다. 인게임 상세 스탯의 이상 숙련 값을 입력하세요. 이상 딜을 보지 않으면 0이어도 됩니다.">
-                    이상 숙련
-                    <input id="anomaly-proficiency" type="number" step="1" value="0" />
-                  </label>
+                </div>
+                <div class="advanced-fields" id="advanced-damage-fields" hidden>
+                  <p class="advanced-note">
+                    세부 검산이 필요할 때만 여는 악귀용 입력 구간입니다. 기본 입력으로 충분하면 닫아두고 쓰면 됩니다.
+                  </p>
+                  <div class="inline-grid">
+                    <label data-help="명파 캐릭터용 보정값입니다. 에이전트 기초 HP 외에 추가로 계산해야 하는 기초 HP가 있을 때만 입력하세요. 일반 딜러는 0이면 됩니다.">
+                      기초 HP 보정
+                      <input id="base-hp" type="number" step="1" value="0" />
+                    </label>
+                    <label data-help="전투 중 조건부 효과로 추가되는 관입력만 입력하세요. 관입력 칸에 이미 포함된 값이면 중복 입력하지 마세요.">
+                      추가 관입력
+                      <input id="flat-sheer-force" type="number" step="1" value="0" />
+                    </label>
+                    <label data-help="명파/관입 피해만 증가시키는 보너스입니다. 표의 관입피해증가 1.45는 여기에 45를 입력하면 됩니다. 일반 강공 딜에는 적용하지 않습니다.">
+                      관입 피해 증가 %
+                      <input id="sheer-dmg-bonus" type="number" step="0.1" value="0" />
+                    </label>
+                    <label data-help="상세 스탯의 관통률 % 또는 버프 관통률을 입력하세요. 관통 수치와는 별도입니다.">
+                      관통률 %
+                      <input id="pen-ratio" type="number" step="0.1" value="0" />
+                    </label>
+                    <label data-help="고정 관통 수치입니다. %가 아니라 숫자로 표시되는 관통 옵션을 입력하세요.">
+                      관통 수치
+                      <input id="flat-pen" type="number" step="1" value="0" />
+                    </label>
+                    <label data-help="이상 피해 계산용입니다. 인게임 상세 스탯의 이상 숙련 값을 입력하세요. 이상 딜을 보지 않으면 0이어도 됩니다.">
+                      이상 숙련
+                      <input id="anomaly-proficiency" type="number" step="1" value="0" />
+                    </label>
+                  </div>
                 </div>
               </section>
 
@@ -258,53 +276,66 @@
                   <h2>파티 버프</h2>
                   <span id="party-buff-summary">-</span>
                 </div>
-                <div class="inline-grid">
-                  <label data-help="같이 편성할 첫 번째 파티원을 고르세요. 자동 적용 시 해당 캐릭터의 대표 버프가 더해집니다.">
+                <div class="mode-toggle-row">
+                  <label
+                    class="checkbox-label mode-toggle"
+                    data-help="켜면 파티 버프 입력과 자동 프리셋 계산을 사용합니다. 자동 프리셋은 기본적으로 명전(M0 + 전무 R1) 기준 가정값입니다."
+                  >
+                    <input id="enable-party-buffs" type="checkbox" checked />
+                    파티 버프 사용
+                    <span class="mode-badge">명전 기준</span>
+                  </label>
+                  <p class="mode-helper" id="party-buff-mode-status">파티 버프 사용 중</p>
+                </div>
+                <div class="advanced-fields" id="party-buff-fields">
+                  <div class="inline-grid">
+                    <label data-help="같이 편성할 첫 번째 파티원을 고르세요. 자동 적용 시 해당 캐릭터의 대표 버프가 더해집니다. 기본 프리셋은 명전(M0 + 전무 R1) 기준입니다.">
                     파티원 1
                     <select id="party-slot-1"></select>
-                  </label>
-                  <label data-help="같이 편성할 두 번째 파티원을 고르세요. 중복 캐릭터는 계산에서 제외됩니다.">
+                    </label>
+                    <label data-help="같이 편성할 두 번째 파티원을 고르세요. 중복 캐릭터는 계산에서 제외됩니다. 기본 프리셋은 명전(M0 + 전무 R1) 기준입니다.">
                     파티원 2
                     <select id="party-slot-2"></select>
-                  </label>
-                  <label data-help="파티원 1이 착용한 4세트 디스크입니다. 서포터의 4세트 파티 버프를 계산할 때 사용합니다.">
+                    </label>
+                    <label data-help="파티원 1이 착용한 4세트 디스크입니다. 서포터의 4세트 파티 버프를 계산할 때 사용합니다.">
                     파티원 1 4세트
                     <select id="party-disc-1"></select>
-                  </label>
-                  <label data-help="파티원 2가 착용한 4세트 디스크입니다. 서포터의 4세트 파티 버프를 계산할 때 사용합니다.">
+                    </label>
+                    <label data-help="파티원 2가 착용한 4세트 디스크입니다. 서포터의 4세트 파티 버프를 계산할 때 사용합니다.">
                     파티원 2 4세트
                     <select id="party-disc-2"></select>
-                  </label>
-                  <label class="checkbox-label" data-help="켜두면 선택한 파티원의 대표 버프를 자동으로 더합니다. 실제 전투에서 발동하지 않는 버프는 끄고 수동값으로 조정하세요.">
+                    </label>
+                    <label class="checkbox-label" data-help="켜두면 선택한 파티원의 대표 버프를 자동으로 더합니다. 자동 프리셋은 기본적으로 명전(M0 + 전무 R1) 기준이며, 실제 전투에서 발동하지 않는 버프는 끄고 수동값으로 조정하세요.">
                     <input id="auto-team-buffs" type="checkbox" checked />
                     파티 프리셋 적용
-                  </label>
-                  <label class="checkbox-label" data-help="켜두면 파티원이 착용한 4세트 디스크의 파티 버프를 자동으로 더합니다.">
+                    </label>
+                    <label class="checkbox-label" data-help="켜두면 파티원이 착용한 4세트 디스크의 파티 버프를 자동으로 더합니다. 파티 프리셋은 기본적으로 명전(M0 + 전무 R1) 기준으로 검산하는 흐름을 가정합니다.">
                     <input id="auto-party-disc-buffs" type="checkbox" checked />
                     파티원 디스크 적용
-                  </label>
-                  <label data-help="파티원, 방부, 전투 조건 등으로 받는 추가 피해 보너스를 직접 입력하세요.">
+                    </label>
+                    <label data-help="파티원, 방부, 전투 조건 등으로 받는 추가 피해 보너스를 직접 입력하세요.">
                     수동 피해 보너스 %
                     <input id="team-bonus" type="number" step="0.1" value="0" />
-                  </label>
-                  <label data-help="파티 버프나 음식/이벤트 효과처럼 공격력 %를 올리는 값을 직접 입력하세요.">
+                    </label>
+                    <label data-help="파티 버프나 음식/이벤트 효과처럼 공격력 %를 올리는 값을 직접 입력하세요.">
                     수동 공격력 %
                     <input id="manual-atk-buff" type="number" step="0.1" value="0" />
-                  </label>
-                  <label data-help="파티 버프 등으로 추가되는 치명타 확률을 입력하세요. 예: +10%면 10입니다.">
+                    </label>
+                    <label data-help="파티 버프 등으로 추가되는 치명타 확률을 입력하세요. 예: +10%면 10입니다.">
                     수동 치명타 확률 %
                     <input id="manual-crit-rate-buff" type="number" step="0.1" value="0" />
-                  </label>
-                  <label data-help="파티 버프 등으로 추가되는 치명타 피해를 입력하세요. 예: +25%면 25입니다.">
+                    </label>
+                    <label data-help="파티 버프 등으로 추가되는 치명타 피해를 입력하세요. 예: +25%면 25입니다.">
                     수동 치명타 피해 %
                     <input id="manual-crit-dmg-buff" type="number" step="0.1" value="0" />
-                  </label>
-                  <label data-help="파티 버프 등으로 추가되는 관통률 %를 입력하세요. 고정 관통 수치와는 별도입니다.">
+                    </label>
+                    <label data-help="파티 버프 등으로 추가되는 관통률 %를 입력하세요. 고정 관통 수치와는 별도입니다.">
                     수동 관통률 %
                     <input id="manual-pen-ratio-buff" type="number" step="0.1" value="0" />
-                  </label>
+                    </label>
+                  </div>
+                  <div class="buff-list" id="buff-list"></div>
                 </div>
-                <div class="buff-list" id="buff-list"></div>
               </section>
 
               <section class="form-section">
@@ -312,10 +343,29 @@
                   <h2>적</h2>
                   <span>방어/저항</span>
                 </div>
+                <div class="filter-row enemy-filter-row">
+                  <label>
+                    적 등급
+                    <select id="enemy-tier-filter"></select>
+                  </label>
+                  <label>
+                    적 타입
+                    <select id="enemy-type-filter"></select>
+                  </label>
+                  <label>
+                    적 진영
+                    <select id="enemy-faction-filter"></select>
+                  </label>
+                </div>
                 <div class="inline-grid">
                   <label data-help="전투 중 상대하는 적의 레벨입니다. 시뮬레이션하려는 콘텐츠의 적 레벨을 넣으세요.">
                     적 레벨
                     <input id="enemy-level" type="number" min="1" max="100" value="70" />
+                  </label>
+                  <label data-help="Fandom API 기준 적 목록입니다. 적을 선택하면 약점과 저항 속성을 아래에 표시합니다. 방어력과 수치형 저항은 콘텐츠별 차이가 있어서 직접 보정하는 용도입니다.">
+                    적 선택
+                    <select id="enemy-select"></select>
+                    <span class="enemy-warning">적 선택 시 방어력/약점/저항/그로기 배율을 자동 입력합니다. 콘텐츠 차이나 파티 디버프는 아래 수치를 수동 보정하세요.</span>
                   </label>
                   <label data-help="적 방어력을 직접 알고 있으면 입력하세요. 0이면 적 레벨 + 100을 방어력 기준값으로 자동 추정합니다. 명파/관입 피해는 방어력 계수를 1로 처리합니다.">
                     적 방어력
@@ -325,13 +375,19 @@
                     적 저항 %
                     <input id="enemy-res" type="number" step="0.1" value="10" />
                   </label>
+                  <label data-help="해당 속성 약점으로 추가로 깎이는 저항입니다. 표에 약점 20이 적혀 있으면 20을 입력하세요. 속저깎과는 별도로 분리해서 표시합니다.">
+                    약점 %
+                    <input id="enemy-weakness" type="number" step="0.1" value="0" />
+                  </label>
                   <label data-help="캐릭터나 디스크 효과로 적 저항을 깎는 수치입니다. 예: 저항 -20% 효과면 20을 입력하세요.">
                     저항 감소 %
                     <input id="res-shred" type="number" step="0.1" value="0" />
+                    <span class="field-note">적 기본값이 아니라 파티/스킬 디버프 수동 입력</span>
                   </label>
                   <label data-help="적이 받는 피해 증가 효과입니다. 피해 보너스와 별도로 곱해지는 디버프 계열 값을 입력하세요.">
                     받는 피해 증가 %
                     <input id="vulnerability" type="number" step="0.1" value="0" />
+                    <span class="field-note">적 기본값이 아니라 파티/스킬 디버프 수동 입력</span>
                   </label>
                   <label data-help="적이 그로기 상태일 때 적용되는 배율입니다. 기본 그로기 150%면 150을 입력하세요.">
                     그로기 배율 %
@@ -341,6 +397,10 @@
                     <input id="enemy-stunned" type="checkbox" />
                     그로기
                   </label>
+                  <div class="enemy-meta field-span-full">
+                    <p class="mode-helper" id="enemy-api-status">Fandom API 적 선택 시 약점/저항 속성을 불러옵니다.</p>
+                    <div class="enemy-traits" id="enemy-traits"></div>
+                  </div>
                 </div>
               </section>
             </form>

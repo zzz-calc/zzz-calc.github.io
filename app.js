@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   "use strict";
 
   const DATA_VERSION = "2026-07-06-v1.6-defense-and-sheer-multipliers-3.0";
@@ -11,21 +11,28 @@
   };
   const STATE_STORAGE_KEY = "zzz-calc-state";
   const THEME_STORAGE_KEY = "zzz-calc-theme";
+  const ENEMY_KO_CACHE_KEY = "zzz-calc-enemy-ko-v1";
+  const ENEMY_DETAIL_CACHE_KEY = "zzz-calc-enemy-detail-v1";
   const EFFECT_DB_URL = "data/effects.mock.json";
   const AGENT_API_VERSION = "3.0";
   const AGENT_API_BASE = `https://static.nanoka.cc/zzz/${AGENT_API_VERSION}`;
   const NANOKA_ASSET_BASE = "https://static.nanoka.cc/assets/zzz";
+  const FANDOM_ENEMY_LIST_URL = "https://zenless-zone-zero.fandom.com/api.php?action=parse&page=Enemy/List&prop=text&format=json&origin=*";
   const TRANSIENT_FIELD_IDS = new Set(["agent-name-filter", "agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
   const SEARCHABLE_SELECTS = {
     "agent-select": "에이전트 검색",
     "growth-agent-select": "에이전트 검색",
     "party-slot-1": "파티원 검색",
     "party-slot-2": "파티원 검색",
+    "enemy-select": "적 검색",
     "engine-select": "W-Engine / 전무 검색",
     "disc-four": "4세트 디스크 검색",
     "disc-two": "2세트 디스크 검색",
     "party-disc-1": "파티원 1 디스크 검색",
     "party-disc-2": "파티원 2 디스크 검색",
+  };
+  const SEARCHABLE_SELECT_LIMITS = {
+    "enemy-select": 24,
   };
 
   const roleLabels = {
@@ -57,6 +64,55 @@
     B: "B",
     I: "I",
   };
+  const enemyAttributeLabels = {
+    Fire: "화염",
+    Ice: "얼음",
+    Electric: "전기",
+    Ether: "에테르",
+    Physical: "물리",
+    Wind: "바람",
+  };
+  const enemyTierLabels = {
+    all: "전체",
+    "Normal": "일반",
+    "Elite": "엘리트",
+    "Boss": "보스",
+    "Notorious Boss": "악명 높은 보스",
+  };
+  const enemyTypeLabels = {
+    all: "전체",
+    "Ethereal": "에테리얼",
+    "Machine": "기계",
+    "Organic": "유기체",
+    "Sacrifice": "희생체",
+    "[[]]": "기타",
+    "-": "기타",
+  };
+  const enemyFactionLabels = {
+    all: "전체",
+    "Ether Mutants": "에테리얼 돌연체",
+    "Special": "특수",
+    "Corrupted": "침식체",
+    "Thugs": "불량배",
+    "Rebel Soldiers": "반란군",
+    "Public Security": "공안국",
+  };
+
+  const enemyCatalog = [
+    {
+      id: "manual",
+      kr: "직접 입력",
+      en: "Manual",
+      faction: "-",
+      type: "-",
+      tier: "-",
+      challenge: "-",
+      weaknesses: [],
+      resistances: [],
+      image: "",
+      sourceUrl: "",
+    },
+  ];
 
   function fandomAvatar(fileName) {
     return `https://zenless-zone-zero.fandom.com/wiki/Special:Redirect/file/${encodeURIComponent(fileName)}`;
@@ -831,6 +887,242 @@
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
     return response.json();
+  }
+  function cleanEnemyText(value) {
+    return String(value ?? "").replace(/\s+/g, " ").trim();
+  }
+
+  function normalizeEnemyMeta(value) {
+    const cleaned = cleanEnemyText(value).replace(/\[\[\]\]/g, "").replace(/—/g, "-");
+    return cleaned || "-";
+  }
+
+  function slugifyEnemyId(value) {
+    return cleanEnemyText(value)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "enemy";
+  }
+
+  function parseEnemyAttributes(cell) {
+    if (!cell) return [];
+    const seen = new Set();
+    cell.querySelectorAll("a[title]").forEach((link) => {
+      const title = cleanEnemyText(link.getAttribute("title"));
+      if (enemyAttributeLabels[title]) seen.add(title);
+    });
+    return Array.from(seen);
+  }
+
+  function parseEnemyCatalog(html) {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const rows = Array.from(doc.querySelectorAll("table.article-table tbody tr")).slice(1);
+    return rows.flatMap((row) => {
+      const cells = row.querySelectorAll("td");
+      if (cells.length < 8) return [];
+      const titleLink = cells[1].querySelector("a[title]");
+      const title = cleanEnemyText(titleLink?.getAttribute("title") || cells[1].textContent);
+      if (!title) return [];
+      const image = cells[0].querySelector("img")?.dataset?.src || "";
+      return [{
+        id: slugifyEnemyId(title),
+        kr: title,
+        en: title,
+        faction: normalizeEnemyMeta(cells[2].textContent),
+        type: normalizeEnemyMeta(cells[3].textContent),
+        tier: normalizeEnemyMeta(cells[4].textContent),
+        challenge: normalizeEnemyMeta(cells[5].textContent),
+        weaknesses: parseEnemyAttributes(cells[6]),
+        resistances: parseEnemyAttributes(cells[7]),
+        image,
+        pageTitle: title,
+        sourceUrl: titleLink ? `https://zenless-zone-zero.fandom.com${titleLink.getAttribute("href")}` : "",
+        stats: {},
+      }];
+    });
+  }
+
+  function chunkItems(items, size) {
+    const chunks = [];
+    for (let index = 0; index < items.length; index += size) {
+      chunks.push(items.slice(index, index + size));
+    }
+    return chunks;
+  }
+
+  function decodeHtmlEntities(value) {
+    const doc = new DOMParser().parseFromString(`<!doctype html><body>${value}`, "text/html");
+    return doc.body.textContent || "";
+  }
+
+  function cleanWikiValue(value) {
+    return decodeHtmlEntities(
+      String(value ?? "")
+        .replace(/\{\{tt\|([^|}]+)\|[^}]+\}\}/g, "$1")
+        .replace(/\{\{lang\|[^=]+=([^|}]+)(?:\|[^}]*)?\}\}/g, "$1")
+        .replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1")
+        .replace(/\[\[([^\]]+)\]\]/g, "$1")
+        .replace(/''+/g, "")
+        .replace(/&nbsp;/gi, " ")
+        .trim(),
+    );
+  }
+
+  function extractEnemyKoreanName(wikiText) {
+    const match = String(wikiText ?? "").match(/^\|ko\s*=\s*(.+)$/m);
+    if (!match) return "";
+    return cleanWikiValue(match[1]);
+  }
+
+  function extractEnemyStats(wikiText) {
+    const readNumber = (field) => {
+      const match = String(wikiText ?? "").match(new RegExp(`^\\|${field}\\s*=\\s*(-?[\\d.]+)`, "m"));
+      return match ? Number(match[1]) : null;
+    };
+    return {
+      defense: readNumber("def"),
+      stunMultiplier: readNumber("stun_multiplier"),
+      resists: {
+        Physical: readNumber("physical_res"),
+        Fire: readNumber("fire_res"),
+        Ice: readNumber("ice_res"),
+        Electric: readNumber("electric_res"),
+        Ether: readNumber("ether_res"),
+        Wind: readNumber("wind_res"),
+      },
+    };
+  }
+
+  function enemyTierLabel(value) {
+    return enemyTierLabels[value] || value || "-";
+  }
+
+  function enemyTypeLabel(value) {
+    return enemyTypeLabels[value] || value || "-";
+  }
+
+  function enemyFactionLabel(value) {
+    return enemyFactionLabels[value] || value || "-";
+  }
+
+  function loadEnemyKoreanNameCache() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(ENEMY_KO_CACHE_KEY) || "{}");
+      enemyCatalog.forEach((enemy) => {
+        if (enemy.id === "manual" || !enemy.pageTitle) return;
+        const koreanName = cached[enemy.pageTitle];
+        if (koreanName) enemy.kr = koreanName;
+      });
+    } catch (_error) {
+      localStorage.removeItem(ENEMY_KO_CACHE_KEY);
+    }
+  }
+
+  function saveEnemyKoreanNameCache() {
+    try {
+      const payload = Object.fromEntries(
+        enemyCatalog
+          .filter((enemy) => enemy.id !== "manual" && enemy.pageTitle && enemy.kr)
+          .map((enemy) => [enemy.pageTitle, enemy.kr]),
+      );
+      localStorage.setItem(ENEMY_KO_CACHE_KEY, JSON.stringify(payload));
+    } catch (_error) {
+      // Ignore cache write failures.
+    }
+  }
+
+  function loadEnemyDetailCache() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(ENEMY_DETAIL_CACHE_KEY) || "{}");
+      enemyCatalog.forEach((enemy) => {
+        if (enemy.id === "manual" || !enemy.pageTitle) return;
+        const detail = cached[enemy.pageTitle];
+        if (!detail) return;
+        if (detail.kr) enemy.kr = detail.kr;
+        if (detail.stats) enemy.stats = detail.stats;
+      });
+    } catch (_error) {
+      localStorage.removeItem(ENEMY_DETAIL_CACHE_KEY);
+    }
+  }
+
+  function saveEnemyDetailCache() {
+    try {
+      const payload = Object.fromEntries(
+        enemyCatalog
+          .filter((enemy) => enemy.id !== "manual" && enemy.pageTitle)
+          .map((enemy) => [enemy.pageTitle, { kr: enemy.kr, stats: enemy.stats || {} }]),
+      );
+      localStorage.setItem(ENEMY_DETAIL_CACHE_KEY, JSON.stringify(payload));
+    } catch (_error) {
+      // Ignore cache write failures.
+    }
+  }
+
+  async function loadEnemyCatalog() {
+    try {
+      const payload = await fetchJson(FANDOM_ENEMY_LIST_URL);
+      const html = payload?.parse?.text?.["*"];
+      const loadedEnemies = parseEnemyCatalog(html);
+      if (loadedEnemies.length < 150) throw new Error(`Unexpected enemy count: ${loadedEnemies.length}`);
+      enemyCatalog.length = 0;
+      enemyCatalog.push(
+        {
+          id: "manual",
+          kr: "직접 입력",
+          en: "Manual",
+          faction: "-",
+          type: "-",
+          tier: "-",
+          challenge: "-",
+          weaknesses: [],
+          resistances: [],
+          image: "",
+          sourceUrl: "",
+        },
+        ...loadedEnemies,
+      );
+    } catch (error) {
+      console.warn("Could not load Fandom enemy catalog; using manual enemy input only.", error);
+    }
+  }
+
+  async function loadEnemyKoreanNames() {
+    const targets = enemyCatalog.filter((enemy) => enemy.id !== "manual" && enemy.pageTitle);
+    if (!targets.length) return;
+
+    try {
+      const chunks = chunkItems(targets, 20);
+      await Promise.all(chunks.map(async (batch) => {
+        const params = new URLSearchParams({
+          action: "query",
+          prop: "revisions",
+          rvprop: "content",
+          rvslots: "main",
+          formatversion: "2",
+          format: "json",
+          origin: "*",
+          titles: batch.map((enemy) => enemy.pageTitle).join("|"),
+        });
+        const payload = await fetchJson(`https://zenless-zone-zero.fandom.com/api.php?${params.toString()}`);
+        const pages = payload?.query?.pages || [];
+        const byTitle = new Map(batch.map((enemy) => [enemy.pageTitle, enemy]));
+        pages.forEach((page) => {
+          const content = page?.revisions?.[0]?.slots?.main?.content || "";
+          const koreanName = extractEnemyKoreanName(content);
+          const stats = extractEnemyStats(content);
+          const enemy = byTitle.get(page?.title);
+          if (!enemy) return;
+          if (koreanName) enemy.kr = koreanName;
+          enemy.stats = stats;
+        });
+      }));
+      saveEnemyKoreanNameCache();
+      saveEnemyDetailCache();
+    } catch (error) {
+      console.warn("Could not load Fandom enemy Korean names; using English enemy names.", error);
+    }
   }
 
   function updateProfileBadge() {
@@ -1625,7 +1917,40 @@
     });
   }
 
+  function updateAdvancedDamageMode() {
+    const toggle = $("#advanced-damage-mode");
+    const panel = $("#advanced-damage-fields");
+    const status = $("#advanced-damage-mode-status");
+    if (!toggle || !panel || !status) return;
+
+    panel.hidden = !toggle.checked;
+    status.textContent = toggle.checked ? "상세 입력 표시 중" : "기본 입력만 표시 중";
+    toggle.setAttribute("aria-expanded", String(toggle.checked));
+  }
+
+  function initAdvancedDamageMode() {
+    updateAdvancedDamageMode();
+    $("#advanced-damage-mode")?.addEventListener("change", updateAdvancedDamageMode);
+  }
+
+  function updatePartyBuffMode() {
+    const toggle = $("#enable-party-buffs");
+    const panel = $("#party-buff-fields");
+    const status = $("#party-buff-mode-status");
+    if (!toggle || !panel || !status) return;
+
+    panel.hidden = !toggle.checked;
+    status.textContent = toggle.checked ? "파티 버프 사용 중" : "파티 버프 미사용";
+    toggle.setAttribute("aria-expanded", String(toggle.checked));
+  }
+
+  function initPartyBuffMode() {
+    updatePartyBuffMode();
+    $("#enable-party-buffs")?.addEventListener("change", updatePartyBuffMode);
+  }
+
   let selectedAgentId = agents[0].id;
+  let lastEnemyPresetKey = "";
   let effectDb = { mindscapes: {}, wEngines: {}, status: "unloaded" };
   let effectDbLoadStatus = "unloaded";
 
@@ -1658,6 +1983,113 @@
 
   function getEngine(id) {
     return engines.find((engine) => engine.id === id) || engines[0];
+  }
+  function getEnemy(id) {
+    return enemyCatalog.find((enemy) => enemy.id === id) || enemyCatalog[0];
+  }
+
+  function currentEnemyAttribute() {
+    const agent = getAgent($("#agent-select")?.value);
+    const map = {
+      physical: "Physical",
+      fire: "Fire",
+      ice: "Ice",
+      frost: "Ice",
+      electric: "Electric",
+      ether: "Ether",
+      wind: "Wind",
+      auricInk: "Ether",
+    };
+    return map[agent?.attribute] || "";
+  }
+
+  function applyEnemyPreset(enemy) {
+    if (!enemy || enemy.id === "manual") {
+      lastEnemyPresetKey = "";
+      return;
+    }
+    const attribute = currentEnemyAttribute();
+    const weaknessField = $("#enemy-weakness");
+    const resField = $("#enemy-res");
+    const defField = $("#enemy-defense");
+    const stunField = $("#stun-multiplier");
+    if (!weaknessField || !resField) return;
+    const resistValue = Number(enemy.stats?.resists?.[attribute]);
+    const presetKey = [
+      enemy.id,
+      attribute || "none",
+      Number.isFinite(resistValue) ? resistValue : "fallback",
+      Number.isFinite(Number(enemy.stats?.defense)) ? enemy.stats.defense : "nodef",
+      Number.isFinite(Number(enemy.stats?.stunMultiplier)) ? enemy.stats.stunMultiplier : "nostun",
+      enemy.weaknesses.join(","),
+      enemy.resistances.join(","),
+    ].join(":");
+    if (presetKey === lastEnemyPresetKey) return;
+
+    if (Number.isFinite(resistValue)) {
+      weaknessField.value = String(resistValue < 0 ? Math.abs(resistValue) : 0);
+      resField.value = String(resistValue > 0 ? resistValue : 0);
+    } else {
+      const hasWeakness = attribute && enemy.weaknesses.includes(attribute);
+      const hasResistance = attribute && enemy.resistances.includes(attribute);
+      weaknessField.value = String(hasWeakness ? 20 : 0);
+      resField.value = String(hasResistance ? 20 : 10);
+    }
+    if (defField && Number.isFinite(Number(enemy.stats?.defense))) {
+      defField.value = String(enemy.stats.defense);
+    }
+    if (stunField && Number.isFinite(Number(enemy.stats?.stunMultiplier))) {
+      stunField.value = String(enemy.stats.stunMultiplier);
+    }
+    lastEnemyPresetKey = presetKey;
+  }
+
+  function enemyAttributeText(items) {
+    return items.length ? items.map((item) => enemyAttributeLabels[item] || item).join(", ") : "없음";
+  }
+
+  function renderEnemyInfo() {
+    const status = $("#enemy-api-status");
+    const traits = $("#enemy-traits");
+    const select = $("#enemy-select");
+    if (!select) return;
+
+    const enemy = getEnemy(select.value);
+    applyEnemyPreset(enemy);
+    if (status) {
+      if (enemy.id === "manual") {
+        status.textContent = "Fandom API 적 선택 시 약점/저항 속성을 불러옵니다. 수치형 방어력과 저항은 직접 입력해 주세요.";
+      } else {
+        const attribute = currentEnemyAttribute();
+        const exactResist = Number(enemy.stats?.resists?.[attribute]);
+        const resSummary = Number.isFinite(exactResist)
+          ? `현재 속성 기준 자동 입력: 약점 ${exactResist < 0 ? Math.abs(exactResist) : "0"} / 적 저항 ${exactResist > 0 ? exactResist : "0"}`
+          : (attribute
+            ? `현재 속성 기준 자동 입력: 약점 ${enemy.weaknesses.includes(attribute) ? "20" : "0"} / 적 저항 ${enemy.resistances.includes(attribute) ? "20" : "10"}`
+            : "현재 속성 기준 자동 입력을 적용했습니다.");
+        const statSummary = [
+          Number.isFinite(Number(enemy.stats?.defense)) ? `방어력 ${enemy.stats.defense}` : "",
+          Number.isFinite(Number(enemy.stats?.stunMultiplier)) ? `그로기 ${enemy.stats.stunMultiplier}%` : "",
+        ].filter(Boolean).join(" / ");
+        const summary = [enemyTierLabel(enemy.tier), enemyTypeLabel(enemy.type), enemyFactionLabel(enemy.faction), enemy.challenge]
+          .filter((value) => value && value !== "-" && value !== "—")
+          .join(" / ");
+        status.textContent = [summary, statSummary, resSummary, "받는 피해 증가/저항 감소는 파티 디버프라 수동 입력"].filter(Boolean).join(" / ");
+      }
+    }
+
+    if (traits) {
+      if (enemy.id === "manual") {
+        traits.innerHTML = '<span class="pill muted">약점/저항은 적 선택 시 표시됩니다.</span>';
+      } else {
+        const sourceLink = enemy.sourceUrl ? `<a class="pill muted" href="${escapeAttr(enemy.sourceUrl)}" target="_blank" rel="noreferrer">Fandom 원문</a>` : "";
+        traits.innerHTML = `
+          <span class="pill">약점: ${escapeAttr(enemyAttributeText(enemy.weaknesses))}</span>
+          <span class="pill">저항: ${escapeAttr(enemyAttributeText(enemy.resistances))}</span>
+          ${sourceLink}
+        `;
+      }
+    }
   }
 
   function escapeAttr(value) {
@@ -1696,6 +2128,10 @@
       .filter((id) => id && id !== "none" && id !== $("#agent-select")?.value);
   }
 
+  function partyBuffsEnabled() {
+    return Boolean($("#enable-party-buffs")?.checked);
+  }
+
   function selectedPartyDiscSources() {
     const usedDiscIds = new Set();
     return [
@@ -1710,7 +2146,7 @@
       if (!preset) return [];
       usedDiscIds.add(discId);
       const agent = getAgent(agentId);
-      return [{ type: "파티 디스크", ...preset, label: `${agent.kr} / ${preset.label}` }];
+      return [{ type: "파티 디스크", ...preset, note: `${preset.note} / 명전 기준`, label: `${agent.kr} / ${preset.label}` }];
     });
   }
 
@@ -1897,15 +2333,16 @@
       if (discBuff) sources.push({ type: "디스크", ...discBuff });
     }
 
-    if ($("#auto-team-buffs")?.checked) {
+    const partySources = [];
+    if (partyBuffsEnabled() && $("#auto-team-buffs")?.checked) {
       selectedPartyIds().forEach((id) => {
         const teamBuff = teamBuffPresets[id];
-        if (teamBuff) sources.push({ type: "파티", ...teamBuff });
+        if (teamBuff) partySources.push({ type: "파티", ...teamBuff, note: `${teamBuff.note} / 명전 기준` });
       });
     }
 
-    if ($("#auto-party-disc-buffs")?.checked) {
-      sources.push(...selectedPartyDiscSources());
+    if (partyBuffsEnabled() && $("#auto-party-disc-buffs")?.checked) {
+      partySources.push(...selectedPartyDiscSources());
     }
 
     sources.push(...calculationReadyDbSources(selectedWEngineDbSources()));
@@ -1922,12 +2359,19 @@
       critRate: number("#manual-crit-rate-buff"),
       critDmg: number("#manual-crit-dmg-buff"),
       penRatio: number("#manual-pen-ratio-buff"),
+      note: "명전 프리셋 외 수동 보정",
     };
-    if (buffParts(manualBuff).length > 0) sources.push(manualBuff);
+    if (partyBuffsEnabled() && buffParts(manualBuff).length > 0) partySources.push(manualBuff);
+    sources.push(...partySources);
     return sources;
   }
 
+  function collectPartyBuffSources(sources) {
+    return partyBuffsEnabled() ? sources.filter((source) => source.type === "파티" || source.type === "파티 디스크" || source.type === "수동") : [];
+  }
+
   function summarizeBuffs(sources) {
+    if (!partyBuffsEnabled()) return "미사용";
     if (sources.length === 0) return "프리셋 없음";
     return `${sources.length}개 적용`;
   }
@@ -1988,6 +2432,17 @@
     });
   }
 
+  function refreshSearchableSelect(select) {
+    if (!select?._searchOptions) return;
+    cacheSearchableSelect(select);
+    syncSearchableSelectInput(select);
+    const { input, list } = searchableSelectParts(select);
+    if (input) input.title = input.value;
+    if (list && !list.hidden) {
+      renderSearchableSuggestions(select, searchableOpenQuery(select, input?.value || ""), true);
+    }
+  }
+
   function selectedSearchOption(select) {
     return select?._searchOptions?.find((item) => item.value === select.value);
   }
@@ -2005,6 +2460,38 @@
     const normalizedQuery = normalizeSearchText(query);
     const options = select._searchOptions || [];
     return normalizedQuery ? options.filter((item) => item.normalized.includes(normalizedQuery)) : options;
+  }
+
+  function searchableOpenQuery(select, inputValue) {
+    return select?.id === "enemy-select" ? "" : inputValue;
+  }
+
+  function filteredEnemies() {
+    const tier = $("#enemy-tier-filter")?.value || "all";
+    const type = $("#enemy-type-filter")?.value || "all";
+    const faction = $("#enemy-faction-filter")?.value || "all";
+    return enemyCatalog.filter((enemy) => {
+      if (enemy.id === "manual") return true;
+      const tierOk = tier === "all" || enemy.tier === tier;
+      const typeOk = type === "all" || enemy.type === type;
+      const factionOk = faction === "all" || enemy.faction === faction;
+      return tierOk && typeOk && factionOk;
+    });
+  }
+
+  function renderEnemySelectOptions() {
+    const select = $("#enemy-select");
+    if (!select) return;
+    const currentValue = select.value;
+    const items = filteredEnemies();
+    fillSelect(select, items, (enemy) => (
+      enemy.id === "manual" ? enemy.kr : `${enemy.kr} (${enemyTierLabel(enemy.tier)} / ${enemyTypeLabel(enemy.type)})`
+    ));
+    const nextValue = items.some((enemy) => enemy.id === currentValue)
+      ? currentValue
+      : (items.find((enemy) => enemy.id !== "manual")?.id || "manual");
+    setSelectValue(select, nextValue);
+    if (select.dataset.searchEnhanced === "true") refreshSearchableSelect(select);
   }
 
   function closeSearchableSelect(select) {
@@ -2035,7 +2522,8 @@
     const { combo, list } = searchableSelectParts(select);
     if (!combo || !list) return;
 
-    const matches = searchableMatches(select, query).slice(0, 8);
+    const maxResults = SEARCHABLE_SELECT_LIMITS[select.id] || 8;
+    const matches = searchableMatches(select, query).slice(0, maxResults);
     const selectedValue = select.value;
     const nodes =
       matches.length > 0
@@ -2113,7 +2601,7 @@
       search.addEventListener("focus", () => {
         closeAllSearchableSelects(select);
         search.select();
-        renderSearchableSuggestions(select, search.value, true);
+        renderSearchableSuggestions(select, searchableOpenQuery(select, search.value), true);
         search.setAttribute("aria-expanded", "true");
       });
       search.addEventListener("input", () => {
@@ -2367,7 +2855,9 @@
     const enemyDefPart = Math.max(enemyDefenseBase * (1 - defReduction / 100) * (1 - penRatio / 100) - flatPen, 1);
     const defMultiplier = usesHpScaling ? 1 : levelCoef / (levelCoef + enemyDefPart);
 
-    const effectiveRes = number("#enemy-res") - number("#res-shred") - buffTotals.resShred;
+    const weakness = number("#enemy-weakness");
+    const effectiveRes = number("#enemy-res") - number("#res-shred") - weakness - buffTotals.resShred;
+    const totalResShred = number("#res-shred") + buffTotals.resShred;
     const resMultiplier = clamp(1 - effectiveRes / 100, 0.05, 2);
     const stunMultiplier = $("#enemy-stunned").checked ? (number("#stun-multiplier") / 100) * (1 + buffTotals.stunDmg / 100) : 1;
 
@@ -2418,6 +2908,9 @@
       enemyDefenseInput,
       enemyDefenseBase,
       defMultiplier,
+      weakness,
+      totalResShred,
+      effectiveRes,
       resMultiplier,
       stunMultiplier,
       anomalyMastery,
@@ -2433,20 +2926,23 @@
 
   function renderDamage() {
     const result = calculateDamage();
+    const partyBuffSources = collectPartyBuffSources(result.buffSources);
     $("#agent-meta").textContent = `${attributeLabels[result.agent.attribute]} / ${roleLabels[result.agent.role]} / ${result.agent.faction}`;
     $("#mindscape-summary").textContent = `M${selectedMindscapeLevel()}`;
     $("#engine-effect-summary").textContent = `R${selectedEngineRefinement()} / ${effectDbLoadStatus}`;
     $("#disc-summary").textContent = `${result.discFour.kr} 4 / ${result.discTwo.kr} 2`;
-    $("#party-buff-summary").textContent = summarizeBuffs(result.buffSources);
+    $("#party-buff-summary").textContent = summarizeBuffs(partyBuffSources);
     $("#normal-damage").textContent = fmt.format(result.nonCrit);
     $("#crit-damage").textContent = fmt.format(result.crit);
     $("#expected-damage").textContent = fmt.format(result.expected);
     $("#anomaly-damage").textContent = fmt.format(result.anomaly);
     renderEffectList("#engine-effect-list", selectedWEngineDbSources(), "선택한 W-Engine의 DB 효과가 없습니다.");
     renderEffectList("#mindscape-effect-list", selectedMindscapeDbSources(), "선택한 돌파 단계의 DB 효과가 없습니다.");
+    const displayedBuffSources = partyBuffsEnabled() ? partyBuffSources : [];
+    const partyBuffEmptyText = partyBuffsEnabled() ? "자동/수동 파티 버프가 없습니다." : "파티 버프 사용 안 함";
     $("#buff-list").replaceChildren(
-      ...(result.buffSources.length
-        ? result.buffSources.map((buff) => {
+      ...(displayedBuffSources.length
+        ? displayedBuffSources.map((buff) => {
             const item = document.createElement("article");
             item.className = "buff-chip";
             const header = document.createElement("div");
@@ -2461,7 +2957,7 @@
             item.append(header, body);
             return item;
           })
-        : [Object.assign(document.createElement("div"), { className: "empty-state", textContent: "자동 버프가 없습니다." })]),
+        : [Object.assign(document.createElement("div"), { className: "empty-state", textContent: partyBuffEmptyText })]),
     );
 
     const lines = [
@@ -2486,7 +2982,9 @@
       ["받는 피해", `${fmt3.format(result.vulnerabilityMultiplier)}x`],
       ["적 방어력", result.enemyDefenseInput > 0 ? fmt.format(result.enemyDefenseBase) : `${fmt.format(result.enemyDefenseBase)} (레벨 자동)`],
       ["관통 / 방어 감소", `${fmt1.format(result.penRatio)}% / ${fmt1.format(result.defReduction)}%`],
-      ["저항 감소", `${fmt1.format(result.buffTotals.resShred)}%`],
+      ["약점", `${fmt1.format(result.weakness)}%`],
+      ["저항 감소", `${fmt1.format(result.totalResShred)}%`],
+      ["적 실효 저항", `${fmt1.format(result.effectiveRes)}%`],
       ["방어 배율", fmt3.format(result.defMultiplier)],
       ["저항 배율", fmt3.format(result.resMultiplier)],
       ["그로기 배율", fmt3.format(result.stunMultiplier)],
@@ -2713,6 +3211,7 @@
   function renderAll() {
     renderAgentGrid();
     renderAgentDetail();
+    renderEnemyInfo();
     renderDamage();
     renderGrowth();
     renderDatabase();
@@ -2723,6 +3222,13 @@
     const agentLabel = (agent) => `${agent.kr} (${attributeLabels[agent.attribute]} / ${roleLabels[agent.role]})`;
     fillSelect($("#agent-select"), agents, agentLabel);
     fillSelect($("#growth-agent-select"), agents, agentLabel);
+    const enemyTiers = Array.from(new Set(enemyCatalog.filter((enemy) => enemy.id !== "manual").map((enemy) => enemy.tier)));
+    const enemyTypes = Array.from(new Set(enemyCatalog.filter((enemy) => enemy.id !== "manual").map((enemy) => enemy.type)));
+    const enemyFactions = Array.from(new Set(enemyCatalog.filter((enemy) => enemy.id !== "manual").map((enemy) => enemy.faction)));
+    $("#enemy-tier-filter").replaceChildren(...["all", ...enemyTiers].map((value) => option(enemyTierLabel(value), value)));
+    $("#enemy-type-filter").replaceChildren(...["all", ...enemyTypes].map((value) => option(enemyTypeLabel(value), value)));
+    $("#enemy-faction-filter").replaceChildren(...["all", ...enemyFactions].map((value) => option(enemyFactionLabel(value), value)));
+    renderEnemySelectOptions();
     const partyOptions = [{ id: "none", kr: "없음" }, ...agents];
     fillSelect($("#party-slot-1"), partyOptions, (agent) => agent.kr);
     fillSelect($("#party-slot-2"), partyOptions, (agent) => agent.kr);
@@ -2781,6 +3287,14 @@
 
     $("#agent-select").addEventListener("change", () => selectAgent($("#agent-select").value));
     $("#growth-agent-select").addEventListener("change", () => selectAgent($("#growth-agent-select").value));
+    ["#enemy-tier-filter", "#enemy-type-filter", "#enemy-faction-filter"].forEach((selector) => {
+      $(selector)?.addEventListener("change", () => {
+        renderEnemySelectOptions();
+        renderEnemyInfo();
+        renderDamage();
+        saveSnapshot();
+      });
+    });
     $("#reset-stats").addEventListener("click", resetStats);
     $("#download-data").addEventListener("click", downloadData);
     $("#copy-growth").addEventListener("click", copyGrowth);
@@ -2791,6 +3305,9 @@
     initFieldHelp();
     await loadApiAgentRoster();
     await loadApiEngineNames();
+    await loadEnemyCatalog();
+    loadEnemyKoreanNameCache();
+    loadEnemyDetailCache();
     applyDisplayData();
     initSelects();
     initSearchableSelects();
@@ -2803,13 +3320,22 @@
     normalizeSelectValue("#mindscape-level", "0");
     normalizeSelectValue("#agent-select", agents[0].id);
     normalizeSelectValue("#growth-agent-select", agents[0].id);
+    normalizeSelectValue("#enemy-select", "manual");
     normalizeSelectValue("#party-slot-1", "none");
     normalizeSelectValue("#party-slot-2", "none");
     normalizeSelectValue("#party-disc-1", "none");
     normalizeSelectValue("#party-disc-2", "none");
+    initAdvancedDamageMode();
+    initPartyBuffMode();
     selectAgent(selectedAgentId, false, false);
     bindEvents();
     renderAll();
+    void loadEnemyKoreanNames().then(() => {
+      renderEnemySelectOptions();
+      renderEnemyInfo();
+      renderDamage();
+      saveSnapshot();
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
