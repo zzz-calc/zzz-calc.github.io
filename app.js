@@ -2,9 +2,17 @@
   "use strict";
 
   const DATA_VERSION = "2026-07-05-v0.3-prydwen-2026-06-16";
+  const DATA_PROFILE = {
+    label: "3.0",
+    agents: 37,
+    wEngines: 93,
+    driveDiscs: 21,
+    naming: "English source names are kept when Korean names are not verified.",
+  };
   const GUIDE_STORAGE_KEY = "zzz-calc-community-guides";
   const STATE_STORAGE_KEY = "zzz-calc-state";
   const REPO_ISSUE_URL = "https://github.com/suhyeong10/zzz-calc/issues/new";
+  const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "database-search"]);
 
   const roleLabels = {
     all: "전체",
@@ -377,6 +385,205 @@
     },
   ];
 
+  agents.push(
+    {
+      id: "ben",
+      kr: "Ben Bigger",
+      en: "Ben Bigger",
+      rank: "A",
+      attribute: "fire",
+      role: "defense",
+      faction: "Belobog Heavy Industries",
+      image: fandomAvatar("Avatar Ben Bigger.png"),
+      stats: { hp: 8578, def: 724, atk: 650, critRate: 5, critDmg: 50, penRatio: 0, impact: 95, anomalyMastery: 90, energy: 1.2 },
+      engines: ["Original Transmorpher", "Big Cylinder"],
+      discs: ["Proto Punk 4 + Soul Rock 2"],
+      teams: [{ name: "Belobog Core", members: ["koleda", "ben", "grace"], note: "Defense/Stun shell for Belobog teams." }],
+    },
+    {
+      id: "corin",
+      kr: "Corin Wickes",
+      en: "Corin Wickes",
+      rank: "A",
+      attribute: "physical",
+      role: "attack",
+      faction: "Victoria Housekeeping Co.",
+      image: fandomAvatar("Avatar Corin Wickes.png"),
+      stats: { hp: 6976, def: 605, atk: 782, critRate: 19.4, critDmg: 50, penRatio: 0, impact: 93, anomalyMastery: 93, energy: 1.2 },
+      engines: ["Housekeeper", "Starlight Engine"],
+      discs: ["Fanged Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Victoria Physical", members: ["corin", "lycaon", "rina"], note: "Stun window focused Physical Attack setup." }],
+    },
+    {
+      id: "grace",
+      kr: "Grace Howard",
+      en: "Grace Howard",
+      rank: "S",
+      attribute: "electric",
+      role: "anomaly",
+      faction: "Belobog Heavy Industries",
+      image: fandomAvatar("Avatar Grace Howard.png"),
+      stats: { hp: 7482, def: 600, atk: 826, critRate: 5, critDmg: 50, penRatio: 0, impact: 83, anomalyMastery: 148, energy: 1.2 },
+      engines: ["Fusion Compiler", "Weeping Gemini"],
+      discs: ["Thunder Metal 4 + Freedom Blues 2"],
+      teams: [{ name: "Shock Core", members: ["grace", "rina", "anton"], note: "Shock uptime with Electric damage follow-up." }],
+    },
+    {
+      id: "koleda",
+      kr: "Koleda Belobog",
+      en: "Koleda Belobog",
+      rank: "S",
+      attribute: "fire",
+      role: "stun",
+      faction: "Belobog Heavy Industries",
+      image: fandomAvatar("Avatar Koleda Belobog.png"),
+      stats: { hp: 8127, def: 594, atk: 737, critRate: 5, critDmg: 50, penRatio: 0, impact: 137, anomalyMastery: 91, energy: 1.2 },
+      engines: ["Hellfire Gears", "The Restrained"],
+      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      teams: [{ name: "Belobog Core", members: ["koleda", "ben", "grace"], note: "Stun and defensive utility for Belobog teams." }],
+    },
+    {
+      id: "nekomata",
+      kr: "Nekomiya Mana",
+      en: "Nekomiya Mana",
+      rank: "S",
+      attribute: "physical",
+      role: "attack",
+      faction: "Cunning Hares",
+      image: fandomAvatar("Avatar Nekomiya Mana.png"),
+      stats: { hp: 7560, def: 588, atk: 911, critRate: 19.4, critDmg: 50, penRatio: 0, impact: 92, anomalyMastery: 92, energy: 1.2 },
+      engines: ["Steel Cushion", "The Brimstone"],
+      discs: ["Fanged Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Cunning Hares Burst", members: ["nekomata", "anby", "nicole"], note: "Defense shred and stun windows for Physical burst." }],
+    },
+    {
+      id: "soldier-11",
+      kr: "Soldier 11",
+      en: "Soldier 11",
+      rank: "S",
+      attribute: "fire",
+      role: "attack",
+      faction: "Obol Squad",
+      image: fandomAvatar("Avatar Soldier 11.png"),
+      stats: { hp: 7673, def: 612, atk: 889, critRate: 19.4, critDmg: 50, penRatio: 0, impact: 93, anomalyMastery: 92, energy: 1.2 },
+      engines: ["The Brimstone", "Starlight Engine"],
+      discs: ["Inferno Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Fire Attack", members: ["soldier-11", "lighter", "lucy"], note: "Fire damage core with Stun and Support slots." }],
+    },
+    {
+      id: "lucy",
+      kr: "Luciana de Montefio",
+      en: "Luciana de Montefio",
+      rank: "A",
+      attribute: "fire",
+      role: "support",
+      faction: "Sons of Calydon",
+      image: fandomAvatar("Avatar Luciana de Montefio.png"),
+      stats: { hp: 8025, def: 613, atk: 659, critRate: 5, critDmg: 50, penRatio: 0, impact: 86, anomalyMastery: 93, energy: 1.56 },
+      engines: ["Kaboom the Cannon", "Slice of Time"],
+      discs: ["Swing Jazz 4 + Hormone Punk 2"],
+      teams: [{ name: "Calydon Fire", members: ["burnice", "lighter", "lucy"], note: "Fire support option for Calydon teams." }],
+    },
+    {
+      id: "piper",
+      kr: "Piper Wheel",
+      en: "Piper Wheel",
+      rank: "A",
+      attribute: "physical",
+      role: "anomaly",
+      faction: "Sons of Calydon",
+      image: fandomAvatar("Avatar Piper Wheel.png"),
+      stats: { hp: 7788, def: 612, atk: 759, critRate: 5, critDmg: 50, penRatio: 0, impact: 86, anomalyMastery: 148, energy: 1.2 },
+      engines: ["Roaring Ride", "Weeping Gemini"],
+      discs: ["Fanged Metal 4 + Freedom Blues 2"],
+      teams: [{ name: "Budget Assault", members: ["piper", "lucy", "seth"], note: "Accessible Physical Anomaly setup." }],
+    },
+    {
+      id: "caesar",
+      kr: "Caesar King",
+      en: "Caesar King",
+      rank: "S",
+      attribute: "physical",
+      role: "defense",
+      faction: "Sons of Calydon",
+      image: fandomAvatar("Avatar Caesar King.png"),
+      stats: { hp: 9526, def: 754, atk: 712, critRate: 5, critDmg: 50, penRatio: 0, impact: 105, anomalyMastery: 90, energy: 1.2 },
+      engines: ["Tusks of Fury", "Original Transmorpher"],
+      discs: ["Proto Punk 4 + Shockstar Disco 2"],
+      teams: [{ name: "Calydon Guard", members: ["burnice", "caesar", "lucy"], note: "Shield, damage amp, and Fire/Anomaly pressure." }],
+    },
+    {
+      id: "evelyn",
+      kr: "Evelyn Chevalier",
+      en: "Evelyn Chevalier",
+      rank: "S",
+      attribute: "fire",
+      role: "attack",
+      faction: "Stars of Lyra",
+      image: fandomAvatar("Avatar Evelyn Chevalier.png"),
+      stats: { hp: 7405, def: 600, atk: 915, critRate: 19.4, critDmg: 50, penRatio: 0, impact: 90, anomalyMastery: 92, energy: 1.2 },
+      engines: ["Heartstring Nocturne", "The Brimstone"],
+      discs: ["Inferno Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Stars of Lyra", members: ["evelyn", "lighter", "astra"], note: "Fire Attack core with strong support window." }],
+    },
+    {
+      id: "trigger",
+      kr: "Trigger",
+      en: "Trigger",
+      rank: "S",
+      attribute: "electric",
+      role: "stun",
+      faction: "Obol Squad",
+      image: fandomAvatar("Avatar Trigger.png"),
+      stats: { hp: 8250, def: 612, atk: 765, critRate: 5, critDmg: 50, penRatio: 0, impact: 137, anomalyMastery: 91, energy: 1.2 },
+      engines: ["Spectral Gaze", "Hellfire Gears"],
+      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      teams: [{ name: "Obol Electric", members: ["harumasa", "trigger", "rina"], note: "Electric Stun slot for Attack teams." }],
+    },
+    {
+      id: "pulchra",
+      kr: "Pulchra Fellini",
+      en: "Pulchra Fellini",
+      rank: "A",
+      attribute: "physical",
+      role: "stun",
+      faction: "Sons of Calydon",
+      image: fandomAvatar("Avatar Pulchra Fellini.png"),
+      stats: { hp: 7764, def: 612, atk: 690, critRate: 5, critDmg: 50, penRatio: 0, impact: 132, anomalyMastery: 91, energy: 1.2 },
+      engines: ["Box Cutter", "Steam Oven"],
+      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      teams: [{ name: "Physical Stun", members: ["jane", "pulchra", "seth"], note: "Physical stun support for Assault teams." }],
+    },
+    {
+      id: "hugo",
+      kr: "Hugo Vlad",
+      en: "Hugo Vlad",
+      rank: "S",
+      attribute: "ice",
+      role: "attack",
+      faction: "Mockingbird",
+      image: fandomAvatar("Avatar Hugo Vlad.png"),
+      stats: { hp: 7482, def: 600, atk: 919, critRate: 19.4, critDmg: 50, penRatio: 0, impact: 90, anomalyMastery: 93, energy: 1.2 },
+      engines: ["Myriad Eclipse", "Deep Sea Visitor"],
+      discs: ["Polar Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Mockingbird Ice", members: ["hugo", "lycaon", "rina"], note: "Ice Attack setup with stun and support." }],
+    },
+    {
+      id: "vivian",
+      kr: "Vivian Banshee",
+      en: "Vivian Banshee",
+      rank: "S",
+      attribute: "ether",
+      role: "anomaly",
+      faction: "Mockingbird",
+      image: fandomAvatar("Avatar Vivian Banshee.png"),
+      stats: { hp: 7788, def: 606, atk: 872, critRate: 5, critDmg: 50, penRatio: 0, impact: 86, anomalyMastery: 148, energy: 1.2 },
+      engines: ["Flight of Fancy", "Fusion Compiler"],
+      discs: ["Chaotic Metal 4 + Freedom Blues 2"],
+      teams: [{ name: "Ether Anomaly", members: ["vivian", "astra", "yanagi"], note: "Ether anomaly pressure with support and Disorder triggers." }],
+    },
+  );
+
   const engines = [
     { id: "manual", kr: "수동 입력", en: "Manual", rank: "-", role: "any", baseAtk: 0, stats: {}, effect: "입력값만 반영" },
     { id: "angel-in-the-shell", kr: "Angel in the Shell", en: "Angel in the Shell", rank: "S", role: "anomaly", baseAtk: 713, stats: { anomalyMastery: 30 }, effect: "에테르 이상 피해 보정" },
@@ -496,18 +703,8 @@
     { id: "phaethon-melody", kr: "파에톤의 노래", en: "Phaethon's Melody", two: "이상 장악 +8%", four: "EX 후 이상 숙련 및 에테르 피해 보정", stats: { anomalyMasteryPct: 8 } },
     { id: "yunkui-tales", kr: "운규 이야기", en: "Yunkui Tales", two: "HP +10%", four: "EX/콤보/궁극기 후 명파 피해 보정", stats: { hpPct: 10 } },
     { id: "king-summit", kr: "산림의 왕", en: "King of the Summit", two: "그로기 수치 +6%", four: "격파 캐릭터 파티 치명타 피해 보정", stats: { dazePct: 6 } },
-    { id: "dawns-bloom", kr: "여명의 꽃", en: "Dawn's Bloom", two: "일반 공격 피해 +15%", four: "강공 캐릭터 일반 공격 보정", stats: { basicDmg: 15 } },
     { id: "moonlight-lullaby", kr: "달빛 기사의 칭송", en: "Moonlight Lullaby", two: "에너지 자동 회복 +20%", four: "지원 캐릭터 파티 피해 보정", stats: { energyRegenPct: 20 } },
-    { id: "wuthering-salon", kr: "울부짖는 살롱", en: "Wuthering Salon", two: "바람 피해 +10%", four: "바람 이상 후 피해 보정", stats: { windDmg: 10 } },
-    { id: "sky-ablaze", kr: "새벽녘 여행기", en: "The Sky Ablaze", two: "에테르 피해 +10%", four: "에테르 캐릭터 치명타 피해 및 공격력 보정", stats: { etherDmg: 10 } },
   ];
-
-  driveDiscs.push(
-    { id: "bunny-wonderland", kr: "Bunny in Wonderland", en: "Bunny in Wonderland", two: "HP +10%", four: "방어 캐릭터 EX/지원 방어/회피 지원 후 파티 피해 보정", stats: { hpPct: 10 } },
-    { id: "notes-chained", kr: "Notes From the Chained", en: "Notes From the Chained", two: "얼음 피해 +10%", four: "만개/빙결 발동 후 이상 숙련 및 이상/혼돈 피해 보정", stats: { iceDmg: 10, frostDmg: 10 } },
-    { id: "shining-aria", kr: "Shining Aria", en: "Shining Aria", two: "에테르 피해 +10%", four: "기본 공격 후 이상 숙련, 적 그로기 중 피해 보정", stats: { etherDmg: 10 } },
-    { id: "white-water-ballad", kr: "White Water Ballad", en: "White Water Ballad", two: "물리 피해 +10%", four: "에테르 베일 중 치확, 강공 캐릭터 베일 발동 후 치확/공격력 보정", stats: { physicalDmg: 10 } },
-  );
 
   const materialNames = {
     role: {
@@ -670,7 +867,7 @@
         card.innerHTML = `
           <div class="portrait">
             <img src="${agent.image}" alt="${agent.kr}" loading="lazy" />
-            <span class="portrait-fallback">${agent.kr.slice(0, 1)}</span>
+            <span class="portrait-fallback" aria-hidden="true"></span>
           </div>
           <div class="agent-card-body">
             <strong>${agent.kr}</strong>
@@ -702,7 +899,7 @@
     $("#agent-detail").innerHTML = `
       <div class="detail-portrait">
         <img src="${agent.image}" alt="${agent.kr}" />
-        <span class="portrait-fallback">${agent.kr.slice(0, 1)}</span>
+        <span class="portrait-fallback" aria-hidden="true"></span>
       </div>
       <div class="detail-copy">
         <div class="detail-title">
@@ -1092,7 +1289,7 @@
   }
 
   function saveSnapshot() {
-    const fields = $$("input, select, textarea").filter((field) => field.id && field.type !== "file");
+    const fields = $$("input, select, textarea").filter((field) => field.id && field.type !== "file" && !TRANSIENT_FIELD_IDS.has(field.id));
     const snapshot = Object.fromEntries(fields.map((field) => [field.id, field.type === "checkbox" ? field.checked : field.value]));
     snapshot.selectedAgentId = selectedAgentId;
     localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(snapshot));
@@ -1102,6 +1299,7 @@
     try {
       const snapshot = JSON.parse(localStorage.getItem(STATE_STORAGE_KEY) || "{}");
       for (const [id, value] of Object.entries(snapshot)) {
+        if (TRANSIENT_FIELD_IDS.has(id)) continue;
         const field = document.getElementById(id);
         if (!field) continue;
         if (field.type === "checkbox") field.checked = Boolean(value);
@@ -1134,7 +1332,7 @@
   }
 
   function downloadData() {
-    const payload = { version: DATA_VERSION, agents, engines, driveDiscs, materialNames, tables };
+    const payload = { version: DATA_VERSION, profile: DATA_PROFILE, agents, engines, driveDiscs, materialNames, tables };
     downloadJson(payload, `zzz-calc-data-${DATA_VERSION}.json`);
   }
 
@@ -1181,11 +1379,17 @@
     fillCoreSelect($("#current-core"));
     fillCoreSelect($("#target-core"));
 
+    const activeRoles = new Set(agents.map((agent) => agent.role));
+    const activeAttributes = new Set(agents.map((agent) => agent.attribute));
     $("#agent-role-filter").replaceChildren(
-      ...["all", "attack", "stun", "anomaly", "support", "defense", "rupture"].map((role) => option(roleLabels[role], role)),
+      ...["all", "attack", "stun", "anomaly", "support", "defense", "rupture"]
+        .filter((role) => role === "all" || activeRoles.has(role))
+        .map((role) => option(roleLabels[role], role)),
     );
     $("#agent-attribute-filter").replaceChildren(
-      ...["all", "physical", "fire", "ice", "frost", "electric", "ether", "wind", "auricInk"].map((attribute) => option(attributeLabels[attribute], attribute)),
+      ...["all", "physical", "fire", "ice", "frost", "electric", "ether", "wind", "auricInk"]
+        .filter((attribute) => attribute === "all" || activeAttributes.has(attribute))
+        .map((attribute) => option(attributeLabels[attribute], attribute)),
     );
 
     $("#target-core").value = "6";
