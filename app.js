@@ -1259,6 +1259,23 @@
     });
   }
 
+  function selectedMindscapeLevel() {
+    return Number($("#mindscape-level")?.value || 0);
+  }
+
+  function mindscapeBuffSource() {
+    const level = selectedMindscapeLevel();
+    const buff = {
+      type: "돌파",
+      label: `M${level} 돌파 보정`,
+      atkPct: number("#mindscape-atk-buff"),
+      dmgBonus: number("#mindscape-dmg-buff"),
+      critRate: number("#mindscape-crit-rate-buff"),
+      critDmg: number("#mindscape-crit-dmg-buff"),
+    };
+    return buffParts(buff).length > 0 ? buff : null;
+  }
+
   function emptyBuffTotals() {
     return Object.fromEntries(buffFields.map((field) => [field, 0]));
   }
@@ -1309,6 +1326,9 @@
     if ($("#auto-party-disc-buffs")?.checked) {
       sources.push(...selectedPartyDiscSources());
     }
+
+    const mindscapeBuff = mindscapeBuffSource();
+    if (mindscapeBuff) sources.push(mindscapeBuff);
 
     const manualBuff = {
       type: "수동",
@@ -1602,6 +1622,7 @@
   function renderDamage() {
     const result = calculateDamage();
     $("#agent-meta").textContent = `${attributeLabels[result.agent.attribute]} / ${roleLabels[result.agent.role]} / ${result.agent.faction}`;
+    $("#mindscape-summary").textContent = `M${selectedMindscapeLevel()}`;
     $("#disc-summary").textContent = `${result.discFour.kr} 4 / ${result.discTwo.kr} 2`;
     $("#party-buff-summary").textContent = summarizeBuffs(result.buffSources);
     $("#normal-damage").textContent = fmt.format(result.nonCrit);
@@ -1946,6 +1967,8 @@
     const partyDiscOptions = [{ id: "none", kr: "없음" }, ...driveDiscs.filter((disc) => disc.id !== "none")];
     fillSelect($("#party-disc-1"), partyDiscOptions, (disc) => disc.kr);
     fillSelect($("#party-disc-2"), partyDiscOptions, (disc) => disc.kr);
+    const mindscapeOptions = Array.from({ length: 7 }, (_, level) => ({ id: String(level), label: `M${level}` }));
+    fillSelect($("#mindscape-level"), mindscapeOptions, (item) => item.label);
     fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} / ${roleLabels[engine.role] || "전체"}`);
     fillSelect($("#disc-four"), driveDiscs, (disc) => disc.kr);
     fillSelect($("#disc-two"), driveDiscs, (disc) => disc.kr);
@@ -2044,6 +2067,7 @@
     normalizeSelectValue("#engine-select", "manual");
     normalizeSelectValue("#disc-four", "woodpecker-electro");
     normalizeSelectValue("#disc-two", "hormone-punk");
+    normalizeSelectValue("#mindscape-level", "0");
     normalizeSelectValue("#agent-select", agents[0].id);
     normalizeSelectValue("#growth-agent-select", agents[0].id);
     normalizeSelectValue("#guide-agent", agents[0].id);
