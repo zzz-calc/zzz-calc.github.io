@@ -40,10 +40,6 @@
     "party-disc-1": "파티원 1 디스크 검색",
     "party-disc-2": "파티원 2 디스크 검색",
   };
-  const SEARCHABLE_SELECT_LIMITS = {
-    "enemy-select": 24,
-  };
-
   const roleLabels = {
     all: "전체",
     attack: "강공",
@@ -2531,8 +2527,7 @@
     const { combo, list } = searchableSelectParts(select);
     if (!combo || !list) return;
 
-    const maxResults = SEARCHABLE_SELECT_LIMITS[select.id] || 8;
-    const matches = searchableMatches(select, query).slice(0, maxResults);
+    const matches = searchableMatches(select, query);
     const selectedValue = select.value;
     const nodes =
       matches.length > 0
