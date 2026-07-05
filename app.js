@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v0.7-api-roster-3.0";
+  const DATA_VERSION = "2026-07-06-v0.8-api-images-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
     agents: 57,
@@ -13,6 +13,7 @@
   const EFFECT_DB_URL = "data/effects.mock.json";
   const AGENT_API_VERSION = "3.0";
   const AGENT_API_BASE = `https://static.nanoka.cc/zzz/${AGENT_API_VERSION}`;
+  const NANOKA_ASSET_BASE = "https://static.nanoka.cc/assets/zzz";
   const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
 
   const roleLabels = {
@@ -697,9 +698,22 @@
     );
   }
 
-  function apiAvatar(name) {
-    const displayName = apiAgentDisplayName(name);
-    return fandomAvatar(`Avatar ${apiAvatarNameOverrides[displayName] || displayName}.png`);
+  function nanokaAssetImage(icon) {
+    return icon ? `${NANOKA_ASSET_BASE}/${encodeURIComponent(icon)}.webp` : "";
+  }
+
+  function nanokaCharacterOg(sourceId) {
+    return `https://zzz.nanoka.cc/character/${sourceId}/og.png?v=${encodeURIComponent(AGENT_API_VERSION)}&lang=en`;
+  }
+
+  function apiAgentImages(sourceId, indexEntry, detail) {
+    const skinIcon = Object.values(detail.skin || {})[0]?.image || "";
+    const image = nanokaAssetImage(indexEntry.icon || detail.icon || skinIcon);
+    const fallback = nanokaCharacterOg(sourceId);
+    return {
+      image: image || fallback,
+      imageFallback: image ? fallback : "",
+    };
   }
 
   function extraValues(detail) {
@@ -754,6 +768,7 @@
     const def = level60Stat(detail.stats.defence, detail.stats.defence_growth, promotion.defence, extraValue(detail, "DEF"));
     const role = apiTypeToRole[indexEntry.type] || "attack";
     const attribute = apiElementToAttribute[indexEntry.element] || "physical";
+    const images = apiAgentImages(sourceId, indexEntry, detail);
     const agent = {
       sourceId,
       id: apiAgentId(indexEntry.en),
@@ -763,7 +778,8 @@
       attribute,
       role,
       faction: Object.values(detail.camp || {})[0] || "Unknown",
-      image: apiAvatar(indexEntry.en),
+      image: images.image,
+      imageFallback: images.imageFallback,
       stats: {
         hp,
         def,
@@ -1469,6 +1485,32 @@
     return engines.find((engine) => engine.id === id) || engines[0];
   }
 
+  function escapeAttr(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function agentImageTag(agent, alt = "", loading = "lazy") {
+    const fallback = agent.imageFallback ? ` data-fallback-src="${escapeAttr(agent.imageFallback)}"` : "";
+    const loadingAttr = loading ? ` loading="${escapeAttr(loading)}"` : "";
+    return `<img src="${escapeAttr(agent.image)}" alt="${escapeAttr(alt)}"${loadingAttr}${fallback} />`;
+  }
+
+  function handleAgentImageError(event) {
+    const image = event.currentTarget;
+    const fallback = image.dataset.fallbackSrc;
+    if (fallback) {
+      image.dataset.fallbackSrc = "";
+      image.classList.remove("broken");
+      image.src = fallback;
+      return;
+    }
+    image.classList.add("broken");
+  }
+
   function getDisc(id) {
     return driveDiscs.find((disc) => disc.id === id) || driveDiscs[0];
   }
@@ -1787,7 +1829,7 @@
         card.dataset.agentId = agent.id;
         card.innerHTML = `
           <div class="portrait">
-            <img src="${agent.image}" alt="${agent.kr}" loading="lazy" />
+            ${agentImageTag(agent, agent.kr)}
             <span class="portrait-fallback" aria-hidden="true"></span>
           </div>
           <div class="agent-card-body">
@@ -1796,9 +1838,7 @@
           </div>
           <span class="rank-badge">${agent.rank}</span>
         `;
-        card.querySelector("img").addEventListener("error", (event) => {
-          event.currentTarget.classList.add("broken");
-        });
+        card.querySelector("img").addEventListener("error", handleAgentImageError);
         card.addEventListener("click", () => selectAgent(agent.id));
         return card;
       }),
@@ -1809,7 +1849,7 @@
     const agent = getAgent(id);
     return `
       <span class="team-chip">
-        <span class="mini-portrait"><img src="${agent.image}" alt="" loading="lazy" /></span>
+        <span class="mini-portrait">${agentImageTag(agent, "")}</span>
         ${agent.kr}
       </span>
     `;
@@ -1819,7 +1859,7 @@
     const agent = getAgent(selectedAgentId);
     $("#agent-detail").innerHTML = `
       <div class="detail-portrait">
-        <img src="${agent.image}" alt="${agent.kr}" />
+        ${agentImageTag(agent, agent.kr, "")}
         <span class="portrait-fallback" aria-hidden="true"></span>
       </div>
       <div class="detail-copy">
@@ -1849,9 +1889,7 @@
         </div>
       </div>
     `;
-    $("#agent-detail img").addEventListener("error", (event) => {
-      event.currentTarget.classList.add("broken");
-    });
+    $("#agent-detail img").addEventListener("error", handleAgentImageError);
 
     $("#team-list").replaceChildren(
       ...agent.teams.map((team) => {
@@ -1867,7 +1905,7 @@
         `;
         card.querySelector(".apply-team").addEventListener("click", () => applyTeam(team));
         card.querySelectorAll("img").forEach((img) => {
-          img.addEventListener("error", (event) => event.currentTarget.classList.add("broken"));
+          img.addEventListener("error", handleAgentImageError);
         });
         return card;
       }),
