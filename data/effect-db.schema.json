@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://suhyeong-park.github.io/zzz-calc/data/effect-db.schema.json",
+  "title": "Zenless Zone Zero Calculator Effect Database",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "gameVersion",
+    "status",
+    "lastUpdated",
+    "sourcePolicy",
+    "sourceRefs",
+    "statFields",
+    "mindscapes",
+    "wEngines"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "type": "string" },
+    "gameVersion": { "type": "string" },
+    "status": { "enum": ["mock", "draft", "verified"] },
+    "lastUpdated": { "type": "string" },
+    "sourcePolicy": {
+      "type": "object",
+      "required": ["officialMachineReadableApi", "notes"],
+      "additionalProperties": false,
+      "properties": {
+        "officialMachineReadableApi": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    },
+    "sourceRefs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["kind", "url", "note"],
+        "additionalProperties": false,
+        "properties": {
+          "kind": { "enum": ["official", "community", "manual-test", "internal"] },
+          "url": { "type": "string" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "statFields": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/statField" },
+      "uniqueItems": true
+    },
+    "mindscapes": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/mindscapeEntry" }
+    },
+    "wEngines": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/wEngineEntry" }
+    }
+  },
+  "$defs": {
+    "statField": {
+      "enum": [
+        "atkPct",
+        "dmgBonus",
+        "critRate",
+        "critDmg",
+        "penRatio",
+        "flatPen",
+        "defReduction",
+        "anomalyProficiency",
+        "anomalyMastery",
+        "stunDmg",
+        "impactPct",
+        "energyRegenPct"
+      ]
+    },
+    "statBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "atkPct": { "type": "number" },
+        "dmgBonus": { "type": "number" },
+        "critRate": { "type": "number" },
+        "critDmg": { "type": "number" },
+        "penRatio": { "type": "number" },
+        "flatPen": { "type": "number" },
+        "defReduction": { "type": "number" },
+        "anomalyProficiency": { "type": "number" },
+        "anomalyMastery": { "type": "number" },
+        "stunDmg": { "type": "number" },
+        "impactPct": { "type": "number" },
+        "energyRegenPct": { "type": "number" }
+      }
+    },
+    "stacking": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "enum": ["none", "refresh", "stack", "unique", "manual"] },
+        "maxStacks": { "type": "number" },
+        "defaultStacks": { "type": "number" },
+        "durationSeconds": { "type": "number" },
+        "uptimeMode": { "enum": ["always", "conditional", "manual"] }
+      }
+    },
+    "buff": {
+      "type": "object",
+      "required": ["id", "target", "trigger", "stats", "mockValue"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "target": { "enum": ["self", "party", "enemy"] },
+        "trigger": { "type": "string" },
+        "condition": { "type": "string" },
+        "appliesTo": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "stats": { "$ref": "#/$defs/statBlock" },
+        "stacking": { "$ref": "#/$defs/stacking" },
+        "sourceRefs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string" },
+        "mockValue": { "type": "boolean" }
+      }
+    },
+    "damageHook": {
+      "type": "object",
+      "required": ["id", "kind", "mockValue"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "kind": {
+          "enum": [
+            "formulaNote",
+            "skillMultiplierDelta",
+            "finalMultiplier",
+            "flatDamage",
+            "anomalyFormula"
+          ]
+        },
+        "targetSkillTags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "value": { "type": "number" },
+        "formula": { "type": "string" },
+        "condition": { "type": "string" },
+        "sourceRefs": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string" },
+        "mockValue": { "type": "boolean" }
+      }
+    },
+    "mindscapeLevel": {
+      "type": "object",
+      "required": ["level", "label", "buffs", "damageHooks"],
+      "additionalProperties": false,
+      "properties": {
+        "level": { "type": "integer", "minimum": 0, "maximum": 6 },
+        "label": { "type": "string" },
+        "shortEffect": { "type": "string" },
+        "buffs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/buff" }
+        },
+        "damageHooks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/damageHook" }
+        }
+      }
+    },
+    "mindscapeEntry": {
+      "type": "object",
+      "required": ["agentId", "agentName", "verification", "levels"],
+      "additionalProperties": false,
+      "properties": {
+        "agentId": { "type": "string" },
+        "agentName": { "type": "string" },
+        "verification": { "enum": ["mock", "draft", "verified"] },
+        "levels": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/mindscapeLevel" },
+          "minItems": 7,
+          "maxItems": 7
+        }
+      }
+    },
+    "wEngineRefinement": {
+      "type": "object",
+      "required": ["refinement", "label", "buffs", "damageHooks"],
+      "additionalProperties": false,
+      "properties": {
+        "refinement": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "label": { "type": "string" },
+        "buffs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/buff" }
+        },
+        "damageHooks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/damageHook" }
+        }
+      }
+    },
+    "wEngineEntry": {
+      "type": "object",
+      "required": ["engineId", "engineName", "verification", "baseStatsAreRefinementIndependent", "refinements"],
+      "additionalProperties": false,
+      "properties": {
+        "engineId": { "type": "string" },
+        "engineName": { "type": "string" },
+        "verification": { "enum": ["mock", "draft", "verified"] },
+        "baseStatsAreRefinementIndependent": { "type": "boolean" },
+        "refinements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/wEngineRefinement" },
+          "minItems": 5,
+          "maxItems": 5
+        }
+      }
+    }
+  }
+}

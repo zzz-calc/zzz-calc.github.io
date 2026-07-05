@@ -1,0 +1,286 @@
+{
+  "$schema": "./effect-db.schema.json",
+  "schemaVersion": "0.1.0",
+  "gameVersion": "3.0",
+  "status": "mock",
+  "lastUpdated": "2026-07-05",
+  "sourcePolicy": {
+    "officialMachineReadableApi": false,
+    "notes": "No documented official JSON or CSV data feed has been confirmed. Keep official page URLs as references, store structured numeric summaries here, and mark unverified values with mockValue=true."
+  },
+  "sourceRefs": {
+    "official-site": {
+      "kind": "official",
+      "url": "https://zenless.hoyoverse.com/en-us/",
+      "note": "Official Zenless Zone Zero website and current version landing page."
+    },
+    "hoyowiki": {
+      "kind": "official",
+      "url": "https://wiki.hoyolab.com/pc/zzz/home",
+      "note": "Official HoYoWiki browser source for human-readable character and item pages."
+    },
+    "manual-test": {
+      "kind": "manual-test",
+      "url": "local://zzz-calc/manual-verification",
+      "note": "Use for in-game or calculator regression checks before marking values verified."
+    }
+  },
+  "statFields": [
+    "atkPct",
+    "dmgBonus",
+    "critRate",
+    "critDmg",
+    "penRatio",
+    "flatPen",
+    "defReduction",
+    "anomalyProficiency",
+    "anomalyMastery",
+    "stunDmg",
+    "impactPct",
+    "energyRegenPct"
+  ],
+  "mindscapes": {
+    "anby": {
+      "agentId": "anby",
+      "agentName": "Anby Demara",
+      "verification": "mock",
+      "levels": [
+        {
+          "level": 0,
+          "label": "M0",
+          "shortEffect": "No mindscape effect.",
+          "buffs": [],
+          "damageHooks": []
+        },
+        {
+          "level": 1,
+          "label": "M1",
+          "shortEffect": "Placeholder for first mindscape effect.",
+          "buffs": [
+            {
+              "id": "anby-m1-placeholder-buff",
+              "label": "M1 placeholder buff",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified in-game condition.",
+              "appliesTo": ["all-damage"],
+              "stats": { "dmgBonus": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock row only. Do not treat 0 as a real effect value.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        },
+        {
+          "level": 2,
+          "label": "M2",
+          "shortEffect": "Placeholder for second mindscape effect.",
+          "buffs": [
+            {
+              "id": "anby-m2-placeholder-buff",
+              "label": "M2 placeholder buff",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified in-game condition.",
+              "appliesTo": ["basic", "special", "ex-special", "chain", "ultimate"],
+              "stats": { "critRate": 0, "critDmg": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock row for UI and formula integration.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        },
+        {
+          "level": 3,
+          "label": "M3",
+          "shortEffect": "Skill level increase placeholder.",
+          "buffs": [],
+          "damageHooks": [
+            {
+              "id": "anby-m3-skill-level-note",
+              "kind": "formulaNote",
+              "targetSkillTags": ["all-agent-skill-levels"],
+              "formula": "Use the higher skill multiplier table after verified skill data is available.",
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Most M3/M5 style nodes affect talent levels, so damage changes should come from skill multiplier DB, not a flat buff.",
+              "mockValue": true
+            }
+          ]
+        },
+        {
+          "level": 4,
+          "label": "M4",
+          "shortEffect": "Placeholder for fourth mindscape effect.",
+          "buffs": [
+            {
+              "id": "anby-m4-placeholder-buff",
+              "label": "M4 placeholder buff",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified in-game condition.",
+              "appliesTo": ["all-damage"],
+              "stats": { "atkPct": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock row only.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        },
+        {
+          "level": 5,
+          "label": "M5",
+          "shortEffect": "Skill level increase placeholder.",
+          "buffs": [],
+          "damageHooks": [
+            {
+              "id": "anby-m5-skill-level-note",
+              "kind": "formulaNote",
+              "targetSkillTags": ["all-agent-skill-levels"],
+              "formula": "Use the higher skill multiplier table after verified skill data is available.",
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock note for later skill multiplier integration.",
+              "mockValue": true
+            }
+          ]
+        },
+        {
+          "level": 6,
+          "label": "M6",
+          "shortEffect": "Placeholder for sixth mindscape effect.",
+          "buffs": [
+            {
+              "id": "anby-m6-placeholder-buff",
+              "label": "M6 placeholder buff",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified in-game condition.",
+              "appliesTo": ["all-damage"],
+              "stats": { "dmgBonus": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock row only.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        }
+      ]
+    }
+  },
+  "wEngines": {
+    "starlight-engine": {
+      "engineId": "starlight-engine",
+      "engineName": "Starlight Engine",
+      "verification": "mock",
+      "baseStatsAreRefinementIndependent": true,
+      "refinements": [
+        {
+          "refinement": 1,
+          "label": "R1",
+          "buffs": [
+            {
+              "id": "starlight-engine-r1-placeholder",
+              "label": "R1 placeholder effect",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified W-Engine trigger.",
+              "appliesTo": ["all-damage"],
+              "stats": { "atkPct": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock refinement value. W-Engine base ATK and sub-stat usually stay separate from refinement effect values.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        },
+        {
+          "refinement": 2,
+          "label": "R2",
+          "buffs": [
+            {
+              "id": "starlight-engine-r2-placeholder",
+              "label": "R2 placeholder effect",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified W-Engine trigger.",
+              "appliesTo": ["all-damage"],
+              "stats": { "atkPct": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock refinement value.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        },
+        {
+          "refinement": 3,
+          "label": "R3",
+          "buffs": [
+            {
+              "id": "starlight-engine-r3-placeholder",
+              "label": "R3 placeholder effect",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified W-Engine trigger.",
+              "appliesTo": ["all-damage"],
+              "stats": { "atkPct": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock refinement value.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        },
+        {
+          "refinement": 4,
+          "label": "R4",
+          "buffs": [
+            {
+              "id": "starlight-engine-r4-placeholder",
+              "label": "R4 placeholder effect",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified W-Engine trigger.",
+              "appliesTo": ["all-damage"],
+              "stats": { "atkPct": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock refinement value.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        },
+        {
+          "refinement": 5,
+          "label": "R5",
+          "buffs": [
+            {
+              "id": "starlight-engine-r5-placeholder",
+              "label": "R5 placeholder effect",
+              "target": "self",
+              "trigger": "manual",
+              "condition": "Replace with verified W-Engine trigger.",
+              "appliesTo": ["all-damage"],
+              "stats": { "atkPct": 0 },
+              "stacking": { "mode": "manual", "uptimeMode": "manual" },
+              "sourceRefs": ["hoyowiki"],
+              "notes": "Mock refinement value.",
+              "mockValue": true
+            }
+          ],
+          "damageHooks": []
+        }
+      ]
+    }
+  }
+}
