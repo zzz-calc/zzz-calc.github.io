@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v1.0-ko-names-3.0";
+  const DATA_VERSION = "2026-07-06-v1.1-dark-mode-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
     agents: 56,
@@ -10,6 +10,7 @@
     naming: "에이전트 이름과 W-Engine 이름은 API 한국어명을 우선 표시하고, 영어명은 검색과 DB 식별용으로 유지합니다.",
   };
   const STATE_STORAGE_KEY = "zzz-calc-state";
+  const THEME_STORAGE_KEY = "zzz-calc-theme";
   const EFFECT_DB_URL = "data/effects.mock.json";
   const AGENT_API_VERSION = "3.0";
   const AGENT_API_BASE = `https://static.nanoka.cc/zzz/${AGENT_API_VERSION}`;
@@ -1486,6 +1487,46 @@
   const fmt = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 });
   const fmt1 = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 1 });
 
+  function getPreferredTheme() {
+    return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
+  }
+
+  function getCurrentTheme() {
+    return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  }
+
+  function updateThemeToggle() {
+    const button = $("#theme-toggle");
+    const icon = $("#theme-toggle-icon");
+    if (!button || !icon) return;
+
+    const theme = getCurrentTheme();
+    const isDark = theme === "dark";
+    icon.textContent = isDark ? "☀" : "☾";
+    button.setAttribute("aria-label", isDark ? "라이트 모드로 전환" : "다크 모드로 전환");
+    button.setAttribute("title", isDark ? "라이트 모드로 전환" : "다크 모드로 전환");
+  }
+
+  function setTheme(theme, persist = true) {
+    const nextTheme = theme === "dark" ? "dark" : "light";
+    document.documentElement.dataset.theme = nextTheme;
+    if (persist) {
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      } catch {
+        // Storage can be unavailable in private or locked-down browser contexts.
+      }
+    }
+    updateThemeToggle();
+  }
+
+  function initThemeToggle() {
+    setTheme(document.documentElement.dataset.theme || getPreferredTheme(), false);
+    $("#theme-toggle")?.addEventListener("click", () => {
+      setTheme(getCurrentTheme() === "dark" ? "light" : "dark");
+    });
+  }
+
   let selectedAgentId = agents[0].id;
   let effectDb = { mindscapes: {}, wEngines: {}, status: "unloaded" };
   let effectDbLoadStatus = "unloaded";
@@ -2408,6 +2449,7 @@
   }
 
   async function init() {
+    initThemeToggle();
     await loadApiAgentRoster();
     await loadApiEngineNames();
     applyDisplayData();
