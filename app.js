@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-05-v0.2";
+  const DATA_VERSION = "2026-07-05-v0.3-prydwen-2026-06-16";
   const GUIDE_STORAGE_KEY = "zzz-calc-community-guides";
   const STATE_STORAGE_KEY = "zzz-calc-state";
   const REPO_ISSUE_URL = "https://github.com/suhyeong10/zzz-calc/issues/new";
@@ -379,19 +379,99 @@
 
   const engines = [
     { id: "manual", kr: "수동 입력", en: "Manual", rank: "-", role: "any", baseAtk: 0, stats: {}, effect: "입력값만 반영" },
-    { id: "deep-sea-visitor", kr: "심해 방문객", en: "Deep Sea Visitor", rank: "S", role: "attack", baseAtk: 713, stats: { critRate: 24 }, effect: "얼음 피해 및 치명타 보정" },
-    { id: "brimstone", kr: "브림스톤", en: "The Brimstone", rank: "S", role: "attack", baseAtk: 684, stats: { atkPct: 30 }, effect: "공격 명중 후 공격력 보정" },
-    { id: "riot-suppressor", kr: "진압자 VI형", en: "Riot Suppressor Mark VI", rank: "S", role: "attack", baseAtk: 713, stats: { critDmg: 48 }, effect: "에테르 강공 보정" },
-    { id: "fusion-compiler", kr: "융합 컴파일러", en: "Fusion Compiler", rank: "S", role: "anomaly", baseAtk: 684, stats: { penRatio: 24 }, effect: "공격력 및 이상 숙련 보정" },
-    { id: "hellfire-gears", kr: "헬파이어 기어", en: "Hellfire Gears", rank: "S", role: "stun", baseAtk: 684, stats: { impact: 18 }, effect: "충격력 보정" },
-    { id: "weeping-cradle", kr: "흐느끼는 요람", en: "Weeping Cradle", rank: "S", role: "support", baseAtk: 684, stats: { penRatio: 24 }, effect: "오프필드 에너지와 피해 보정" },
-    { id: "restrained", kr: "구속된 자", en: "The Restrained", rank: "S", role: "stun", baseAtk: 684, stats: { impact: 18 }, effect: "공격 명중 후 충격력 보정" },
-    { id: "sharpened-stinger", kr: "예리한 앞발", en: "Sharpened Stinger", rank: "S", role: "anomaly", baseAtk: 713, stats: { anomalyProficiency: 90 }, effect: "물리 이상 피해 보정" },
-    { id: "hailstorm-shrine", kr: "폭풍우 신사", en: "Hailstorm Shrine", rank: "S", role: "anomaly", baseAtk: 743, stats: { critRate: 24 }, effect: "서리/얼음 이상 보정" },
-    { id: "timeweaver", kr: "타임위버", en: "Timeweaver", rank: "S", role: "anomaly", baseAtk: 713, stats: { anomalyProficiency: 90 }, effect: "전기 이상과 혼돈 보정" },
-    { id: "blazing-laurel", kr: "불타는 월계관", en: "Blazing Laurel", rank: "S", role: "stun", baseAtk: 713, stats: { impact: 18 }, effect: "불/얼음 파티 치명 피해 보정" },
-    { id: "chief-sidekick", kr: "수석 조수", en: "Chief Sidekick", rank: "S", role: "stun", baseAtk: 713, stats: { critRate: 24 }, effect: "불 속성 격파 지원 보정" },
-    { id: "cloudcleave", kr: "구름을 헤친 빛", en: "Cloudcleave Radiance", rank: "S", role: "attack", baseAtk: 743, stats: { critDmg: 48 }, effect: "물리 저항 무시 및 명파 보정" },
+    { id: "angel-in-the-shell", kr: "Angel in the Shell", en: "Angel in the Shell", rank: "S", role: "anomaly", baseAtk: 713, stats: { anomalyMastery: 30 }, effect: "에테르 이상 피해 보정" },
+    { id: "bellicose-blaze", kr: "Bellicose Blaze", en: "Bellicose Blaze", rank: "S", role: "attack", baseAtk: 713, stats: { energyRegen: 60 }, effect: "불 여진 방어 무시 보정" },
+    { id: "blazing-laurel", kr: "Blazing Laurel", en: "Blazing Laurel", rank: "S", role: "stun", baseAtk: 713, stats: { impact: 18 }, effect: "불/얼음 파티 치명 피해 보정" },
+    { id: "chief-sidekick", kr: "Chief Sidekick", en: "Chief Sidekick", rank: "S", role: "stun", baseAtk: 713, stats: { critRate: 24 }, effect: "불 속성 격파 지원 보정" },
+    { id: "cloudcleave-radiance", kr: "Cloudcleave Radiance", en: "Cloudcleave Radiance", rank: "S", role: "attack", baseAtk: 743, stats: { critDmg: 48 }, effect: "물리 저항 무시 및 명파 보정" },
+    { id: "cordis-germina", kr: "Cordis Germina", en: "Cordis Germina", rank: "S", role: "attack", baseAtk: 713, stats: { critRate: 24 }, effect: "전기 기본/궁극기 방어 무시 보정" },
+    { id: "deep-sea-visitor", kr: "Deep Sea Visitor", en: "Deep Sea Visitor", rank: "S", role: "attack", baseAtk: 713, stats: { critRate: 24 }, effect: "얼음 피해 및 치명타 보정" },
+    { id: "dreamlit-hearth", kr: "Dreamlit Hearth", en: "Dreamlit Hearth", rank: "S", role: "support", baseAtk: 713, stats: { hpPct: 30 }, effect: "에테르 베일 파티 피해/HP 보정" },
+    { id: "elegant-vanity", kr: "Elegant Vanity", en: "Elegant Vanity", rank: "S", role: "support", baseAtk: 713, stats: { atkPct: 30 }, effect: "에너지 소모 후 파티 피해 보정" },
+    { id: "flamemaker-shaker", kr: "Flamemaker Shaker", en: "Flamemaker Shaker", rank: "S", role: "anomaly", baseAtk: 713, stats: { atkPct: 30 }, effect: "오프필드 불 이상 보정" },
+    { id: "flight-of-fancy", kr: "Flight of Fancy", en: "Flight of Fancy", rank: "S", role: "anomaly", baseAtk: 713, stats: { anomalyProficiency: 90 }, effect: "에테르 이상 축적/숙련 보정" },
+    { id: "frostfall-sickle", kr: "Frostfall Sickle", en: "Frostfall Sickle", rank: "S", role: "anomaly", baseAtk: 713, stats: { anomalyMastery: 30 }, effect: "얼음 이상 피해 보정" },
+    { id: "fusion-compiler", kr: "Fusion Compiler", en: "Fusion Compiler", rank: "S", role: "anomaly", baseAtk: 684, stats: { penRatio: 24 }, effect: "공격력 및 이상 숙련 보정" },
+    { id: "hailstorm-shrine", kr: "Hailstorm Shrine", en: "Hailstorm Shrine", rank: "S", role: "anomaly", baseAtk: 743, stats: { critRate: 24 }, effect: "서리/얼음 이상 보정" },
+    { id: "half-sugar-bunny", kr: "Half-Sugar Bunny", en: "Half-Sugar Bunny", rank: "S", role: "defense", baseAtk: 713, stats: { hpPct: 30 }, effect: "에테르 베일 파티 공격/HP/치피 보정" },
+    { id: "heartstring-nocturne", kr: "Heartstring Nocturne", en: "Heartstring Nocturne", rank: "S", role: "attack", baseAtk: 713, stats: { critRate: 24 }, effect: "불 체인/궁극기 저항 무시 보정" },
+    { id: "hellfire-gears", kr: "Hellfire Gears", en: "Hellfire Gears", rank: "S", role: "stun", baseAtk: 684, stats: { impact: 18 }, effect: "오프필드 에너지와 충격력 보정" },
+    { id: "ice-jade-teapot", kr: "Ice-Jade Teapot", en: "Ice-Jade Teapot", rank: "S", role: "stun", baseAtk: 713, stats: { impact: 18 }, effect: "충격력 및 파티 피해 보정" },
+    { id: "joyau-dore", kr: "Joyau Dore", en: "Joyau Dore", rank: "S", role: "anomaly", baseAtk: 713, stats: { energyRegen: 60 }, effect: "바람 이상 및 파티 이상 숙련 보정" },
+    { id: "krakens-cradle", kr: "Kraken's Cradle", en: "Kraken's Cradle", rank: "S", role: "rupture", baseAtk: 713, stats: { hpPct: 30 }, effect: "얼음 명파/HP 조건 치확 보정" },
+    { id: "metanukimorphosis", kr: "Metanukimorphosis", en: "Metanukimorphosis", rank: "S", role: "support", baseAtk: 713, stats: { energyRegen: 60 }, effect: "물리 여진 파티 이상 숙련 보정" },
+    { id: "myriad-eclipse", kr: "Myriad Eclipse", en: "Myriad Eclipse", rank: "S", role: "attack", baseAtk: 713, stats: { critRate: 24 }, effect: "얼음 EX/체인/궁극기 방어 무시 보정" },
+    { id: "neon-fantasies", kr: "Neon Fantasies", en: "Neon Fantasies", rank: "S", role: "stun", baseAtk: 713, stats: { anomalyMastery: 30 }, effect: "에테르 격파 파티 피해 보정" },
+    { id: "practiced-perfection", kr: "Practiced Perfection", en: "Practiced Perfection", rank: "S", role: "anomaly", baseAtk: 713, stats: { atkPct: 30 }, effect: "물리 강타/이상 장악 보정" },
+    { id: "qingming-birdcage", kr: "Qingming Birdcage", en: "Qingming Birdcage", rank: "S", role: "rupture", baseAtk: 743, stats: { hpPct: 30 }, effect: "에테르 명파 피해 보정" },
+    { id: "riot-suppressor-mark-vi", kr: "Riot Suppressor Mark VI", en: "Riot Suppressor Mark VI", rank: "S", role: "attack", baseAtk: 713, stats: { critDmg: 48 }, effect: "에테르 강공 보정" },
+    { id: "roaring-furnace", kr: "Roaring Fur-nace", en: "Roaring Fur-nace", rank: "S", role: "stun", baseAtk: 713, stats: { atkPct: 30 }, effect: "불 체인/궁극기 파티 피해 보정" },
+    { id: "serpentine-seeker", kr: "Serpentine Seeker", en: "Serpentine Seeker", rank: "S", role: "attack", baseAtk: 713, stats: { energyRegen: 60 }, effect: "전기 에너지 소모 방어 무시 보정" },
+    { id: "severed-innocence", kr: "Severed Innocence", en: "Severed Innocence", rank: "S", role: "attack", baseAtk: 713, stats: { critDmg: 48 }, effect: "전기 치명 피해 보정" },
+    { id: "sharpened-stinger", kr: "Sharpened Stinger", en: "Sharpened Stinger", rank: "S", role: "anomaly", baseAtk: 713, stats: { anomalyProficiency: 90 }, effect: "물리 이상 피해 보정" },
+    { id: "sol-exuvia", kr: "Sol Exuvia", en: "Sol Exuvia", rank: "S", role: "attack", baseAtk: 713, stats: { atkPct: 30 }, effect: "피로이스 전용 에테르 저항 무시 보정" },
+    { id: "spectral-gaze", kr: "Spectral Gaze", en: "Spectral Gaze", rank: "S", role: "stun", baseAtk: 713, stats: { critRate: 24 }, effect: "전기 여진 방깎/충격력 보정" },
+    { id: "starlight-rider-faceplate", kr: "Starlight Rider Faceplate", en: "Starlight Rider Faceplate", rank: "S", role: "rupture", baseAtk: 713, stats: { hpPct: 30 }, effect: "물리 명파 피해 보정" },
+    { id: "steel-cushion", kr: "Steel Cushion", en: "Steel Cushion", rank: "S", role: "attack", baseAtk: 684, stats: { critRate: 24 }, effect: "물리 피해 및 배후 공격 보정" },
+    { id: "the-brimstone", kr: "The Brimstone", en: "The Brimstone", rank: "S", role: "attack", baseAtk: 684, stats: { atkPct: 30 }, effect: "공격 명중 후 공격력 보정" },
+    { id: "the-restrained", kr: "The Restrained", en: "The Restrained", rank: "S", role: "stun", baseAtk: 684, stats: { impact: 18 }, effect: "기본 공격 피해/그로기 보정" },
+    { id: "thoughtbop", kr: "Thoughtbop", en: "Thoughtbop", rank: "S", role: "support", baseAtk: 713, stats: { energyRegen: 60 }, effect: "물리 지원 파티 피해/공격 보정" },
+    { id: "timeweaver", kr: "Timeweaver", en: "Timeweaver", rank: "S", role: "anomaly", baseAtk: 713, stats: { atkPct: 30 }, effect: "전기 이상과 혼돈 보정" },
+    { id: "tusks-of-fury", kr: "Tusks of Fury", en: "Tusks of Fury", rank: "S", role: "defense", baseAtk: 713, stats: { impact: 18 }, effect: "실드/파티 피해/그로기 보정" },
+    { id: "weeping-cradle", kr: "Weeping Cradle", en: "Weeping Cradle", rank: "S", role: "support", baseAtk: 684, stats: { penRatio: 24 }, effect: "오프필드 에너지와 피해 보정" },
+    { id: "wrathful-vajra", kr: "Wrathful Vajra", en: "Wrathful Vajra", rank: "S", role: "rupture", baseAtk: 713, stats: { hpPct: 30 }, effect: "불 명파 피해 보정" },
+    { id: "yesterday-calls", kr: "Yesterday Calls", en: "Yesterday Calls", rank: "S", role: "stun", baseAtk: 713, stats: { critRate: 24 }, effect: "물리 격파/파티 치피 보정" },
+    { id: "zanshin-herb-case", kr: "Zanshin Herb Case", en: "Zanshin Herb Case", rank: "S", role: "attack", baseAtk: 713, stats: { critDmg: 48 }, effect: "전기 대시 공격 보정" },
+    { id: "bashful-demon", kr: "Bashful Demon", en: "Bashful Demon", rank: "A", role: "support", baseAtk: 624, stats: { atkPct: 25 }, effect: "얼음 피해 및 파티 공격력 보정" },
+    { id: "big-cylinder", kr: "Big Cylinder", en: "Big Cylinder", rank: "A", role: "defense", baseAtk: 624, stats: { defense: 40 }, effect: "피해 감소 및 방어력 기반 추가 피해" },
+    { id: "box-cutter", kr: "Box Cutter", en: "Box Cutter", rank: "A", role: "stun", baseAtk: 624, stats: { impact: 15 }, effect: "물리 여진 피해/그로기 보정" },
+    { id: "bunny-band", kr: "Bunny Band", en: "Bunny Band", rank: "A", role: "defense", baseAtk: 594, stats: { defense: 40 }, effect: "HP 및 실드 중 공격력 보정" },
+    { id: "cannon-rotor", kr: "Cannon Rotor", en: "Cannon Rotor", rank: "A", role: "attack", baseAtk: 594, stats: { critRate: 20 }, effect: "공격력 및 치명타 추가 피해" },
+    { id: "cauldron-of-clarity", kr: "Cauldron of Clarity", en: "Cauldron of Clarity", rank: "A", role: "rupture", baseAtk: 594, stats: { hpPct: 25 }, effect: "EX 후 피해/치확 보정" },
+    { id: "demara-battery-mark-ii", kr: "Demara Battery Mark II", en: "Demara Battery Mark II", rank: "A", role: "stun", baseAtk: 624, stats: { impact: 15 }, effect: "전기 피해와 에너지 획득 보정" },
+    { id: "drill-rig-red-axis", kr: "Drill Rig - Red Axis", en: "Drill Rig - Red Axis", rank: "A", role: "attack", baseAtk: 624, stats: { energyRegen: 50 }, effect: "전기 기본/대시 공격 보정" },
+    { id: "electro-lip-gloss", kr: "Electro-Lip Gloss", en: "Electro-Lip Gloss", rank: "A", role: "anomaly", baseAtk: 594, stats: { anomalyProficiency: 75 }, effect: "이상 대상 공격/피해 보정" },
+    { id: "gilded-blossom", kr: "Gilded Blossom", en: "Gilded Blossom", rank: "A", role: "attack", baseAtk: 594, stats: { atkPct: 25 }, effect: "공격력 및 EX 피해 보정" },
+    { id: "grill-owisp", kr: "Grill O'Wisp", en: "Grill O'Wisp", rank: "A", role: "rupture", baseAtk: 624, stats: { hpPct: 25 }, effect: "불 피해/HP 감소 치확 보정" },
+    { id: "housekeeper", kr: "Housekeeper", en: "Housekeeper", rank: "A", role: "attack", baseAtk: 624, stats: { atkPct: 25 }, effect: "오프필드 에너지와 물리 피해 보정" },
+    { id: "iris-enigma", kr: "Iris Enigma", en: "Iris Enigma", rank: "A", role: "support", baseAtk: 594, stats: { atkPct: 25 }, effect: "궁극기 후 에너지 회복 보정" },
+    { id: "kaboom-the-cannon", kr: "Kaboom the Cannon", en: "Kaboom the Cannon", rank: "A", role: "support", baseAtk: 624, stats: { energyRegen: 50 }, effect: "파티 공격력 보정" },
+    { id: "marcato-desire", kr: "Marcato Desire", en: "Marcato Desire", rank: "A", role: "attack", baseAtk: 594, stats: { critRate: 20 }, effect: "EX/체인 후 공격력 보정" },
+    { id: "original-transmorpher", kr: "Original Transmorpher", en: "Original Transmorpher", rank: "A", role: "defense", baseAtk: 594, stats: { hpPct: 25 }, effect: "HP 및 피격 후 충격력 보정" },
+    { id: "peacekeeper-specialized", kr: "Peacekeeper - Specialized", en: "Peacekeeper - Specialized", rank: "A", role: "defense", baseAtk: 624, stats: { atkPct: 25 }, effect: "실드 중 에너지/이상 축적 보정" },
+    { id: "precious-fossilized-core", kr: "Precious Fossilized Core", en: "Precious Fossilized Core", rank: "A", role: "stun", baseAtk: 594, stats: { impact: 15 }, effect: "적 HP 조건 그로기 보정" },
+    { id: "puzzle-sphere", kr: "Puzzle Sphere", en: "Puzzle Sphere", rank: "A", role: "rupture", baseAtk: 594, stats: { atkPct: 25 }, effect: "EX 치명 피해/저HP 피해 보정" },
+    { id: "radiowave-journey", kr: "Radiowave Journey", en: "Radiowave Journey", rank: "A", role: "rupture", baseAtk: 594, stats: { hpPct: 25 }, effect: "체인/궁극기 후 명파력 보정" },
+    { id: "rainforest-gourmet", kr: "Rainforest Gourmet", en: "Rainforest Gourmet", rank: "A", role: "anomaly", baseAtk: 594, stats: { anomalyProficiency: 75 }, effect: "에너지 소모 공격력 보정" },
+    { id: "reel-projector", kr: "Reel Projector", en: "Reel Projector", rank: "A", role: "defense", baseAtk: 594, stats: { impact: 15 }, effect: "HP 조건 피해 감소/미아즈마 감소" },
+    { id: "roaring-ride", kr: "Roaring Ride", en: "Roaring Ride", rank: "A", role: "anomaly", baseAtk: 624, stats: { atkPct: 25 }, effect: "EX 명중 후 무작위 이상 보정" },
+    { id: "six-shooter", kr: "Six Shooter", en: "Six Shooter", rank: "A", role: "stun", baseAtk: 594, stats: { impact: 15 }, effect: "충전 스택 기반 EX 그로기 보정" },
+    { id: "slice-of-time", kr: "Slice of Time", en: "Slice of Time", rank: "A", role: "support", baseAtk: 594, stats: { penRatio: 20 }, effect: "데시벨/에너지 생성 보정" },
+    { id: "spring-embrace", kr: "Spring Embrace", en: "Spring Embrace", rank: "A", role: "defense", baseAtk: 594, stats: { atkPct: 25 }, effect: "피해 감소와 에너지 획득 보정" },
+    { id: "starlight-engine", kr: "Starlight Engine", en: "Starlight Engine", rank: "A", role: "attack", baseAtk: 594, stats: { atkPct: 25 }, effect: "회피 반격/퀵 지원 후 공격력 보정" },
+    { id: "starlight-engine-replica", kr: "Starlight Engine Replica", en: "Starlight Engine Replica", rank: "A", role: "attack", baseAtk: 624, stats: { atkPct: 25 }, effect: "원거리 기본/대시 물리 피해 보정" },
+    { id: "steam-oven", kr: "Steam Oven", en: "Steam Oven", rank: "A", role: "stun", baseAtk: 594, stats: { energyRegen: 50 }, effect: "에너지 누적 충격력 보정" },
+    { id: "street-superstar", kr: "Street Superstar", en: "Street Superstar", rank: "A", role: "attack", baseAtk: 594, stats: { atkPct: 25 }, effect: "체인 후 궁극기 피해 보정" },
+    { id: "the-simmering-pot", kr: "The Simmering Pot", en: "The Simmering Pot", rank: "A", role: "stun", baseAtk: 594, stats: { impact: 15 }, effect: "지원 추격 그로기/피해 보정" },
+    { id: "the-vault", kr: "The Vault", en: "The Vault", rank: "A", role: "support", baseAtk: 624, stats: { energyRegen: 50 }, effect: "에테르 공격 후 파티 피해 보정" },
+    { id: "tremor-trigram-vessel", kr: "Tremor Trigram Vessel", en: "Tremor Trigram Vessel", rank: "A", role: "defense", baseAtk: 624, stats: { atkPct: 25 }, effect: "EX/궁극기 피해와 에너지 보정" },
+    { id: "unfettered-game-ball", kr: "Unfettered Game Ball", en: "Unfettered Game Ball", rank: "A", role: "support", baseAtk: 594, stats: { energyRegen: 50 }, effect: "속성 카운터 후 파티 치확 보정" },
+    { id: "weeping-gemini", kr: "Weeping Gemini", en: "Weeping Gemini", rank: "A", role: "anomaly", baseAtk: 594, stats: { atkPct: 25 }, effect: "이상 발생 후 이상 숙련 보정" },
+    { id: "cinder-cobalt", kr: "[Cinder] Cobalt", en: "[Cinder] Cobalt", rank: "B", role: "rupture", baseAtk: 475, stats: { hpPct: 20 }, effect: "진입/교대 공격력 보정" },
+    { id: "identity-base", kr: "[Identity] Base", en: "[Identity] Base", rank: "B", role: "defense", baseAtk: 475, stats: { defense: 32 }, effect: "피격 후 방어력 보정" },
+    { id: "identity-inflection", kr: "[Identity] Inflection", en: "[Identity] Inflection", rank: "B", role: "defense", baseAtk: 475, stats: { defense: 32 }, effect: "피격 후 공격자 피해 감소" },
+    { id: "lunar-decrescent", kr: "[Lunar] Decrescent", en: "[Lunar] Decrescent", rank: "B", role: "attack", baseAtk: 475, stats: { atkPct: 20 }, effect: "체인/궁극기 후 피해 보정" },
+    { id: "lunar-noviluna", kr: "[Lunar] Noviluna", en: "[Lunar] Noviluna", rank: "B", role: "attack", baseAtk: 475, stats: { critRate: 16 }, effect: "EX 후 에너지 생성" },
+    { id: "lunar-pleniluna", kr: "[Lunar] Pleniluna", en: "[Lunar] Pleniluna", rank: "B", role: "attack", baseAtk: 475, stats: { atkPct: 20 }, effect: "기본/대시/회피 반격 피해 보정" },
+    { id: "magnetic-storm-alpha", kr: "[Magnetic Storm] Alpha", en: "[Magnetic Storm] Alpha", rank: "B", role: "anomaly", baseAtk: 475, stats: { atkPct: 20 }, effect: "이상 축적 후 이상 장악 보정" },
+    { id: "magnetic-storm-bravo", kr: "[Magnetic Storm] Bravo", en: "[Magnetic Storm] Bravo", rank: "B", role: "anomaly", baseAtk: 356, stats: {}, effect: "이상 축적 후 이상 숙련 보정" },
+    { id: "magnetic-storm-charlie", kr: "[Magnetic Storm] Charlie", en: "[Magnetic Storm] Charlie", rank: "B", role: "anomaly", baseAtk: 475, stats: { penRatio: 16 }, effect: "이상 발생 후 에너지 생성" },
+    { id: "reverb-mark-i", kr: "[Reverb] Mark I", en: "[Reverb] Mark I", rank: "B", role: "support", baseAtk: 475, stats: { atkPct: 20 }, effect: "EX 후 파티 충격력 보정" },
+    { id: "reverb-mark-ii", kr: "[Reverb] Mark II", en: "[Reverb] Mark II", rank: "B", role: "support", baseAtk: 475, stats: { energyRegen: 40 }, effect: "EX/체인 후 파티 이상 보정" },
+    { id: "reverb-mark-iii", kr: "[Reverb] Mark III", en: "[Reverb] Mark III", rank: "B", role: "support", baseAtk: 475, stats: { hpPct: 20 }, effect: "체인/궁극기 후 파티 공격력 보정" },
+    { id: "vortex-arrow", kr: "[Vortex] Arrow", en: "[Vortex] Arrow", rank: "B", role: "stun", baseAtk: 475, stats: { impact: 12 }, effect: "주 대상 그로기 보정" },
+    { id: "vortex-hatchet", kr: "[Vortex] Hatchet", en: "[Vortex] Hatchet", rank: "B", role: "stun", baseAtk: 475, stats: { energyRegen: 16 }, effect: "진입/교대 충격력 보정" },
+    { id: "vortex-revolver", kr: "[Vortex] Revolver", en: "[Vortex] Revolver", rank: "B", role: "stun", baseAtk: 475, stats: { atkPct: 20 }, effect: "EX 그로기 보정" },
   ];
 
   const driveDiscs = [
@@ -421,6 +501,13 @@
     { id: "wuthering-salon", kr: "울부짖는 살롱", en: "Wuthering Salon", two: "바람 피해 +10%", four: "바람 이상 후 피해 보정", stats: { windDmg: 10 } },
     { id: "sky-ablaze", kr: "새벽녘 여행기", en: "The Sky Ablaze", two: "에테르 피해 +10%", four: "에테르 캐릭터 치명타 피해 및 공격력 보정", stats: { etherDmg: 10 } },
   ];
+
+  driveDiscs.push(
+    { id: "bunny-wonderland", kr: "Bunny in Wonderland", en: "Bunny in Wonderland", two: "HP +10%", four: "방어 캐릭터 EX/지원 방어/회피 지원 후 파티 피해 보정", stats: { hpPct: 10 } },
+    { id: "notes-chained", kr: "Notes From the Chained", en: "Notes From the Chained", two: "얼음 피해 +10%", four: "만개/빙결 발동 후 이상 숙련 및 이상/혼돈 피해 보정", stats: { iceDmg: 10, frostDmg: 10 } },
+    { id: "shining-aria", kr: "Shining Aria", en: "Shining Aria", two: "에테르 피해 +10%", four: "기본 공격 후 이상 숙련, 적 그로기 중 피해 보정", stats: { etherDmg: 10 } },
+    { id: "white-water-ballad", kr: "White Water Ballad", en: "White Water Ballad", two: "물리 피해 +10%", four: "에테르 베일 중 치확, 강공 캐릭터 베일 발동 후 치확/공격력 보정", stats: { physicalDmg: 10 } },
+  );
 
   const materialNames = {
     role: {
@@ -1026,6 +1113,13 @@
     }
   }
 
+  function normalizeSelectValue(selector, fallbackValue) {
+    const field = $(selector);
+    if (!field) return;
+    const hasValue = Array.from(field.options).some((item) => item.value === field.value);
+    if (!hasValue) field.value = fallbackValue;
+  }
+
   function resetStats() {
     const agent = getAgent($("#agent-select").value);
     $("#crit-rate").value = Math.max(0, 50 - agent.stats.critRate);
@@ -1163,6 +1257,12 @@
     initSelects();
     loadGuides();
     restoreSnapshot();
+    normalizeSelectValue("#engine-select", "manual");
+    normalizeSelectValue("#disc-four", "woodpecker-electro");
+    normalizeSelectValue("#disc-two", "hormone-punk");
+    normalizeSelectValue("#agent-select", agents[0].id);
+    normalizeSelectValue("#growth-agent-select", agents[0].id);
+    normalizeSelectValue("#guide-agent", agents[0].id);
     selectAgent(selectedAgentId, false);
     bindEvents();
     renderAll();
