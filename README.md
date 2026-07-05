@@ -7,7 +7,7 @@ Zenless Zone Zero 계산기입니다. 에이전트 이름과 W-Engine 이름은 
 - 에이전트 이미지 카드, 상세 보기, 추천 파티 프리셋
 - 수동 스탯, W-Engine, 디스크, 파티 버프, 적 보정을 반영하는 딜량 계산기
 - 에이전트, 스킬, 핵심 스킬, W-Engine 육성 재화 계산기
-- 에이전트 57명, W-Engine 93종, 활성 디스크 28종, 재화 카테고리 데이터 표
+- 에이전트 56명, W-Engine 93종, 활성 디스크 28종, 재화 카테고리 데이터 표
 - 정적 GitHub Pages 배포
 
 ## 로컬 미리보기
@@ -31,7 +31,7 @@ gh repo create zzz-calc --public --source . --remote origin --push
 
 GitHub Pages에서 빌드 없이 제공할 수 있도록 데이터는 `app.js`에 포함되어 있습니다. 현재 프로필은 에이전트 이름과 W-Engine 이름을 영어로 유지하고, UI/데이터 라벨은 한국어로 표시합니다.
 
-3.0 live 데이터는 Nanoka static API의 `character.json`, `weapon.json`, `equipment.json` 기준으로 동기화합니다. 에이전트 로스터는 페이지 로드 시 API 스냅샷을 읽어 57명으로 구성하고, 실패 시 내장 fallback 데이터를 사용합니다.
+3.0 live 데이터는 Nanoka static API의 `character.json`, `weapon.json`, `equipment.json` 기준으로 동기화합니다. 에이전트 로스터는 페이지 로드 시 API 스냅샷을 읽어 공개 아이콘이 있는 56명으로 구성하고, 실패 시 내장 fallback 데이터를 사용합니다.
 
 - API 루트: https://static.nanoka.cc/zzz/3.0/
 - 효과 DB는 W-Engine 재련 1~5단계와 에이전트 돌파 원문을 Nanoka static API에서 다시 생성합니다.

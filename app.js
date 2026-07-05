@@ -1,10 +1,10 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v0.8-api-images-3.0";
+  const DATA_VERSION = "2026-07-06-v0.9-public-roster-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
-    agents: 57,
+    agents: 56,
     wEngines: 93,
     driveDiscs: 28,
     naming: "에이전트 이름과 W-Engine 이름은 영어로 유지하고, 나머지 UI와 데이터 라벨은 한국어로 표시합니다.",
@@ -664,7 +664,6 @@
     "Soldier 11": "soldier-11",
     "Starlight - Billy": "starlight-billy",
     "Zhu Yuan": "zhu-yuan",
-    Avatar_Female_Size02_Remielle: "remielle",
   };
 
   const apiAvatarNameOverrides = {
@@ -684,7 +683,11 @@
   };
 
   function apiAgentDisplayName(name) {
-    return name === "Avatar_Female_Size02_Remielle" ? "Remielle" : name;
+    return name;
+  }
+
+  function isPublicApiAgent(entry) {
+    return Boolean(entry?.icon) && !String(entry?.en || "").startsWith("Avatar_");
   }
 
   function apiAgentId(name) {
@@ -818,10 +821,12 @@
     try {
       const index = await fetchJson(`${AGENT_API_BASE}/character.json`);
       const loadedAgents = await Promise.all(
-        Object.entries(index).map(async ([sourceId, entry]) => {
-          const detail = await fetchJson(`${AGENT_API_BASE}/en/character/${sourceId}.json`);
-          return apiAgentFromDetail(sourceId, entry, detail);
-        }),
+        Object.entries(index)
+          .filter(([, entry]) => isPublicApiAgent(entry))
+          .map(async ([sourceId, entry]) => {
+            const detail = await fetchJson(`${AGENT_API_BASE}/en/character/${sourceId}.json`);
+            return apiAgentFromDetail(sourceId, entry, detail);
+          }),
       );
       if (loadedAgents.length < 50) throw new Error(`Unexpected agent count: ${loadedAgents.length}`);
       agents.length = 0;

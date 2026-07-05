@@ -307,7 +307,7 @@ button:focus-visible {
   position: relative;
   min-height: 238px;
   display: grid;
-  grid-template-rows: minmax(148px, 1fr) auto;
+  grid-template-rows: 168px auto;
   gap: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -338,7 +338,7 @@ button:focus-visible {
 }
 
 .portrait {
-  min-height: 156px;
+  height: 168px;
 }
 
 .portrait img,
@@ -350,6 +350,19 @@ button:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.portrait img {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.detail-portrait img {
+  width: 92%;
+  height: 96%;
+  object-position: center bottom;
 }
 
 .mini-portrait img {
@@ -822,10 +835,11 @@ tr:last-child td {
 
   .agent-card {
     min-height: 212px;
+    grid-template-rows: 138px auto;
   }
 
   .portrait {
-    min-height: 132px;
+    height: 138px;
   }
 
   .mini-stats {

@@ -354,11 +354,10 @@ const apiAgentIdOverrides = {
   "Soldier 11": "soldier-11",
   "Starlight - Billy": "starlight-billy",
   "Zhu Yuan": "zhu-yuan",
-  Avatar_Female_Size02_Remielle: "remielle",
 };
 
 function apiAgentDisplayName(name) {
-  return name === "Avatar_Female_Size02_Remielle" ? "Remielle" : name;
+  return name;
 }
 
 function apiAgentId(name) {
@@ -373,11 +372,13 @@ function apiAgentId(name) {
 }
 
 function apiAgents(characterIndex) {
-  return Object.entries(characterIndex).map(([sourceId, item]) => ({
-    id: apiAgentId(item.en),
-    name: apiAgentDisplayName(item.en),
-    source: { sourceId, item },
-  }));
+  return Object.entries(characterIndex)
+    .filter(([, item]) => item.icon && !String(item.en || "").startsWith("Avatar_"))
+    .map(([sourceId, item]) => ({
+      id: apiAgentId(item.en),
+      name: apiAgentDisplayName(item.en),
+      source: { sourceId, item },
+    }));
 }
 
 const appSource = await readFile(APP_SOURCE_PATH, "utf8");
