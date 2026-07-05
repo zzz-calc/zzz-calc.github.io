@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="젠레스 존 제로 한국어 딜량 계산기 및 육성 재화 계산기" />
+    <title>ZZZ Calc</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Zenless Zone Zero</p>
+          <h1>ZZZ 계산기</h1>
+        </div>
+        <div class="version-badge">v0 데이터</div>
+      </header>
+
+      <nav class="tabs" aria-label="계산기 탭">
+        <button class="tab-button active" type="button" data-tab="damage">딜량</button>
+        <button class="tab-button" type="button" data-tab="growth">육성 재화</button>
+        <button class="tab-button" type="button" data-tab="database">데이터</button>
+      </nav>
+
+      <main>
+        <section class="tab-panel active" id="damage-panel" aria-labelledby="damage">
+          <div class="workspace two-column">
+            <form class="tool-panel" id="damage-form">
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>에이전트</h2>
+                  <span id="agent-meta">-</span>
+                </div>
+                <label>
+                  에이전트
+                  <select id="agent-select"></select>
+                </label>
+                <label>
+                  W-엔진
+                  <select id="engine-select"></select>
+                </label>
+                <div class="inline-grid">
+                  <label>
+                    공격자 레벨
+                    <input id="attacker-level" type="number" min="1" max="60" value="60" />
+                  </label>
+                  <label>
+                    스킬 계수 %
+                    <input id="skill-multiplier" type="number" min="1" step="0.1" value="600" />
+                  </label>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>스탯</h2>
+                  <button class="ghost-button" id="reset-stats" type="button">초기화</button>
+                </div>
+                <div class="inline-grid">
+                  <label>
+                    공격력 %
+                    <input id="atk-percent" type="number" step="0.1" value="70" />
+                  </label>
+                  <label>
+                    고정 공격력
+                    <input id="flat-atk" type="number" step="1" value="316" />
+                  </label>
+                  <label>
+                    치명타 확률 %
+                    <input id="crit-rate" type="number" step="0.1" value="60" />
+                  </label>
+                  <label>
+                    치명타 피해 %
+                    <input id="crit-dmg" type="number" step="0.1" value="120" />
+                  </label>
+                  <label>
+                    피해 보너스 %
+                    <input id="dmg-bonus" type="number" step="0.1" value="46.6" />
+                  </label>
+                  <label>
+                    관통률 %
+                    <input id="pen-ratio" type="number" step="0.1" value="0" />
+                  </label>
+                  <label>
+                    관통 수치
+                    <input id="flat-pen" type="number" step="1" value="0" />
+                  </label>
+                  <label>
+                    이상 숙련도
+                    <input id="anomaly-proficiency" type="number" step="1" value="0" />
+                  </label>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>디스크</h2>
+                  <span id="disc-summary">-</span>
+                </div>
+                <div class="inline-grid">
+                  <label>
+                    4세트
+                    <select id="disc-four"></select>
+                  </label>
+                  <label>
+                    2세트
+                    <select id="disc-two"></select>
+                  </label>
+                  <label>
+                    4세트 보정 %
+                    <input id="disc-conditional" type="number" step="0.1" value="0" />
+                  </label>
+                  <label>
+                    기타 버프 %
+                    <input id="team-bonus" type="number" step="0.1" value="0" />
+                  </label>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>적</h2>
+                  <span>방어/저항</span>
+                </div>
+                <div class="inline-grid">
+                  <label>
+                    적 레벨
+                    <input id="enemy-level" type="number" min="1" max="100" value="70" />
+                  </label>
+                  <label>
+                    적 저항 %
+                    <input id="enemy-res" type="number" step="0.1" value="10" />
+                  </label>
+                  <label>
+                    저항 감소 %
+                    <input id="res-shred" type="number" step="0.1" value="0" />
+                  </label>
+                  <label>
+                    받피증 %
+                    <input id="vulnerability" type="number" step="0.1" value="0" />
+                  </label>
+                  <label>
+                    그로기 배율 %
+                    <input id="stun-multiplier" type="number" step="1" value="150" />
+                  </label>
+                  <label class="checkbox-label">
+                    <input id="enemy-stunned" type="checkbox" />
+                    그로기
+                  </label>
+                </div>
+              </section>
+            </form>
+
+            <aside class="results-panel">
+              <div class="result-grid">
+                <article class="result-card strong">
+                  <span>기댓값</span>
+                  <strong id="expected-damage">0</strong>
+                </article>
+                <article class="result-card">
+                  <span>치명타</span>
+                  <strong id="crit-damage">0</strong>
+                </article>
+                <article class="result-card">
+                  <span>비치명</span>
+                  <strong id="normal-damage">0</strong>
+                </article>
+                <article class="result-card">
+                  <span>이상 피해</span>
+                  <strong id="anomaly-damage">0</strong>
+                </article>
+              </div>
+
+              <section class="breakdown">
+                <h2>계산값</h2>
+                <dl id="damage-breakdown"></dl>
+              </section>
+            </aside>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="growth-panel" aria-labelledby="growth">
+          <div class="workspace two-column">
+            <form class="tool-panel" id="growth-form">
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>대상</h2>
+                  <span id="growth-agent-meta">-</span>
+                </div>
+                <label>
+                  에이전트
+                  <select id="growth-agent-select"></select>
+                </label>
+                <div class="inline-grid">
+                  <label>
+                    현재 레벨
+                    <input id="current-level" type="number" min="1" max="60" value="1" />
+                  </label>
+                  <label>
+                    목표 레벨
+                    <input id="target-level" type="number" min="1" max="60" value="60" />
+                  </label>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>스킬</h2>
+                  <span>일반 스킬</span>
+                </div>
+                <div class="inline-grid">
+                  <label>
+                    현재 스킬
+                    <input id="current-skill" type="number" min="1" max="12" value="1" />
+                  </label>
+                  <label>
+                    목표 스킬
+                    <input id="target-skill" type="number" min="1" max="12" value="12" />
+                  </label>
+                  <label>
+                    스킬 개수
+                    <input id="skill-count" type="number" min="0" max="5" value="5" />
+                  </label>
+                  <label>
+                    핵심 현재
+                    <select id="current-core"></select>
+                  </label>
+                  <label>
+                    핵심 목표
+                    <select id="target-core"></select>
+                  </label>
+                </div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>W-엔진</h2>
+                  <span>레벨</span>
+                </div>
+                <div class="inline-grid">
+                  <label>
+                    현재 레벨
+                    <input id="current-engine-level" type="number" min="1" max="60" value="1" />
+                  </label>
+                  <label>
+                    목표 레벨
+                    <input id="target-engine-level" type="number" min="1" max="60" value="60" />
+                  </label>
+                </div>
+              </section>
+            </form>
+
+            <aside class="results-panel">
+              <div class="section-heading">
+                <h2>필요 재화</h2>
+                <button class="ghost-button" id="copy-growth" type="button">복사</button>
+              </div>
+              <div class="resource-list" id="resource-list"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="database-panel" aria-labelledby="database">
+          <div class="database-toolbar">
+            <label>
+              검색
+              <input id="database-search" type="search" placeholder="에이전트, 디스크, W-엔진" />
+            </label>
+            <button class="ghost-button" id="download-data" type="button">JSON</button>
+          </div>
+          <div class="database-grid">
+            <section class="data-table-panel">
+              <h2>에이전트</h2>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>이름</th>
+                      <th>랭크</th>
+                      <th>속성</th>
+                      <th>역할군</th>
+                      <th>공격력</th>
+                    </tr>
+                  </thead>
+                  <tbody id="agent-table"></tbody>
+                </table>
+              </div>
+            </section>
+            <section class="data-table-panel">
+              <h2>디스크</h2>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>세트</th>
+                      <th>2세트</th>
+                      <th>4세트</th>
+                    </tr>
+                  </thead>
+                  <tbody id="disc-table"></tbody>
+                </table>
+              </div>
+            </section>
+            <section class="data-table-panel">
+              <h2>W-엔진</h2>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>이름</th>
+                      <th>랭크</th>
+                      <th>역할군</th>
+                      <th>기초 공격력</th>
+                    </tr>
+                  </thead>
+                  <tbody id="engine-table"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+
