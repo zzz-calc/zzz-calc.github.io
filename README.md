@@ -21,7 +21,11 @@ Then open `http://localhost:4173`.
 
 This repository includes `.github/workflows/pages.yml`. Push `main` to GitHub, then enable GitHub Pages with "GitHub Actions" as the source.
 
+```powershell
+gh auth refresh -h github.com -s repo -s workflow
+gh repo create zzz-calc --public --source . --remote origin --push
+```
+
 ## Data Notes
 
 The first version keeps data in `app.js` so GitHub Pages can serve it without a build step. Material count tables are marked as v0 and should be replaced with verified tables as the database work continues.
-
