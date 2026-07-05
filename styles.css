@@ -229,10 +229,6 @@ button:focus-visible {
   gap: 12px;
 }
 
-.filter-row {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .checkbox-label {
   min-height: 42px;
   align-self: end;

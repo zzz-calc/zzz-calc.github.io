@@ -12,7 +12,7 @@
   const GUIDE_STORAGE_KEY = "zzz-calc-community-guides";
   const STATE_STORAGE_KEY = "zzz-calc-state";
   const REPO_ISSUE_URL = "https://github.com/suhyeong10/zzz-calc/issues/new";
-  const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "database-search"]);
+  const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
 
   const roleLabels = {
     all: "전체",
@@ -34,6 +34,14 @@
     ether: "에테르",
     wind: "바람",
     auricInk: "현묵",
+  };
+
+  const rankLabels = {
+    all: "전체",
+    S: "S",
+    A: "A",
+    B: "B",
+    I: "I",
   };
 
   function fandomAvatar(fileName) {
@@ -1340,10 +1348,12 @@
   function renderAgentGrid() {
     const role = $("#agent-role-filter").value;
     const attribute = $("#agent-attribute-filter").value;
+    const rank = $("#agent-rank-filter").value;
     const filtered = agents.filter((agent) => {
       const roleOk = role === "all" || agent.role === role;
       const attrOk = attribute === "all" || agent.attribute === attribute;
-      return roleOk && attrOk;
+      const rankOk = rank === "all" || agent.rank === rank;
+      return roleOk && attrOk && rankOk;
     });
 
     $("#agent-count").textContent = `${filtered.length}명`;
@@ -1906,6 +1916,7 @@
 
     const activeRoles = new Set(agents.map((agent) => agent.role));
     const activeAttributes = new Set(agents.map((agent) => agent.attribute));
+    const activeRanks = new Set(agents.map((agent) => agent.rank));
     $("#agent-role-filter").replaceChildren(
       ...["all", "attack", "stun", "anomaly", "support", "defense", "rupture"]
         .filter((role) => role === "all" || activeRoles.has(role))
@@ -1915,6 +1926,11 @@
       ...["all", "physical", "fire", "ice", "frost", "electric", "ether", "wind", "auricInk"]
         .filter((attribute) => attribute === "all" || activeAttributes.has(attribute))
         .map((attribute) => option(attributeLabels[attribute], attribute)),
+    );
+    $("#agent-rank-filter").replaceChildren(
+      ...["all", "S", "A", "B", "I"]
+        .filter((rank) => rank === "all" || activeRanks.has(rank))
+        .map((rank) => option(rankLabels[rank], rank)),
     );
 
     $("#target-core").value = "6";
