@@ -1943,7 +1943,7 @@
     const partyOptions = [{ id: "none", kr: "없음" }, ...agents];
     fillSelect($("#party-slot-1"), partyOptions, (agent) => agent.kr);
     fillSelect($("#party-slot-2"), partyOptions, (agent) => agent.kr);
-    const partyDiscOptions = [{ id: "none", kr: "없음" }, ...driveDiscs.filter((disc) => partyDiscBuffPresets[disc.id])];
+    const partyDiscOptions = [{ id: "none", kr: "없음" }, ...driveDiscs.filter((disc) => disc.id !== "none")];
     fillSelect($("#party-disc-1"), partyDiscOptions, (disc) => disc.kr);
     fillSelect($("#party-disc-2"), partyDiscOptions, (disc) => disc.kr);
     fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} / ${roleLabels[engine.role] || "전체"}`);
