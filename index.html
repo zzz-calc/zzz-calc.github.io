@@ -14,17 +14,58 @@
           <p class="eyebrow">Zenless Zone Zero</p>
           <h1>ZZZ 계산기</h1>
         </div>
-        <div class="version-badge">v0 데이터</div>
+        <div class="version-badge">v0.2 한국어 데이터</div>
       </header>
 
       <nav class="tabs" aria-label="계산기 탭">
-        <button class="tab-button active" type="button" data-tab="damage">딜량</button>
+        <button class="tab-button active" type="button" data-tab="agents">캐릭터</button>
+        <button class="tab-button" type="button" data-tab="damage">딜량</button>
         <button class="tab-button" type="button" data-tab="growth">육성 재화</button>
+        <button class="tab-button" type="button" data-tab="community">커뮤니티</button>
         <button class="tab-button" type="button" data-tab="database">데이터</button>
       </nav>
 
       <main>
-        <section class="tab-panel active" id="damage-panel" aria-labelledby="damage">
+        <section class="tab-panel active" id="agents-panel">
+          <div class="workspace two-column wide-left">
+            <section class="tool-panel">
+              <div class="form-section">
+                <div class="section-heading">
+                  <h2>캐릭터 선택</h2>
+                  <span id="agent-count">-</span>
+                </div>
+                <div class="filter-row">
+                  <label>
+                    역할군
+                    <select id="agent-role-filter"></select>
+                  </label>
+                  <label>
+                    속성
+                    <select id="agent-attribute-filter"></select>
+                  </label>
+                </div>
+              </div>
+              <div class="agent-grid" id="agent-grid"></div>
+            </section>
+
+            <aside class="results-panel agent-detail-panel">
+              <div class="agent-hero" id="agent-detail"></div>
+              <section class="breakdown">
+                <div class="section-heading">
+                  <h2>추천 파티</h2>
+                  <span>초안</span>
+                </div>
+                <div class="team-list" id="team-list"></div>
+              </section>
+              <div class="action-row">
+                <button class="primary-button" type="button" data-jump="damage">딜량 계산</button>
+                <button class="ghost-button" type="button" data-jump="growth">육성 계산</button>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="damage-panel">
           <div class="workspace two-column">
             <form class="tool-panel" id="damage-form">
               <section class="form-section">
@@ -87,7 +128,7 @@
                     <input id="flat-pen" type="number" step="1" value="0" />
                   </label>
                   <label>
-                    이상 숙련도
+                    이상 숙련
                     <input id="anomaly-proficiency" type="number" step="1" value="0" />
                   </label>
                 </div>
@@ -112,7 +153,7 @@
                     <input id="disc-conditional" type="number" step="0.1" value="0" />
                   </label>
                   <label>
-                    기타 버프 %
+                    파티/기타 버프 %
                     <input id="team-bonus" type="number" step="0.1" value="0" />
                   </label>
                 </div>
@@ -171,7 +212,6 @@
                   <strong id="anomaly-damage">0</strong>
                 </article>
               </div>
-
               <section class="breakdown">
                 <h2>계산값</h2>
                 <dl id="damage-breakdown"></dl>
@@ -180,7 +220,7 @@
           </div>
         </section>
 
-        <section class="tab-panel" id="growth-panel" aria-labelledby="growth">
+        <section class="tab-panel" id="growth-panel">
           <div class="workspace two-column">
             <form class="tool-panel" id="growth-form">
               <section class="form-section">
@@ -261,7 +301,81 @@
           </div>
         </section>
 
-        <section class="tab-panel" id="database-panel" aria-labelledby="database">
+        <section class="tab-panel" id="community-panel">
+          <div class="workspace two-column">
+            <form class="tool-panel" id="guide-form">
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>조합/공략 등록</h2>
+                  <span>브라우저 저장</span>
+                </div>
+                <div class="inline-grid">
+                  <label>
+                    작성자
+                    <input id="guide-author" type="text" maxlength="24" placeholder="닉네임" />
+                  </label>
+                  <label>
+                    제목
+                    <input id="guide-title" type="text" maxlength="60" placeholder="예: 미야비 혼돈 파티" />
+                  </label>
+                  <label>
+                    중심 캐릭터
+                    <select id="guide-agent"></select>
+                  </label>
+                  <label>
+                    태그
+                    <input id="guide-tags" type="text" maxlength="80" placeholder="혼돈, 시유, 강습전" />
+                  </label>
+                </div>
+              </section>
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>파티</h2>
+                  <span>3인</span>
+                </div>
+                <div class="inline-grid three">
+                  <label>
+                    1번
+                    <select id="guide-slot-1"></select>
+                  </label>
+                  <label>
+                    2번
+                    <select id="guide-slot-2"></select>
+                  </label>
+                  <label>
+                    3번
+                    <select id="guide-slot-3"></select>
+                  </label>
+                </div>
+              </section>
+              <section class="form-section">
+                <label>
+                  공략
+                  <textarea id="guide-body" rows="8" maxlength="1200" placeholder="운용, 디스크, W-엔진, 주의점"></textarea>
+                </label>
+                <div class="action-row">
+                  <button class="primary-button" id="save-guide" type="submit">저장</button>
+                  <button class="ghost-button" id="export-guides" type="button">JSON 내보내기</button>
+                  <label class="file-button">
+                    JSON 가져오기
+                    <input id="import-guides" type="file" accept="application/json" />
+                  </label>
+                  <a class="ghost-link" id="issue-link" href="#" target="_blank" rel="noreferrer">GitHub 제보</a>
+                </div>
+              </section>
+            </form>
+
+            <aside class="results-panel">
+              <div class="section-heading">
+                <h2>저장된 공략</h2>
+                <button class="ghost-button" id="clear-guides" type="button">비우기</button>
+              </div>
+              <div class="guide-list" id="guide-list"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="database-panel">
           <div class="database-toolbar">
             <label>
               검색
@@ -280,7 +394,7 @@
                       <th>랭크</th>
                       <th>속성</th>
                       <th>역할군</th>
-                      <th>공격력</th>
+                      <th>추천</th>
                     </tr>
                   </thead>
                   <tbody id="agent-table"></tbody>
@@ -326,4 +440,3 @@
     <script src="./app.js"></script>
   </body>
 </html>
-
