@@ -5,7 +5,7 @@ English-first calculator for Zenless Zone Zero.
 ## Scope
 
 - Agent gallery with image cards, source names, quick detail view, and starter team presets
-- Damage calculator with manual stats, W-Engine, Drive Disc, enemy, and buff inputs
+- Damage calculator with manual stats, W-Engine, Drive Disc, party member buff presets, enemy, and buff inputs
 - Growth material planner for Agents, skills, core skill, and W-Engines
 - Community guide draft storage with JSON import/export and a GitHub Issue handoff link
 - Data tables for 40 Agents, 93 W-Engines, 21 active Drive Disc sets, and material categories
@@ -34,6 +34,6 @@ The app keeps data in `app.js` so GitHub Pages can serve it without a build step
 
 Version 3.0 data adds Pyrois, Velina Airgid, and Norma Hollowell from English community database sources. Pyrois and Velina are treated as released Version 3.0 agents; Norma is marked as a preview/upcoming entry until fuller release data is published.
 
-Material count tables and team presets are marked as v0 and should be replaced with verified tables as database work continues.
+Material count tables, Drive Disc conditional presets, and team buff presets are marked as v0 and should be replaced with fully verified tables as database work continues.
 
 GitHub Pages cannot accept public uploads by itself. The community tab stores guides in the user's browser, supports JSON sharing, and prepares a GitHub Issue link for public submissions.

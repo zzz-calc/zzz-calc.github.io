@@ -149,14 +149,56 @@
                     <select id="disc-two"></select>
                   </label>
                   <label>
-                    4-Piece Conditional %
+                    Manual Disc DMG %
                     <input id="disc-conditional" type="number" step="0.1" value="0" />
                   </label>
-                  <label>
-                    Team/Other Buff %
-                    <input id="team-bonus" type="number" step="0.1" value="0" />
+                  <label class="checkbox-label">
+                    <input id="auto-disc-buffs" type="checkbox" checked />
+                    Apply 4-Piece Preset
                   </label>
                 </div>
+              </section>
+
+              <section class="form-section">
+                <div class="section-heading">
+                  <h2>Party Buffs</h2>
+                  <span id="party-buff-summary">-</span>
+                </div>
+                <div class="inline-grid">
+                  <label>
+                    Teammate 1
+                    <select id="party-slot-1"></select>
+                  </label>
+                  <label>
+                    Teammate 2
+                    <select id="party-slot-2"></select>
+                  </label>
+                  <label class="checkbox-label">
+                    <input id="auto-team-buffs" type="checkbox" checked />
+                    Apply Team Presets
+                  </label>
+                  <label>
+                    Manual DMG Bonus %
+                    <input id="team-bonus" type="number" step="0.1" value="0" />
+                  </label>
+                  <label>
+                    Manual ATK %
+                    <input id="manual-atk-buff" type="number" step="0.1" value="0" />
+                  </label>
+                  <label>
+                    Manual CRIT Rate %
+                    <input id="manual-crit-rate-buff" type="number" step="0.1" value="0" />
+                  </label>
+                  <label>
+                    Manual CRIT DMG %
+                    <input id="manual-crit-dmg-buff" type="number" step="0.1" value="0" />
+                  </label>
+                  <label>
+                    Manual PEN Ratio %
+                    <input id="manual-pen-ratio-buff" type="number" step="0.1" value="0" />
+                  </label>
+                </div>
+                <div class="buff-list" id="buff-list"></div>
               </section>
 
               <section class="form-section">

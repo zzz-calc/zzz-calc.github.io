@@ -512,7 +512,8 @@ button:focus-visible {
 }
 
 .team-list,
-.guide-list {
+.guide-list,
+.buff-list {
   display: grid;
   gap: 10px;
 }
@@ -522,6 +523,44 @@ button:focus-visible {
   display: grid;
   gap: 10px;
   padding: 12px;
+}
+
+.buff-list {
+  margin-top: 12px;
+}
+
+.buff-chip {
+  display: grid;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.buff-chip div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.buff-chip strong {
+  font-size: 13px;
+}
+
+.buff-chip span,
+.buff-chip p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.buff-chip p {
+  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 .section-heading.compact {

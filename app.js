@@ -947,6 +947,50 @@
     "moonlight-lullaby": { two: "Energy Regen +20%", four: "Support EX Special Attack or Ultimate increases squad DMG." },
   };
 
+  const discBuffPresets = {
+    "fanged-metal": { label: "Fanged Metal 4pc", dmgBonus: 35, note: "After Assault" },
+    "polar-metal": { label: "Polar Metal 4pc", dmgBonus: 20, note: "Basic/Dash focus" },
+    "thunder-metal": { label: "Thunder Metal 4pc", atkPct: 28, note: "Shocked enemy" },
+    "chaotic-metal": { label: "Chaotic Metal 4pc", critDmg: 20, note: "Corruption stacks" },
+    "inferno-metal": { label: "Inferno Metal 4pc", critRate: 28, note: "Burning enemy" },
+    "swing-jazz": { label: "Swing Jazz 4pc", dmgBonus: 15, note: "After Chain/Ultimate" },
+    "hormone-punk": { label: "Hormone Punk 4pc", atkPct: 25, note: "Combat entry/swap-in" },
+    "puffer-electro": { label: "Puffer Electro 4pc", dmgBonus: 20, atkPct: 15, note: "Ultimate window" },
+    "woodpecker-electro": { label: "Woodpecker Electro 4pc", atkPct: 27, note: "3 CRIT stacks" },
+    "proto-punk": { label: "Proto Punk 4pc", dmgBonus: 15, note: "After Assist" },
+    "chaos-jazz": { label: "Chaos Jazz 4pc", dmgBonus: 15, note: "Off-field/EX window" },
+    "astral-voice": { label: "Astral Voice 4pc", dmgBonus: 24, note: "Astral stacks" },
+    "branch-blade": { label: "Branch & Blade Song 4pc", critRate: 12, critDmg: 30, note: "Freeze/Shatter window" },
+    "shadow-harmony": { label: "Shadow Harmony 4pc", atkPct: 20, critRate: 12, note: "Aftershock/Dash hits" },
+    "phaethon-melody": { label: "Phaethon's Melody 4pc", dmgBonus: 18, anomalyProficiency: 60, note: "EX sequence" },
+    "yunkui-tales": { label: "Yunkui Tales 4pc", critRate: 12, dmgBonus: 20, note: "Sheer DMG route" },
+    "king-summit": { label: "King of the Summit 4pc", critDmg: 30, note: "Stun specialty support" },
+    "moonlight-lullaby": { label: "Moonlight Lullaby 4pc", dmgBonus: 18, note: "Support EX/Ultimate" },
+  };
+
+  const teamBuffPresets = {
+    astra: { label: "Astra Yao", atkPct: 15, dmgBonus: 30, note: "Support buff window" },
+    nicole: { label: "Nicole Demara", defReduction: 40, dmgBonus: 10, note: "Ether field / DEF shred" },
+    rina: { label: "Alexandrina Sebastiane", penRatio: 20, dmgBonus: 10, note: "PEN support" },
+    soukaku: { label: "Soukaku", atkPct: 20, dmgBonus: 10, note: "ATK support" },
+    lucy: { label: "Lucy", atkPct: 15, note: "Cheer On!" },
+    caesar: { label: "Caesar King", atkPct: 15, dmgBonus: 25, note: "Shield support" },
+    seth: { label: "Seth Lowell", anomalyProficiency: 100, dmgBonus: 10, note: "Anomaly shield support" },
+    yuzuha: { label: "Ukinami Yuzuha", anomalyProficiency: 120, dmgBonus: 15, note: "Physical Anomaly support" },
+    "pan-yinhu": { label: "Pan Yinhu", dmgBonus: 12, note: "Defensive utility support" },
+    "ju-fufu": { label: "Ju Fufu", critDmg: 30, stunDmg: 10, note: "Stun support" },
+    lighter: { label: "Lighter", stunDmg: 15, dmgBonus: 15, note: "Stun window support" },
+    qingyi: { label: "Qingyi", stunDmg: 20, note: "High stun multiplier window" },
+    lycaon: { label: "Von Lycaon", stunDmg: 15, dmgBonus: 10, note: "Stun support" },
+    anby: { label: "Anby Demara", stunDmg: 10, note: "Starter stun support" },
+    koleda: { label: "Koleda Belobog", stunDmg: 15, note: "Fire stun support" },
+    pulchra: { label: "Pulchra Fellini", stunDmg: 12, note: "Physical stun support" },
+    norma: { label: "Norma Hollowell", stunDmg: 15, critRate: 8, note: "Preview Fire stun support" },
+    velina: { label: "Velina Airgid", anomalyMastery: 84, dmgBonus: 15, note: "Wind Anomaly support" },
+  };
+
+  const buffFields = ["atkPct", "dmgBonus", "critRate", "critDmg", "penRatio", "flatPen", "defReduction", "anomalyProficiency", "anomalyMastery", "stunDmg"];
+
   function needsEnglishText(value) {
     return typeof value === "string" && /[^\x00-\x7F]/.test(value);
   }
@@ -1090,6 +1134,86 @@
     return driveDiscs.find((disc) => disc.id === id) || driveDiscs[0];
   }
 
+  function selectedPartyIds() {
+    return ["#party-slot-1", "#party-slot-2"]
+      .map((selector) => $(selector)?.value)
+      .filter((id) => id && id !== "none" && id !== $("#agent-select")?.value);
+  }
+
+  function emptyBuffTotals() {
+    return Object.fromEntries(buffFields.map((field) => [field, 0]));
+  }
+
+  function addBuffTotals(total, buff) {
+    buffFields.forEach((field) => {
+      total[field] += Number(buff[field] || 0);
+    });
+    return total;
+  }
+
+  function buffParts(buff) {
+    const labels = {
+      atkPct: "ATK",
+      dmgBonus: "DMG",
+      critRate: "CRIT Rate",
+      critDmg: "CRIT DMG",
+      penRatio: "PEN Ratio",
+      flatPen: "Flat PEN",
+      defReduction: "DEF Shred",
+      anomalyProficiency: "Anomaly Proficiency",
+      anomalyMastery: "Anomaly Mastery",
+      stunDmg: "Stun DMG",
+    };
+    return buffFields
+      .filter((field) => Number(buff[field] || 0) !== 0)
+      .map((field) => {
+        const value = Number(buff[field] || 0);
+        const suffix = field === "flatPen" || field === "anomalyProficiency" || field === "anomalyMastery" ? "" : "%";
+        return `${labels[field]} +${fmt1.format(value)}${suffix}`;
+      });
+  }
+
+  function collectBuffSources(discFour) {
+    const sources = [];
+    if ($("#auto-disc-buffs")?.checked) {
+      const discBuff = discBuffPresets[discFour.id];
+      if (discBuff) sources.push({ type: "Drive Disc", ...discBuff });
+    }
+
+    if ($("#auto-team-buffs")?.checked) {
+      selectedPartyIds().forEach((id) => {
+        const teamBuff = teamBuffPresets[id];
+        if (teamBuff) sources.push({ type: "Party", ...teamBuff });
+      });
+    }
+
+    const manualBuff = {
+      type: "Manual",
+      label: "Manual Buffs",
+      atkPct: number("#manual-atk-buff"),
+      dmgBonus: number("#team-bonus"),
+      critRate: number("#manual-crit-rate-buff"),
+      critDmg: number("#manual-crit-dmg-buff"),
+      penRatio: number("#manual-pen-ratio-buff"),
+    };
+    if (buffParts(manualBuff).length > 0) sources.push(manualBuff);
+    return sources;
+  }
+
+  function summarizeBuffs(sources) {
+    if (sources.length === 0) return "No presets";
+    return `${sources.length} active`;
+  }
+
+  function syncDamagePartyFromAgent(agentId) {
+    const firstTeam = getAgent(agentId).teams[0];
+    const members = (firstTeam?.members || []).filter((id) => id !== agentId);
+    const slot1 = $("#party-slot-1");
+    const slot2 = $("#party-slot-2");
+    if (slot1) slot1.value = members[0] || "none";
+    if (slot2) slot2.value = members[1] || "none";
+  }
+
   function option(label, value) {
     const item = document.createElement("option");
     item.value = value;
@@ -1119,12 +1243,13 @@
     $$(".tab-panel").forEach((panel) => panel.classList.toggle("active", panel.id === `${tabName}-panel`));
   }
 
-  function selectAgent(id, shouldRender = true) {
+  function selectAgent(id, shouldRender = true, shouldSyncParty = true) {
     selectedAgentId = getAgent(id).id;
     ["#agent-select", "#growth-agent-select", "#guide-agent", "#guide-slot-1"].forEach((selector) => {
       const field = $(selector);
       if (field) field.value = selectedAgentId;
     });
+    if (shouldSyncParty) syncDamagePartyFromAgent(selectedAgentId);
     if (shouldRender) renderAll();
   }
 
@@ -1238,6 +1363,9 @@
     $("#guide-slot-1").value = team.members[0] || selectedAgentId;
     $("#guide-slot-2").value = team.members[1] || selectedAgentId;
     $("#guide-slot-3").value = team.members[2] || selectedAgentId;
+    const damageMembers = team.members.filter((id) => id !== selectedAgentId);
+    $("#party-slot-1").value = damageMembers[0] || "none";
+    $("#party-slot-2").value = damageMembers[1] || "none";
     $("#guide-title").value = team.name;
     $("#guide-body").value = team.note;
     $("#guide-tags").value = `${roleLabels[getAgent(selectedAgentId).role]}, Recommended Team`;
@@ -1260,20 +1388,22 @@
     const discFour = getDisc($("#disc-four").value);
     const discTwo = getDisc($("#disc-two").value);
     const discs = [discFour, discTwo];
+    const buffSources = collectBuffSources(discFour);
+    const buffTotals = buffSources.reduce((total, buff) => addBuffTotals(total, buff), emptyBuffTotals());
 
     const attackerLevel = number("#attacker-level");
     const enemyLevel = number("#enemy-level");
     const baseAtk = agent.stats.atk + engine.baseAtk;
-    const atkPct = number("#atk-percent") + (engine.stats.atkPct || 0) + sumStatFromDiscs(discs, "atkPct");
+    const atkPct = number("#atk-percent") + (engine.stats.atkPct || 0) + sumStatFromDiscs(discs, "atkPct") + buffTotals.atkPct;
     const flatAtk = number("#flat-atk");
     const totalAtk = baseAtk * (1 + atkPct / 100) + flatAtk;
 
     const critRate = clamp(
-      agent.stats.critRate + (engine.stats.critRate || 0) + sumStatFromDiscs(discs, "critRate") + number("#crit-rate"),
+      agent.stats.critRate + (engine.stats.critRate || 0) + sumStatFromDiscs(discs, "critRate") + number("#crit-rate") + buffTotals.critRate,
       0,
       100,
     );
-    const critDmg = agent.stats.critDmg + (engine.stats.critDmg || 0) + sumStatFromDiscs(discs, "critDmg") + number("#crit-dmg");
+    const critDmg = agent.stats.critDmg + (engine.stats.critDmg || 0) + sumStatFromDiscs(discs, "critDmg") + number("#crit-dmg") + buffTotals.critDmg;
 
     const baseDmgBonus =
       number("#dmg-bonus") +
@@ -1281,23 +1411,24 @@
       sumStatFromDiscs(discs, "basicDmg") +
       sumStatFromDiscs(discs, "aftershockDmg") +
       number("#disc-conditional") +
-      number("#team-bonus");
+      buffTotals.dmgBonus;
     const vulnerability = number("#vulnerability");
     const damageBonusMultiplier = (1 + baseDmgBonus / 100) * (1 + vulnerability / 100);
 
     const penRatio = clamp(
-      number("#pen-ratio") + (engine.stats.penRatio || 0) + sumStatFromDiscs(discs, "penRatio") + agent.stats.penRatio,
+      number("#pen-ratio") + (engine.stats.penRatio || 0) + sumStatFromDiscs(discs, "penRatio") + agent.stats.penRatio + buffTotals.penRatio,
       0,
       100,
     );
-    const flatPen = number("#flat-pen");
+    const flatPen = number("#flat-pen") + buffTotals.flatPen;
+    const defReduction = clamp(buffTotals.defReduction, 0, 95);
     const levelCoef = attackerLevel + 100;
-    const enemyDefPart = Math.max((enemyLevel + 100) * (1 - penRatio / 100) - flatPen, 1);
+    const enemyDefPart = Math.max((enemyLevel + 100) * (1 - defReduction / 100) * (1 - penRatio / 100) - flatPen, 1);
     const defMultiplier = levelCoef / (levelCoef + enemyDefPart);
 
     const effectiveRes = number("#enemy-res") - number("#res-shred");
     const resMultiplier = clamp(1 - effectiveRes / 100, 0.05, 2);
-    const stunMultiplier = $("#enemy-stunned").checked ? number("#stun-multiplier") / 100 : 1;
+    const stunMultiplier = $("#enemy-stunned").checked ? (number("#stun-multiplier") / 100) * (1 + buffTotals.stunDmg / 100) : 1;
 
     const skillMultiplier = number("#skill-multiplier") / 100;
     const nonCrit = totalAtk * skillMultiplier * damageBonusMultiplier * defMultiplier * resMultiplier * stunMultiplier;
@@ -1305,8 +1436,12 @@
     const expected = nonCrit * (1 + (critRate / 100) * (critDmg / 100));
 
     const anomalyProficiency =
-      number("#anomaly-proficiency") + (engine.stats.anomalyProficiency || 0) + sumStatFromDiscs(discs, "anomalyProficiency");
-    const anomalyMastery = agent.stats.anomalyMastery + (engine.stats.anomalyMastery || 0) + sumStatFromDiscs(discs, "anomalyMastery");
+      number("#anomaly-proficiency") +
+      (engine.stats.anomalyProficiency || 0) +
+      sumStatFromDiscs(discs, "anomalyProficiency") +
+      buffTotals.anomalyProficiency;
+    const anomalyMastery =
+      agent.stats.anomalyMastery + (engine.stats.anomalyMastery || 0) + sumStatFromDiscs(discs, "anomalyMastery") + buffTotals.anomalyMastery;
     const anomaly = totalAtk * 4.5 * (1 + anomalyProficiency / 100) * damageBonusMultiplier * defMultiplier * resMultiplier;
 
     return {
@@ -1318,11 +1453,16 @@
       critRate,
       critDmg,
       baseDmgBonus,
+      penRatio,
+      flatPen,
+      defReduction,
       defMultiplier,
       resMultiplier,
       stunMultiplier,
       anomalyMastery,
       anomalyProficiency,
+      buffSources,
+      buffTotals,
       nonCrit,
       crit,
       expected,
@@ -1334,15 +1474,33 @@
     const result = calculateDamage();
     $("#agent-meta").textContent = `${attributeLabels[result.agent.attribute]} / ${roleLabels[result.agent.role]} / ${result.agent.faction}`;
     $("#disc-summary").textContent = `${result.discFour.kr} 4 / ${result.discTwo.kr} 2`;
+    $("#party-buff-summary").textContent = summarizeBuffs(result.buffSources);
     $("#normal-damage").textContent = fmt.format(result.nonCrit);
     $("#crit-damage").textContent = fmt.format(result.crit);
     $("#expected-damage").textContent = fmt.format(result.expected);
     $("#anomaly-damage").textContent = fmt.format(result.anomaly);
+    $("#buff-list").replaceChildren(
+      ...(result.buffSources.length
+        ? result.buffSources.map((buff) => {
+            const item = document.createElement("article");
+            item.className = "buff-chip";
+            item.innerHTML = `
+              <div>
+                <strong>${buff.label}</strong>
+                <span>${buff.type}${buff.note ? ` / ${buff.note}` : ""}</span>
+              </div>
+              <p>${buffParts(buff).join(" / ")}</p>
+            `;
+            return item;
+          })
+        : [Object.assign(document.createElement("div"), { className: "empty-state", textContent: "No automatic buffs active." })]),
+    );
 
     const lines = [
       ["Total ATK", fmt.format(result.totalAtk)],
       ["CRIT", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
       ["DMG Bonus", `${fmt1.format(result.baseDmgBonus)}%`],
+      ["PEN / DEF Shred", `${fmt1.format(result.penRatio)}% / ${fmt1.format(result.defReduction)}%`],
       ["DEF Multiplier", fmt1.format(result.defMultiplier)],
       ["RES Multiplier", fmt1.format(result.resMultiplier)],
       ["Stun Multiplier", fmt1.format(result.stunMultiplier)],
@@ -1653,6 +1811,9 @@
     fillSelect($("#guide-slot-1"), agents, (agent) => agent.kr);
     fillSelect($("#guide-slot-2"), agents, (agent) => agent.kr);
     fillSelect($("#guide-slot-3"), agents, (agent) => agent.kr);
+    const partyOptions = [{ id: "none", kr: "None" }, ...agents];
+    fillSelect($("#party-slot-1"), partyOptions, (agent) => agent.kr);
+    fillSelect($("#party-slot-2"), partyOptions, (agent) => agent.kr);
     fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} / ${roleLabels[engine.role] || "All"}`);
     fillSelect($("#disc-four"), driveDiscs, (disc) => disc.kr);
     fillSelect($("#disc-two"), driveDiscs, (disc) => disc.kr);
@@ -1677,6 +1838,7 @@
     $("#disc-two").value = "hormone-punk";
     $("#guide-slot-2").value = agents[1].id;
     $("#guide-slot-3").value = agents[2].id;
+    syncDamagePartyFromAgent(selectedAgentId);
   }
 
   function bindEvents() {
@@ -1747,7 +1909,9 @@
     normalizeSelectValue("#agent-select", agents[0].id);
     normalizeSelectValue("#growth-agent-select", agents[0].id);
     normalizeSelectValue("#guide-agent", agents[0].id);
-    selectAgent(selectedAgentId, false);
+    normalizeSelectValue("#party-slot-1", "none");
+    normalizeSelectValue("#party-slot-2", "none");
+    selectAgent(selectedAgentId, false, false);
     bindEvents();
     renderAll();
     renderGuides();
