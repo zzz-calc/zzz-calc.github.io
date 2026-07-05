@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v1.2-damage-tooltips-3.0";
+  const DATA_VERSION = "2026-07-06-v1.3-searchable-selects-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
     agents: 56,
@@ -15,7 +15,18 @@
   const AGENT_API_VERSION = "3.0";
   const AGENT_API_BASE = `https://static.nanoka.cc/zzz/${AGENT_API_VERSION}`;
   const NANOKA_ASSET_BASE = "https://static.nanoka.cc/assets/zzz";
-  const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
+  const TRANSIENT_FIELD_IDS = new Set(["agent-name-filter", "agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
+  const SEARCHABLE_SELECTS = {
+    "agent-select": "에이전트 검색",
+    "growth-agent-select": "에이전트 검색",
+    "party-slot-1": "파티원 검색",
+    "party-slot-2": "파티원 검색",
+    "engine-select": "W-Engine / 전무 검색",
+    "disc-four": "4세트 디스크 검색",
+    "disc-two": "2세트 디스크 검색",
+    "party-disc-1": "파티원 1 디스크 검색",
+    "party-disc-2": "파티원 2 디스크 검색",
+  };
 
   const roleLabels = {
     all: "전체",
@@ -1486,6 +1497,7 @@
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
   const fmt = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 });
   const fmt1 = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 1 });
+  const normalizeSearchText = (value) => String(value ?? "").normalize("NFKC").toLowerCase().replace(/\s+/g, " ").trim();
 
   function getPreferredTheme() {
     return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
@@ -1923,23 +1935,30 @@
     const members = (firstTeam?.members || []).filter((id) => id !== agentId);
     const slot1 = $("#party-slot-1");
     const slot2 = $("#party-slot-2");
-    if (slot1) slot1.value = members[0] || "none";
-    if (slot2) slot2.value = members[1] || "none";
+    setSelectValue(slot1, members[0] || "none");
+    setSelectValue(slot2, members[1] || "none");
     const disc1 = $("#party-disc-1");
     const disc2 = $("#party-disc-2");
-    if (disc1) disc1.value = "none";
-    if (disc2) disc2.value = "none";
+    setSelectValue(disc1, "none");
+    setSelectValue(disc2, "none");
   }
 
-  function option(label, value) {
+  function option(label, value, searchText = "") {
     const item = document.createElement("option");
     item.value = value;
     item.textContent = label;
+    if (searchText) item.dataset.search = searchText;
     return item;
   }
 
   function fillSelect(select, items, labeler) {
-    select.replaceChildren(...items.map((item) => option(labeler(item), item.id)));
+    select.replaceChildren(
+      ...items.map((item) => {
+        const label = labeler(item);
+        const searchText = [label, item.kr, item.en, item.id, item.role, item.attribute, item.rank, item.faction].filter(Boolean).join(" ");
+        return option(label, item.id, searchText);
+      }),
+    );
   }
 
   function fillCoreSelect(select) {
@@ -1955,6 +1974,93 @@
     select.replaceChildren(...items.map((item) => option(item.label, item.id)));
   }
 
+  function cacheSearchableSelect(select) {
+    select._searchOptions = Array.from(select.options).map((item) => {
+      const searchText = [item.dataset.search, item.textContent, item.value].filter(Boolean).join(" ");
+      return {
+        value: item.value,
+        label: item.textContent,
+        searchText,
+        normalized: normalizeSearchText(searchText),
+      };
+    });
+  }
+
+  function updateSearchableSelectStatus(select, visibleCount, totalCount) {
+    const status = select.parentElement?.querySelector(`[data-search-status-for="${select.id}"]`);
+    if (!status) return;
+    const query = select._searchQuery || "";
+    status.textContent = query ? `${visibleCount}/${totalCount}개 표시` : `${totalCount}개`;
+  }
+
+  function renderSearchableSelectOptions(select, query = select._searchQuery || "", preferredValue = select.value) {
+    if (!select?._searchOptions) return;
+    const normalizedQuery = normalizeSearchText(query);
+    const allOptions = select._searchOptions;
+    const selectedEntry = allOptions.find((item) => item.value === preferredValue);
+    let matches = normalizedQuery ? allOptions.filter((item) => item.normalized.includes(normalizedQuery)) : allOptions;
+
+    if (selectedEntry && !matches.some((item) => item.value === selectedEntry.value)) {
+      matches = [selectedEntry, ...matches];
+    }
+
+    select._searchQuery = query;
+    select.replaceChildren(...matches.map((item) => option(item.label, item.value, item.searchText)));
+    if (selectedEntry) {
+      select.value = selectedEntry.value;
+    } else if (select.options.length > 0) {
+      select.selectedIndex = 0;
+    }
+    updateSearchableSelectStatus(select, normalizedQuery ? matches.filter((item) => item.normalized.includes(normalizedQuery)).length : matches.length, allOptions.length);
+  }
+
+  function setSelectValue(select, value) {
+    if (!select) return;
+    if (select._searchOptions) {
+      renderSearchableSelectOptions(select, select._searchQuery || "", value);
+    }
+    select.value = value;
+  }
+
+  function initSearchableSelects() {
+    Object.entries(SEARCHABLE_SELECTS).forEach(([id, placeholder]) => {
+      const select = document.getElementById(id);
+      if (!select || select.dataset.searchEnhanced === "true") return;
+
+      cacheSearchableSelect(select);
+      select.dataset.searchEnhanced = "true";
+
+      const search = document.createElement("input");
+      search.type = "search";
+      search.className = "select-search";
+      search.placeholder = placeholder;
+      search.autocomplete = "off";
+      search.setAttribute("aria-label", placeholder);
+      search.dataset.selectSearchFor = id;
+
+      const status = document.createElement("span");
+      status.className = "select-search-status";
+      status.dataset.searchStatusFor = id;
+
+      select.before(search);
+      select.after(status);
+      updateSearchableSelectStatus(select, select._searchOptions.length, select._searchOptions.length);
+
+      search.addEventListener("input", () => {
+        renderSearchableSelectOptions(select, search.value, select.value);
+      });
+      search.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          search.value = "";
+          renderSearchableSelectOptions(select, "", select.value);
+        }
+      });
+      select.addEventListener("change", () => {
+        renderSearchableSelectOptions(select, search.value, select.value);
+      });
+    });
+  }
+
   function switchTab(tabName) {
     $$(".tab-button").forEach((button) => button.classList.toggle("active", button.dataset.tab === tabName));
     $$(".tab-panel").forEach((panel) => panel.classList.toggle("active", panel.id === `${tabName}-panel`));
@@ -1964,21 +2070,23 @@
     selectedAgentId = getAgent(id).id;
     ["#agent-select", "#growth-agent-select"].forEach((selector) => {
       const field = $(selector);
-      if (field) field.value = selectedAgentId;
+      setSelectValue(field, selectedAgentId);
     });
     if (shouldSyncParty) syncDamagePartyFromAgent(selectedAgentId);
     if (shouldRender) renderAll();
   }
 
   function renderAgentGrid() {
+    const query = normalizeSearchText($("#agent-name-filter").value);
     const role = $("#agent-role-filter").value;
     const attribute = $("#agent-attribute-filter").value;
     const rank = $("#agent-rank-filter").value;
     const filtered = agents.filter((agent) => {
+      const nameOk = !query || normalizeSearchText([agent.kr, agent.en, agent.faction].filter(Boolean).join(" ")).includes(query);
       const roleOk = role === "all" || agent.role === role;
       const attrOk = attribute === "all" || agent.attribute === attribute;
       const rankOk = rank === "all" || agent.rank === rank;
-      return roleOk && attrOk && rankOk;
+      return nameOk && roleOk && attrOk && rankOk;
     });
 
     $("#agent-count").textContent = `${filtered.length}명`;
@@ -2075,8 +2183,8 @@
 
   function applyTeam(team) {
     const damageMembers = team.members.filter((id) => id !== selectedAgentId);
-    $("#party-slot-1").value = damageMembers[0] || "none";
-    $("#party-slot-2").value = damageMembers[1] || "none";
+    setSelectValue($("#party-slot-1"), damageMembers[0] || "none");
+    setSelectValue($("#party-slot-2"), damageMembers[1] || "none");
     switchTab("damage");
     renderAll();
   }
@@ -2400,6 +2508,7 @@
         const field = document.getElementById(id);
         if (!field) continue;
         if (field.type === "checkbox") field.checked = Boolean(value);
+        else if (field.tagName === "SELECT") setSelectValue(field, value);
         else field.value = value;
       }
       selectedAgentId = snapshot.selectedAgentId || $("#agent-select").value || agents[0].id;
@@ -2411,8 +2520,10 @@
   function normalizeSelectValue(selector, fallbackValue) {
     const field = $(selector);
     if (!field) return;
-    const hasValue = Array.from(field.options).some((item) => item.value === field.value);
-    if (!hasValue) field.value = fallbackValue;
+    const options = field._searchOptions || Array.from(field.options);
+    const hasValue = options.some((item) => item.value === field.value);
+    if (!hasValue) setSelectValue(field, fallbackValue);
+    else setSelectValue(field, field.value);
   }
 
   function resetStats() {
@@ -2520,7 +2631,7 @@
     });
 
     $$("input, select, textarea").forEach((field) => {
-      if (field.type === "file") return;
+      if (field.type === "file" || field.classList.contains("select-search")) return;
       field.addEventListener("input", renderAll);
       field.addEventListener("change", renderAll);
     });
@@ -2539,6 +2650,7 @@
     await loadApiEngineNames();
     applyDisplayData();
     initSelects();
+    initSearchableSelects();
     await loadEffectDb();
     restoreSnapshot();
     normalizeSelectValue("#engine-select", "manual");

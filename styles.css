@@ -319,6 +319,20 @@ select {
   min-height: 42px;
 }
 
+.select-search {
+  min-height: 36px;
+  padding-left: 10px;
+}
+
+.select-search-status {
+  min-height: 14px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: right;
+}
+
 textarea {
   min-height: 140px;
   padding: 11px;
@@ -343,8 +357,15 @@ button:focus-visible {
 .inline-grid.three,
 .filter-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+
+.inline-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.filter-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .checkbox-label {
