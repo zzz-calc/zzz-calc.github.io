@@ -1,16 +1,18 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-05-v0.6-kr-ui-3.0";
+  const DATA_VERSION = "2026-07-06-v0.7-api-roster-3.0";
   const DATA_PROFILE = {
-    label: "3.0",
-    agents: 40,
+    label: "3.0 live",
+    agents: 57,
     wEngines: 93,
     driveDiscs: 28,
     naming: "에이전트 이름과 W-Engine 이름은 영어로 유지하고, 나머지 UI와 데이터 라벨은 한국어로 표시합니다.",
   };
   const STATE_STORAGE_KEY = "zzz-calc-state";
   const EFFECT_DB_URL = "data/effects.mock.json";
+  const AGENT_API_VERSION = "3.0";
+  const AGENT_API_BASE = `https://static.nanoka.cc/zzz/${AGENT_API_VERSION}`;
   const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
 
   const roleLabels = {
@@ -633,6 +635,190 @@
     },
   );
 
+  const apiTypeToRole = {
+    1: "attack",
+    2: "stun",
+    3: "anomaly",
+    4: "support",
+    5: "defense",
+    6: "rupture",
+  };
+
+  const apiElementToAttribute = {
+    200: "physical",
+    201: "fire",
+    202: "ice",
+    203: "electric",
+    204: "wind",
+    205: "ether",
+    300: "physical",
+  };
+
+  const apiAgentIdOverrides = {
+    "Astra Yao": "astra",
+    "Ju Fufu": "ju-fufu",
+    "Orphie & Magus": "orphie-magus",
+    "Pan Yinhu": "pan-yinhu",
+    "Soldier 0 - Anby": "soldier-0-anby",
+    "Soldier 11": "soldier-11",
+    "Starlight - Billy": "starlight-billy",
+    "Zhu Yuan": "zhu-yuan",
+    Avatar_Female_Size02_Remielle: "remielle",
+  };
+
+  const apiAvatarNameOverrides = {
+    Anby: "Anby Demara",
+    Anton: "Anton Ivanov",
+    Billy: "Billy Kid",
+    Corin: "Corin Wickes",
+    Ellen: "Ellen Joe",
+    Grace: "Grace Howard",
+    Harumasa: "Asaba Harumasa",
+    Lycaon: "Von Lycaon",
+    Lucy: "Luciana de Montefio",
+    Miyabi: "Hoshimi Miyabi",
+    Nekomata: "Nekomiya Mana",
+    Rina: "Alexandrina Sebastiane",
+    Yanagi: "Tsukishiro Yanagi",
+  };
+
+  function apiAgentDisplayName(name) {
+    return name === "Avatar_Female_Size02_Remielle" ? "Remielle" : name;
+  }
+
+  function apiAgentId(name) {
+    return (
+      apiAgentIdOverrides[name] ||
+      apiAgentDisplayName(name)
+        .toLowerCase()
+        .replace(/&/g, "and")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+    );
+  }
+
+  function apiAvatar(name) {
+    const displayName = apiAgentDisplayName(name);
+    return fandomAvatar(`Avatar ${apiAvatarNameOverrides[displayName] || displayName}.png`);
+  }
+
+  function extraValues(detail) {
+    return Object.values(detail.extra_level?.["6"]?.extra || {});
+  }
+
+  function extraValue(detail, names) {
+    const nameSet = new Set(Array.isArray(names) ? names : [names]);
+    return extraValues(detail)
+      .filter((item) => nameSet.has(item.name))
+      .reduce((total, item) => total + Number(item.value || 0), 0);
+  }
+
+  function level60Stat(base, growth, promotion, extra) {
+    return Math.round(Number(base || 0) + (Number(growth || 0) / 10000) * 59 + Number(promotion || 0) + Number(extra || 0));
+  }
+
+  function roleDefaultDiscs(agent) {
+    if (agent.role === "rupture") return ["Yunkui Tales 4 + Woodpecker Electro 2"];
+    if (agent.role === "stun") return ["Shockstar Disco 4 + Swing Jazz 2"];
+    if (agent.role === "support") return ["Swing Jazz 4 + Hormone Punk 2"];
+    if (agent.role === "defense") return ["Proto Punk 4 + Soul Rock 2"];
+    if (agent.role === "anomaly") {
+      if (agent.attribute === "wind") return ["Wuthering Salon 4 + Freedom Blues 2"];
+      if (agent.attribute === "ether") return ["Chaotic Metal 4 + Freedom Blues 2"];
+      return ["Freedom Blues 4 + Chaos Jazz 2"];
+    }
+    if (agent.attribute === "fire") return ["Inferno Metal 4 + Woodpecker Electro 2"];
+    if (agent.attribute === "ice") return ["Polar Metal 4 + Woodpecker Electro 2"];
+    if (agent.attribute === "electric") return ["Thunder Metal 4 + Woodpecker Electro 2"];
+    if (agent.attribute === "ether") return ["The Sky Ablaze 4 + Woodpecker Electro 2"];
+    return ["Fanged Metal 4 + Woodpecker Electro 2"];
+  }
+
+  function roleDefaultEngines(agent) {
+    const byRole = {
+      attack: ["The Brimstone", "Starlight Engine"],
+      stun: ["Hellfire Gears", "The Restrained"],
+      anomaly: ["Fusion Compiler", "Weeping Gemini"],
+      support: ["Elegant Vanity", "Weeping Cradle"],
+      defense: ["Original Transmorpher", "Bunny Band"],
+      rupture: ["Kraken's Cradle", "Radiowave Journey"],
+    };
+    return byRole[agent.role] || ["Manual"];
+  }
+
+  function apiAgentFromDetail(sourceId, indexEntry, detail) {
+    const name = apiAgentDisplayName(indexEntry.en);
+    const promotion = detail.level?.["6"] || {};
+    const hp = level60Stat(detail.stats.hp_max, detail.stats.hp_growth, promotion.hp_max, extraValue(detail, "HP"));
+    const atk = level60Stat(detail.stats.attack, detail.stats.attack_growth, promotion.attack, extraValue(detail, ["Base ATK", "ATK"]));
+    const def = level60Stat(detail.stats.defence, detail.stats.defence_growth, promotion.defence, extraValue(detail, "DEF"));
+    const role = apiTypeToRole[indexEntry.type] || "attack";
+    const attribute = apiElementToAttribute[indexEntry.element] || "physical";
+    const agent = {
+      sourceId,
+      id: apiAgentId(indexEntry.en),
+      kr: indexEntry.ko?.startsWith("Avatar_") ? name : indexEntry.ko || name,
+      en: name,
+      rank: indexEntry.rank === 4 ? "S" : indexEntry.rank === 3 ? "A" : "B",
+      attribute,
+      role,
+      faction: Object.values(detail.camp || {})[0] || "Unknown",
+      image: apiAvatar(indexEntry.en),
+      stats: {
+        hp,
+        def,
+        atk,
+        critRate: Number(((detail.stats.crit || 0) / 100 + extraValue(detail, "CRIT Rate") / 100).toFixed(1)),
+        critDmg: Number(((detail.stats.crit_damage || 0) / 100 + extraValue(detail, "CRIT DMG") / 100).toFixed(1)),
+        penRatio: Number(((detail.stats.pen_rate || 0) / 100 + extraValue(detail, "PEN Ratio") / 100).toFixed(1)),
+        impact: (detail.stats.break_stun || 0) + extraValue(detail, "Impact"),
+        anomalyMastery: (detail.stats.element_abnormal_power || 0) + extraValue(detail, "Anomaly Mastery"),
+        energy: Number((((detail.stats.sp_recover || 0) + extraValue(detail, "Base Energy Regen")) / 100).toFixed(2)),
+        rpMax: detail.stats.rp_max || 0,
+        rpRecover: detail.stats.rp_recover || 0,
+      },
+      engines: [],
+      discs: [],
+      teams: [],
+    };
+    agent.engines = roleDefaultEngines(agent);
+    agent.discs = roleDefaultDiscs(agent);
+    agent.teams = [{ name: `${name} Core`, members: [agent.id], note: "API roster baseline. Party recommendations need manual verification." }];
+    return agent;
+  }
+
+  async function fetchJson(url) {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+    return response.json();
+  }
+
+  function updateProfileBadge() {
+    const badge = document.querySelector(".version-badge");
+    if (badge) badge.textContent = `${DATA_PROFILE.label} KR - ${DATA_PROFILE.agents}/${DATA_PROFILE.wEngines}/${DATA_PROFILE.driveDiscs} 데이터`;
+  }
+
+  async function loadApiAgentRoster() {
+    try {
+      const index = await fetchJson(`${AGENT_API_BASE}/character.json`);
+      const loadedAgents = await Promise.all(
+        Object.entries(index).map(async ([sourceId, entry]) => {
+          const detail = await fetchJson(`${AGENT_API_BASE}/en/character/${sourceId}.json`);
+          return apiAgentFromDetail(sourceId, entry, detail);
+        }),
+      );
+      if (loadedAgents.length < 50) throw new Error(`Unexpected agent count: ${loadedAgents.length}`);
+      agents.length = 0;
+      agents.push(...loadedAgents);
+      DATA_PROFILE.agents = loadedAgents.length;
+      DATA_PROFILE.label = `${AGENT_API_VERSION} live API`;
+      updateProfileBadge();
+    } catch (error) {
+      console.warn("Could not load API agent roster; using embedded fallback.", error);
+      updateProfileBadge();
+    }
+  }
+
   const engines = [
     { id: "manual", kr: "수동 입력", en: "Manual", rank: "-", role: "any", baseAtk: 0, stats: {}, effect: "입력값만 반영" },
     { id: "angel-in-the-shell", kr: "Angel in the Shell", en: "Angel in the Shell", rank: "S", role: "anomaly", baseAtk: 713, stats: { anomalyMastery: 30 }, effect: "에테르 이상 피해 보정" },
@@ -1096,6 +1282,8 @@
 
   const buffFields = [
     "atkPct",
+    "hpPct",
+    "sheerForce",
     "dmgBonus",
     "critRate",
     "critDmg",
@@ -1415,6 +1603,8 @@
   function buffParts(buff) {
     const labels = {
       atkPct: "공격력",
+      hpPct: "HP",
+      sheerForce: "명파력",
       dmgBonus: "피해",
       critRate: "치명타 확률",
       critDmg: "치명타 피해",
@@ -1432,7 +1622,8 @@
       .filter((field) => Number(buff[field] || 0) !== 0)
       .map((field) => {
         const value = Number(buff[field] || 0);
-        const suffix = field === "flatPen" || field === "anomalyProficiency" || field === "anomalyMastery" ? "" : "%";
+        const suffix =
+          field === "flatPen" || field === "anomalyProficiency" || field === "anomalyMastery" || field === "sheerForce" ? "" : "%";
         return `${labels[field]} +${fmt1.format(value)}${suffix}`;
       });
   }
@@ -1715,6 +1906,15 @@
     const atkPct = number("#atk-percent") + (engine.stats.atkPct || 0) + sumStatFromDiscs(discs, "atkPct") + buffTotals.atkPct;
     const flatAtk = number("#flat-atk");
     const totalAtk = baseAtk * (1 + atkPct / 100) + flatAtk;
+    const baseHp = agent.stats.hp + number("#base-hp");
+    const hpPct = number("#hp-percent") + (engine.stats.hpPct || 0) + sumStatFromDiscs(discs, "hpPct") + buffTotals.hpPct;
+    const flatHp = number("#flat-hp");
+    const totalHp = baseHp * (1 + hpPct / 100) + flatHp;
+    const usesHpScaling = agent.role === "rupture";
+    const flatSheerForce = number("#flat-sheer-force") + buffTotals.sheerForce;
+    const totalSheerForce = usesHpScaling ? totalAtk * 0.3 + totalHp * 0.1 + flatSheerForce : 0;
+    const damageBase = usesHpScaling ? totalSheerForce : totalAtk;
+    const damageBaseLabel = usesHpScaling ? "명파력 기반" : "공격력 기반";
 
     const critRate = clamp(
       agent.stats.critRate + (engine.stats.critRate || 0) + sumStatFromDiscs(discs, "critRate") + number("#crit-rate") + buffTotals.critRate,
@@ -1742,14 +1942,14 @@
     const defReduction = clamp(buffTotals.defReduction, 0, 95);
     const levelCoef = attackerLevel + 100;
     const enemyDefPart = Math.max((enemyLevel + 100) * (1 - defReduction / 100) * (1 - penRatio / 100) - flatPen, 1);
-    const defMultiplier = levelCoef / (levelCoef + enemyDefPart);
+    const defMultiplier = usesHpScaling ? 1 : levelCoef / (levelCoef + enemyDefPart);
 
     const effectiveRes = number("#enemy-res") - number("#res-shred") - buffTotals.resShred;
     const resMultiplier = clamp(1 - effectiveRes / 100, 0.05, 2);
     const stunMultiplier = $("#enemy-stunned").checked ? (number("#stun-multiplier") / 100) * (1 + buffTotals.stunDmg / 100) : 1;
 
     const skillMultiplier = number("#skill-multiplier") / 100;
-    const nonCrit = totalAtk * skillMultiplier * damageBonusMultiplier * defMultiplier * resMultiplier * stunMultiplier;
+    const nonCrit = damageBase * skillMultiplier * damageBonusMultiplier * defMultiplier * resMultiplier * stunMultiplier;
     const crit = nonCrit * (1 + critDmg / 100);
     const expected = nonCrit * (1 + (critRate / 100) * (critDmg / 100));
 
@@ -1768,6 +1968,13 @@
       discFour,
       discTwo,
       totalAtk,
+      totalHp,
+      hpPct,
+      flatSheerForce,
+      totalSheerForce,
+      damageBase,
+      damageBaseLabel,
+      usesHpScaling,
       critRate,
       critDmg,
       baseDmgBonus,
@@ -1822,8 +2029,13 @@
     );
 
     const lines = [
+      ["피해 기준", result.damageBaseLabel],
+      ...(result.usesHpScaling ? [["총 명파력", fmt.format(result.totalSheerForce)]] : []),
       ["총 공격력", fmt.format(result.totalAtk)],
+      ["총 HP", fmt.format(result.totalHp)],
       ["치명타", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
+      ["HP 보너스", `${fmt1.format(result.hpPct)}%`],
+      ...(result.usesHpScaling ? [["고정 명파력", fmt.format(result.flatSheerForce)]] : []),
       ["피해 보너스", `${fmt1.format(result.baseDmgBonus)}%`],
       ["관통 / 방어 감소", `${fmt1.format(result.penRatio)}% / ${fmt1.format(result.defReduction)}%`],
       ["저항 감소", `${fmt1.format(result.buffTotals.resShred)}%`],
@@ -2010,6 +2222,10 @@
     $("#crit-dmg").value = Math.max(0, 120 - agent.stats.critDmg);
     $("#atk-percent").value = 70;
     $("#flat-atk").value = 316;
+    $("#base-hp").value = 0;
+    $("#hp-percent").value = agent.role === "rupture" ? 30 : 0;
+    $("#flat-hp").value = 0;
+    $("#flat-sheer-force").value = 0;
     $("#dmg-bonus").value = 46.6;
     $("#pen-ratio").value = 0;
     $("#flat-pen").value = 0;
@@ -2118,6 +2334,8 @@
   }
 
   async function init() {
+    await loadApiAgentRoster();
+    applyDisplayData();
     initSelects();
     await loadEffectDb();
     restoreSnapshot();

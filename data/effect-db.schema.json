@@ -60,6 +60,8 @@
     "statField": {
       "enum": [
         "atkPct",
+        "hpPct",
+        "sheerForce",
         "dmgBonus",
         "critRate",
         "critDmg",
@@ -79,6 +81,8 @@
       "additionalProperties": false,
       "properties": {
         "atkPct": { "type": "number" },
+        "hpPct": { "type": "number" },
+        "sheerForce": { "type": "number" },
         "dmgBonus": { "type": "number" },
         "critRate": { "type": "number" },
         "critDmg": { "type": "number" },

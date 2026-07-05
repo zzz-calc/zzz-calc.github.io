@@ -136,9 +136,10 @@ function hasStats(stats) {
 }
 
 function stackMultiplier(sentences, index) {
+  const previous = sentences.slice(Math.max(0, index - 3), index).join(" ");
   const current = sentences[index] || "";
   const next = sentences[index + 1] || "";
-  const stackText = `${current} ${next.match(/^Can stack/i) ? next : ""}`;
+  const stackText = `${previous} ${current} ${next.match(/^Can stack/i) ? next : ""}`;
   const match = stackText.match(/(?:stacking up to|up to)\s+(\d+)\s+(?:stacks|times)/i);
   return match ? Number(match[1]) : 1;
 }
@@ -170,6 +171,7 @@ function parseEffectStats(rawText) {
     applyPercentMatches(stats, "atkPct", sentence, /Increases ATK by ([\d.]+)%/gi);
     applyPercentMatches(stats, "atkPct", sentence, /(?:the equipper's|their|her|his|all squad members') ATK (?:is )?(?:increases|increased) by ([\d.]+)%/gi);
     applyPercentMatches(stats, "atkPct", sentence, /gain(?:s)? ([\d.]+)% ATK/gi);
+    applyPercentMatches(stats, "hpPct", sentence, /(?:Max HP|HP) (?:is )?(?:increases|increased|increase) by ([\d.]+)%/gi);
 
     applyPercentMatches(stats, "dmgBonus", sentence, /Increases (?:the equipper's |their |her |his |all squad members' |all Agents' |all units' )?(?:Ice|Fire|Electric|Ether|Physical|Wind|Sheer|Attribute Anomaly|Disorder|Basic Attack|Dash Attack|Dodge Counter|Chain Attack|Ultimate|EX Special Attack|Aftershock|Vortex|Windswept|Frostburn - Break)? ?DMG by ([\d.]+)%/gi, multiplier);
     applyPercentMatches(stats, "dmgBonus", sentence, /(?:the equipper's|their|her|his|all squad members'|all Agents'|all units') [^.]{0,40}?(?<!CRIT )DMG (?:dealt )?(?:increases|is increased) by ([\d.]+)%/gi, multiplier);
@@ -214,6 +216,12 @@ function parseEffectStats(rawText) {
       addStat(stats, "anomalyMastery", Number(match[1]) * stackableMultiplier);
       addStat(stats, "anomalyProficiency", Number(match[1]) * stackableMultiplier);
     }
+    for (const match of sentence.matchAll(/Sheer Force (?:is )?(?:increases|increased) by ([\d.]+)/gi)) {
+      addStat(stats, "sheerForce", Number(match[1]) * stackableMultiplier);
+    }
+    for (const match of sentence.matchAll(/(?:increases|increased) (?:the equipper's |their |her |his )?Sheer Force by ([\d.]+)/gi)) {
+      addStat(stats, "sheerForce", Number(match[1]) * stackableMultiplier);
+    }
   });
 
   return stats;
@@ -254,9 +262,9 @@ function pendingBuff(id, label) {
     appliesTo: ["all-damage"],
     stats: {},
     stacking: { mode: "manual", uptimeMode: "manual" },
-    sourceRefs: ["manual-test"],
-    notes: "Run the importer again after updating the local name mapping.",
-    mockValue: true,
+    sourceRefs: ["nanoka-static"],
+    notes: "No source text is available for this row in the 3.0 API snapshot.",
+    mockValue: false,
   };
 }
 
@@ -282,9 +290,9 @@ function pendingDamageHook(id, label) {
     targetSkillTags: ["all-agent-skill-levels"],
     formula: "Source text was not matched for this row.",
     sourceStatus: "source-pending",
-    sourceRefs: ["manual-test"],
+    sourceRefs: ["nanoka-static"],
     notes: label,
-    mockValue: true,
+    mockValue: false,
   };
 }
 
@@ -337,8 +345,42 @@ function refinementRows(engine, detail) {
   });
 }
 
+const apiAgentIdOverrides = {
+  "Astra Yao": "astra",
+  "Ju Fufu": "ju-fufu",
+  "Orphie & Magus": "orphie-magus",
+  "Pan Yinhu": "pan-yinhu",
+  "Soldier 0 - Anby": "soldier-0-anby",
+  "Soldier 11": "soldier-11",
+  "Starlight - Billy": "starlight-billy",
+  "Zhu Yuan": "zhu-yuan",
+  Avatar_Female_Size02_Remielle: "remielle",
+};
+
+function apiAgentDisplayName(name) {
+  return name === "Avatar_Female_Size02_Remielle" ? "Remielle" : name;
+}
+
+function apiAgentId(name) {
+  return (
+    apiAgentIdOverrides[name] ||
+    apiAgentDisplayName(name)
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+  );
+}
+
+function apiAgents(characterIndex) {
+  return Object.entries(characterIndex).map(([sourceId, item]) => ({
+    id: apiAgentId(item.en),
+    name: apiAgentDisplayName(item.en),
+    source: { sourceId, item },
+  }));
+}
+
 const appSource = await readFile(APP_SOURCE_PATH, "utf8");
-const agents = extractEntries(sliceBetween(appSource, "const agents = [", "const engines = ["));
 const engines = extractEntries(sliceBetween(appSource, "const engines = [", "const driveDiscs = [")).filter((engine) => engine.id !== "manual");
 
 const manifest = await fetchJson("/manifest.json");
@@ -347,13 +389,9 @@ const version = requestedVersion === "latest" || requestedVersion === "live" ? m
 
 const [characterIndex, weaponIndex] = await Promise.all([fetchJson(`/zzz/${version}/character.json`), fetchJson(`/zzz/${version}/weapon.json`)]);
 
-const characterLookup = sourceListToLookup(characterIndex, (item) => [item.en, item.code]);
 const weaponLookup = sourceListToLookup(weaponIndex, (item) => [item.en]);
 
-const matchedAgents = agents.map((agent) => ({
-  ...agent,
-  source: matchSource(characterLookup, [agent.name, ...(agentApiNamesById[agent.id] || [])]),
-}));
+const matchedAgents = apiAgents(characterIndex);
 const matchedEngines = engines.map((engine) => ({
   ...engine,
   source: matchSource(weaponLookup, [engine.name]),
@@ -413,6 +451,8 @@ const database = {
   },
   statFields: [
     "atkPct",
+    "hpPct",
+    "sheerForce",
     "dmgBonus",
     "critRate",
     "critDmg",
@@ -455,7 +495,7 @@ await writeFile(OUTPUT_PATH, `${JSON.stringify(database, null, 2)}\n`);
 
 const unmatchedAgents = matchedAgents.filter((agent) => !agent.source);
 const unmatchedEngines = matchedEngines.filter((engine) => !engine.source);
-console.log(`Imported ${agents.length - unmatchedAgents.length}/${agents.length} Agent effect sets.`);
+console.log(`Imported ${matchedAgents.length - unmatchedAgents.length}/${matchedAgents.length} Agent effect sets.`);
 console.log(`Imported ${engines.length - unmatchedEngines.length}/${engines.length} W-Engine effect sets.`);
 console.log(`Source version: ${version}`);
 if (unmatchedAgents.length) console.warn(`Unmatched Agents: ${unmatchedAgents.map((agent) => agent.name).join(", ")}`);
