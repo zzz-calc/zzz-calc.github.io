@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Zenless Zone Zero damage and growth material calculator" />
-    <title>ZZZ Calc</title>
+    <meta name="description" content="젠레스 존 제로 딜량 및 육성 재화 계산기" />
+    <title>ZZZ 계산기</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -12,17 +12,17 @@
       <header class="topbar">
         <div>
           <p class="eyebrow">Zenless Zone Zero</p>
-          <h1>ZZZ Calculator</h1>
+          <h1>ZZZ 계산기</h1>
         </div>
-        <div class="version-badge">3.0 EN - 40/93/21 DB</div>
+        <div class="version-badge">3.0 KR - 40/93/21 데이터</div>
       </header>
 
-      <nav class="tabs" aria-label="Calculator tabs">
-        <button class="tab-button active" type="button" data-tab="agents">Agents</button>
-        <button class="tab-button" type="button" data-tab="damage">Damage</button>
-        <button class="tab-button" type="button" data-tab="growth">Growth</button>
-        <button class="tab-button" type="button" data-tab="community">Community</button>
-        <button class="tab-button" type="button" data-tab="database">Data</button>
+      <nav class="tabs" aria-label="계산기 탭">
+        <button class="tab-button active" type="button" data-tab="agents">에이전트</button>
+        <button class="tab-button" type="button" data-tab="damage">딜량</button>
+        <button class="tab-button" type="button" data-tab="growth">육성</button>
+        <button class="tab-button" type="button" data-tab="community">커뮤니티</button>
+        <button class="tab-button" type="button" data-tab="database">데이터</button>
       </nav>
 
       <main>
@@ -31,16 +31,16 @@
             <section class="tool-panel">
               <div class="form-section">
                 <div class="section-heading">
-                  <h2>Agent Select</h2>
+                  <h2>에이전트 선택</h2>
                   <span id="agent-count">-</span>
                 </div>
                 <div class="filter-row">
                   <label>
-                    Specialty
+                    역할군
                     <select id="agent-role-filter"></select>
                   </label>
                   <label>
-                    Attribute
+                    속성
                     <select id="agent-attribute-filter"></select>
                   </label>
                 </div>
@@ -52,14 +52,14 @@
               <div class="agent-hero" id="agent-detail"></div>
               <section class="breakdown">
                 <div class="section-heading">
-                  <h2>Recommended Teams</h2>
-                  <span>Draft</span>
+                  <h2>추천 파티</h2>
+                  <span>초안</span>
                 </div>
                 <div class="team-list" id="team-list"></div>
               </section>
               <div class="action-row">
-                <button class="primary-button" type="button" data-jump="damage">Damage Calc</button>
-                <button class="ghost-button" type="button" data-jump="growth">Growth Calc</button>
+                <button class="primary-button" type="button" data-jump="damage">딜량 계산</button>
+                <button class="ghost-button" type="button" data-jump="growth">육성 계산</button>
               </div>
             </aside>
           </div>
@@ -70,11 +70,11 @@
             <form class="tool-panel" id="damage-form">
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Agent</h2>
+                  <h2>에이전트</h2>
                   <span id="agent-meta">-</span>
                 </div>
                 <label>
-                  Agent
+                  에이전트
                   <select id="agent-select"></select>
                 </label>
                 <label>
@@ -83,11 +83,11 @@
                 </label>
                 <div class="inline-grid">
                   <label>
-                    Attacker Level
+                    공격자 레벨
                     <input id="attacker-level" type="number" min="1" max="60" value="60" />
                   </label>
                   <label>
-                    Skill Multiplier %
+                    스킬 계수 %
                     <input id="skill-multiplier" type="number" min="1" step="0.1" value="600" />
                   </label>
                 </div>
@@ -95,40 +95,40 @@
 
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Stats</h2>
-                  <button class="ghost-button" id="reset-stats" type="button">Reset</button>
+                  <h2>스탯</h2>
+                  <button class="ghost-button" id="reset-stats" type="button">초기화</button>
                 </div>
                 <div class="inline-grid">
                   <label>
-                    ATK %
+                    공격력 %
                     <input id="atk-percent" type="number" step="0.1" value="70" />
                   </label>
                   <label>
-                    Flat ATK
+                    고정 공격력
                     <input id="flat-atk" type="number" step="1" value="316" />
                   </label>
                   <label>
-                    CRIT Rate %
+                    치명타 확률 %
                     <input id="crit-rate" type="number" step="0.1" value="60" />
                   </label>
                   <label>
-                    CRIT DMG %
+                    치명타 피해 %
                     <input id="crit-dmg" type="number" step="0.1" value="120" />
                   </label>
                   <label>
-                    DMG Bonus %
+                    피해 보너스 %
                     <input id="dmg-bonus" type="number" step="0.1" value="46.6" />
                   </label>
                   <label>
-                    PEN Ratio %
+                    관통률 %
                     <input id="pen-ratio" type="number" step="0.1" value="0" />
                   </label>
                   <label>
-                    Flat PEN
+                    관통 수치
                     <input id="flat-pen" type="number" step="1" value="0" />
                   </label>
                   <label>
-                    Anomaly Proficiency
+                    이상 숙련
                     <input id="anomaly-proficiency" type="number" step="1" value="0" />
                   </label>
                 </div>
@@ -136,65 +136,65 @@
 
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Drive Discs</h2>
+                  <h2>디스크</h2>
                   <span id="disc-summary">-</span>
                 </div>
                 <div class="inline-grid">
                   <label>
-                    4-Piece
+                    4세트
                     <select id="disc-four"></select>
                   </label>
                   <label>
-                    2-Piece
+                    2세트
                     <select id="disc-two"></select>
                   </label>
                   <label>
-                    Manual Disc DMG %
+                    수동 디스크 피해 %
                     <input id="disc-conditional" type="number" step="0.1" value="0" />
                   </label>
                   <label class="checkbox-label">
                     <input id="auto-disc-buffs" type="checkbox" checked />
-                    Apply 4-Piece Preset
+                    4세트 프리셋 적용
                   </label>
                 </div>
               </section>
 
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Party Buffs</h2>
+                  <h2>파티 버프</h2>
                   <span id="party-buff-summary">-</span>
                 </div>
                 <div class="inline-grid">
                   <label>
-                    Teammate 1
+                    파티원 1
                     <select id="party-slot-1"></select>
                   </label>
                   <label>
-                    Teammate 2
+                    파티원 2
                     <select id="party-slot-2"></select>
                   </label>
                   <label class="checkbox-label">
                     <input id="auto-team-buffs" type="checkbox" checked />
-                    Apply Team Presets
+                    파티 프리셋 적용
                   </label>
                   <label>
-                    Manual DMG Bonus %
+                    수동 피해 보너스 %
                     <input id="team-bonus" type="number" step="0.1" value="0" />
                   </label>
                   <label>
-                    Manual ATK %
+                    수동 공격력 %
                     <input id="manual-atk-buff" type="number" step="0.1" value="0" />
                   </label>
                   <label>
-                    Manual CRIT Rate %
+                    수동 치명타 확률 %
                     <input id="manual-crit-rate-buff" type="number" step="0.1" value="0" />
                   </label>
                   <label>
-                    Manual CRIT DMG %
+                    수동 치명타 피해 %
                     <input id="manual-crit-dmg-buff" type="number" step="0.1" value="0" />
                   </label>
                   <label>
-                    Manual PEN Ratio %
+                    수동 관통률 %
                     <input id="manual-pen-ratio-buff" type="number" step="0.1" value="0" />
                   </label>
                 </div>
@@ -203,33 +203,33 @@
 
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Enemy</h2>
-                  <span>DEF/RES</span>
+                  <h2>적</h2>
+                  <span>방어/저항</span>
                 </div>
                 <div class="inline-grid">
                   <label>
-                    Enemy Level
+                    적 레벨
                     <input id="enemy-level" type="number" min="1" max="100" value="70" />
                   </label>
                   <label>
-                    Enemy RES %
+                    적 저항 %
                     <input id="enemy-res" type="number" step="0.1" value="10" />
                   </label>
                   <label>
-                    RES Shred %
+                    저항 감소 %
                     <input id="res-shred" type="number" step="0.1" value="0" />
                   </label>
                   <label>
-                    Vulnerability %
+                    받는 피해 증가 %
                     <input id="vulnerability" type="number" step="0.1" value="0" />
                   </label>
                   <label>
-                    Stun Multiplier %
+                    그로기 배율 %
                     <input id="stun-multiplier" type="number" step="1" value="150" />
                   </label>
                   <label class="checkbox-label">
                     <input id="enemy-stunned" type="checkbox" />
-                    Stunned
+                    그로기
                   </label>
                 </div>
               </section>
@@ -238,24 +238,24 @@
             <aside class="results-panel">
               <div class="result-grid">
                 <article class="result-card strong">
-                  <span>Expected</span>
+                  <span>기댓값</span>
                   <strong id="expected-damage">0</strong>
                 </article>
                 <article class="result-card">
-                  <span>Critical</span>
+                  <span>치명타</span>
                   <strong id="crit-damage">0</strong>
                 </article>
                 <article class="result-card">
-                  <span>Non-Critical</span>
+                  <span>비치명</span>
                   <strong id="normal-damage">0</strong>
                 </article>
                 <article class="result-card">
-                  <span>Anomaly</span>
+                  <span>이상 피해</span>
                   <strong id="anomaly-damage">0</strong>
                 </article>
               </div>
               <section class="breakdown">
-                <h2>Breakdown</h2>
+                <h2>계산값</h2>
                 <dl id="damage-breakdown"></dl>
               </section>
             </aside>
@@ -267,20 +267,20 @@
             <form class="tool-panel" id="growth-form">
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Target</h2>
+                  <h2>대상</h2>
                   <span id="growth-agent-meta">-</span>
                 </div>
                 <label>
-                  Agent
+                  에이전트
                   <select id="growth-agent-select"></select>
                 </label>
                 <div class="inline-grid">
                   <label>
-                    Current Level
+                    현재 레벨
                     <input id="current-level" type="number" min="1" max="60" value="1" />
                   </label>
                   <label>
-                    Target Level
+                    목표 레벨
                     <input id="target-level" type="number" min="1" max="60" value="60" />
                   </label>
                 </div>
@@ -288,28 +288,28 @@
 
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Skills</h2>
-                  <span>Combat Skills</span>
+                  <h2>스킬</h2>
+                  <span>전투 스킬</span>
                 </div>
                 <div class="inline-grid">
                   <label>
-                    Current Skill
+                    현재 스킬
                     <input id="current-skill" type="number" min="1" max="12" value="1" />
                   </label>
                   <label>
-                    Target Skill
+                    목표 스킬
                     <input id="target-skill" type="number" min="1" max="12" value="12" />
                   </label>
                   <label>
-                    Skill Count
+                    스킬 개수
                     <input id="skill-count" type="number" min="0" max="5" value="5" />
                   </label>
                   <label>
-                    Current Core
+                    핵심 현재
                     <select id="current-core"></select>
                   </label>
                   <label>
-                    Target Core
+                    핵심 목표
                     <select id="target-core"></select>
                   </label>
                 </div>
@@ -318,15 +318,15 @@
               <section class="form-section">
                 <div class="section-heading">
                   <h2>W-Engine</h2>
-                  <span>Level</span>
+                  <span>레벨</span>
                 </div>
                 <div class="inline-grid">
                   <label>
-                    Current Level
+                    현재 레벨
                     <input id="current-engine-level" type="number" min="1" max="60" value="1" />
                   </label>
                   <label>
-                    Target Level
+                    목표 레벨
                     <input id="target-engine-level" type="number" min="1" max="60" value="60" />
                   </label>
                 </div>
@@ -335,8 +335,8 @@
 
             <aside class="results-panel">
               <div class="section-heading">
-                <h2>Required Materials</h2>
-                <button class="ghost-button" id="copy-growth" type="button">Copy</button>
+                <h2>필요 재화</h2>
+                <button class="ghost-button" id="copy-growth" type="button">복사</button>
               </div>
               <div class="resource-list" id="resource-list"></div>
             </aside>
@@ -348,69 +348,69 @@
             <form class="tool-panel" id="guide-form">
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Add Team/Guide</h2>
-                  <span>Browser Storage</span>
+                  <h2>조합/공략 등록</h2>
+                  <span>브라우저 저장</span>
                 </div>
                 <div class="inline-grid">
                   <label>
-                    Author
-                    <input id="guide-author" type="text" maxlength="24" placeholder="Nickname" />
+                    작성자
+                    <input id="guide-author" type="text" maxlength="24" placeholder="닉네임" />
                   </label>
                   <label>
-                    Title
-                    <input id="guide-title" type="text" maxlength="60" placeholder="e.g. Miyabi Disorder Team" />
+                    제목
+                    <input id="guide-title" type="text" maxlength="60" placeholder="예: Miyabi 혼돈 파티" />
                   </label>
                   <label>
-                    Main Agent
+                    중심 에이전트
                     <select id="guide-agent"></select>
                   </label>
                   <label>
-                    Tags
-                    <input id="guide-tags" type="text" maxlength="80" placeholder="Disorder, Shiyu, Assault" />
+                    태그
+                    <input id="guide-tags" type="text" maxlength="80" placeholder="혼돈, 시유, 강습전" />
                   </label>
                 </div>
               </section>
               <section class="form-section">
                 <div class="section-heading">
-                  <h2>Team</h2>
-                  <span>3 Slots</span>
+                  <h2>파티</h2>
+                  <span>3인</span>
                 </div>
                 <div class="inline-grid three">
                   <label>
-                    Slot 1
+                    1번
                     <select id="guide-slot-1"></select>
                   </label>
                   <label>
-                    Slot 2
+                    2번
                     <select id="guide-slot-2"></select>
                   </label>
                   <label>
-                    Slot 3
+                    3번
                     <select id="guide-slot-3"></select>
                   </label>
                 </div>
               </section>
               <section class="form-section">
                 <label>
-                  Guide
-                  <textarea id="guide-body" rows="8" maxlength="1200" placeholder="Rotation, Drive Discs, W-Engines, caveats"></textarea>
+                  공략
+                  <textarea id="guide-body" rows="8" maxlength="1200" placeholder="운용, 디스크, W-Engine, 주의점"></textarea>
                 </label>
                 <div class="action-row">
-                  <button class="primary-button" id="save-guide" type="submit">Save</button>
-                  <button class="ghost-button" id="export-guides" type="button">Export JSON</button>
+                  <button class="primary-button" id="save-guide" type="submit">저장</button>
+                  <button class="ghost-button" id="export-guides" type="button">JSON 내보내기</button>
                   <label class="file-button">
-                    Import JSON
+                    JSON 가져오기
                     <input id="import-guides" type="file" accept="application/json" />
                   </label>
-                  <a class="ghost-link" id="issue-link" href="#" target="_blank" rel="noreferrer">GitHub Submit</a>
+                  <a class="ghost-link" id="issue-link" href="#" target="_blank" rel="noreferrer">GitHub 제보</a>
                 </div>
               </section>
             </form>
 
             <aside class="results-panel">
               <div class="section-heading">
-                <h2>Saved Guides</h2>
-                <button class="ghost-button" id="clear-guides" type="button">Clear</button>
+                <h2>저장된 공략</h2>
+                <button class="ghost-button" id="clear-guides" type="button">비우기</button>
               </div>
               <div class="guide-list" id="guide-list"></div>
             </aside>
@@ -420,23 +420,23 @@
         <section class="tab-panel" id="database-panel">
           <div class="database-toolbar">
             <label>
-              Search
-              <input id="database-search" type="search" placeholder="Agent, Drive Disc, W-Engine" />
+              검색
+              <input id="database-search" type="search" placeholder="에이전트, 디스크, W-Engine" />
             </label>
             <button class="ghost-button" id="download-data" type="button">JSON</button>
           </div>
           <div class="database-grid">
             <section class="data-table-panel">
-              <h2>Agents</h2>
+              <h2>에이전트</h2>
               <div class="table-scroll">
                 <table>
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>Rank</th>
-                      <th>Attribute</th>
-                      <th>Specialty</th>
-                      <th>Teams</th>
+                      <th>이름</th>
+                      <th>랭크</th>
+                      <th>속성</th>
+                      <th>역할군</th>
+                      <th>추천 파티</th>
                     </tr>
                   </thead>
                   <tbody id="agent-table"></tbody>
@@ -444,14 +444,14 @@
               </div>
             </section>
             <section class="data-table-panel">
-              <h2>Drive Discs</h2>
+              <h2>디스크</h2>
               <div class="table-scroll">
                 <table>
                   <thead>
                     <tr>
-                      <th>Set</th>
-                      <th>2-Piece</th>
-                      <th>4-Piece</th>
+                      <th>세트</th>
+                      <th>2세트</th>
+                      <th>4세트</th>
                     </tr>
                   </thead>
                   <tbody id="disc-table"></tbody>
@@ -459,15 +459,15 @@
               </div>
             </section>
             <section class="data-table-panel">
-              <h2>W-Engines</h2>
+              <h2>W-Engine</h2>
               <div class="table-scroll">
                 <table>
                   <thead>
                     <tr>
-                      <th>Name</th>
-                      <th>Rank</th>
-                      <th>Specialty</th>
-                      <th>Base ATK</th>
+                      <th>이름</th>
+                      <th>랭크</th>
+                      <th>역할군</th>
+                      <th>기초 공격력</th>
                     </tr>
                   </thead>
                   <tbody id="engine-table"></tbody>

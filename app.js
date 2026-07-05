@@ -1,13 +1,13 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-05-v0.4-en-3.0";
+  const DATA_VERSION = "2026-07-05-v0.6-kr-ui-3.0";
   const DATA_PROFILE = {
     label: "3.0",
     agents: 40,
     wEngines: 93,
     driveDiscs: 21,
-    naming: "English source names are used throughout the app.",
+    naming: "에이전트 이름과 W-Engine 이름은 영어로 유지하고, 나머지 UI와 데이터 라벨은 한국어로 표시합니다.",
   };
   const GUIDE_STORAGE_KEY = "zzz-calc-community-guides";
   const STATE_STORAGE_KEY = "zzz-calc-state";
@@ -15,25 +15,25 @@
   const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "database-search"]);
 
   const roleLabels = {
-    all: "All",
-    attack: "Attack",
-    stun: "Stun",
-    anomaly: "Anomaly",
-    support: "Support",
-    defense: "Defense",
-    rupture: "Rupture",
+    all: "전체",
+    attack: "강공",
+    stun: "격파",
+    anomaly: "이상",
+    support: "지원",
+    defense: "방어",
+    rupture: "명파",
   };
 
   const attributeLabels = {
-    all: "All",
-    physical: "Physical",
-    fire: "Fire",
-    ice: "Ice",
-    frost: "Frost",
-    electric: "Electric",
-    ether: "Ether",
-    wind: "Wind",
-    auricInk: "Auric Ink",
+    all: "전체",
+    physical: "물리",
+    fire: "불",
+    ice: "얼음",
+    frost: "서리",
+    electric: "전기",
+    ether: "에테르",
+    wind: "바람",
+    auricInk: "현묵",
   };
 
   function fandomAvatar(fileName) {
@@ -922,80 +922,154 @@
     },
   };
 
-  const discEnglishEffects = {
-    none: { kr: "None", two: "None", four: "None" },
-    "fanged-metal": { two: "Physical DMG +10%", four: "After Assault, the target takes increased damage." },
-    "polar-metal": { two: "Ice DMG +10%", four: "Basic and Dash Attack DMG increases, with extra value after Freeze/Shatter." },
-    "thunder-metal": { two: "Electric DMG +10%", four: "ATK increases while an enemy is Shocked." },
-    "chaotic-metal": { two: "Ether DMG +10%", four: "CRIT DMG increases, with extra stacks after Corruption damage." },
-    "inferno-metal": { two: "Fire DMG +10%", four: "CRIT Rate increases against Burning enemies." },
-    "swing-jazz": { two: "Energy Regen +20%", four: "Chain Attack or Ultimate increases squad DMG." },
-    "soul-rock": { two: "DEF +16%", four: "Taking damage reduces incoming damage briefly." },
-    "hormone-punk": { two: "ATK +10%", four: "ATK increases on combat entry or swap-in." },
-    "freedom-blues": { two: "Anomaly Proficiency +30", four: "EX Special Attack hits reduce Anomaly Buildup RES." },
-    "shockstar-disco": { two: "Impact +6%", four: "Basic, Dash, and Dodge Counter Daze increases." },
-    "puffer-electro": { two: "PEN Ratio +8%", four: "Ultimate DMG increases and grants ATK after Ultimate." },
-    "woodpecker-electro": { two: "CRIT Rate +8%", four: "CRIT hits grant stacking ATK." },
-    "proto-punk": { two: "Shield Effect +15%", four: "Defensive or Evasive Assist increases squad DMG." },
-    "chaos-jazz": { two: "Anomaly Proficiency +30", four: "Fire/Electric DMG and off-field EX/Assist DMG increase." },
-    "astral-voice": { two: "ATK +10%", four: "Quick Assist entries grant Astral stacks." },
-    "branch-blade": { two: "CRIT DMG +16%", four: "High Anomaly Mastery and Freeze/Shatter boost CRIT." },
-    "shadow-harmony": { two: "Aftershock and Dash Attack DMG +15%", four: "Aftershock or Dash hits grant ATK and CRIT Rate." },
-    "phaethon-melody": { two: "Anomaly Mastery +8%", four: "EX Special Attacks increase Anomaly Proficiency and Ether DMG." },
-    "yunkui-tales": { two: "HP +10%", four: "EX, Chain, or Ultimate grants CRIT Rate; max stacks boost Sheer DMG." },
-    "king-summit": { two: "Daze +6%", four: "Stun specialty users boost squad CRIT DMG." },
-    "moonlight-lullaby": { two: "Energy Regen +20%", four: "Support EX Special Attack or Ultimate increases squad DMG." },
+  const koreanAgentDisplay = {
+    anby: { faction: "교활한 토끼굴", teams: [{ name: "초반 전기", members: ["anby", "anton", "nicole"], note: "격파 후 전기 강공 딜러를 넣는 기본형입니다." }] },
+    anton: { faction: "벨로보그 중공업", teams: [{ name: "전기 강공", members: ["anton", "anby", "rina"], note: "감전 유지 후 그로기 창에 버스트를 몰아넣습니다." }] },
+    billy: { faction: "교활한 토끼굴", teams: [{ name: "교활한 토끼굴", members: ["billy", "anby", "nicole"], note: "무료 에이전트 중심의 물리 강공 조합입니다." }] },
+    nicole: { faction: "교활한 토끼굴", teams: [{ name: "에테르 버스트", members: ["zhu-yuan", "qingyi", "nicole"], note: "몹몰이와 방어 감소 후 Zhu Yuan의 화력을 집중합니다." }] },
+    "zhu-yuan": {
+      faction: "치안국 특수대응팀",
+      teams: [
+        { name: "Zhu Yuan 표준", members: ["zhu-yuan", "qingyi", "nicole"], note: "그로기 창에 탄창을 몰아넣는 표준 구성입니다." },
+        { name: "Zhu Yuan 지원 강화", members: ["zhu-yuan", "anby", "astra"], note: "지원 버프를 크게 받는 버스트형 구성입니다." },
+      ],
+    },
+    qingyi: { faction: "치안국 특수대응팀", teams: [{ name: "그로기 코어", members: ["zhu-yuan", "qingyi", "nicole"], note: "고효율 격파 슬롯으로 버스트 딜러를 보조합니다." }] },
+    ellen: {
+      faction: "빅토리아 하우스키핑",
+      teams: [
+        { name: "Ellen 빙결", members: ["ellen", "lycaon", "soukaku"], note: "격파와 얼음 버프로 안정적으로 딜 타이밍을 만듭니다." },
+        { name: "Ellen 버프형", members: ["ellen", "lighter", "soukaku"], note: "Lighter 보유 시 화력 창을 더 크게 잡는 구성입니다." },
+      ],
+    },
+    lycaon: { faction: "빅토리아 하우스키핑", teams: [{ name: "얼음 격파", members: ["ellen", "lycaon", "soukaku"], note: "Ellen과 궁합이 좋은 얼음 격파 슬롯입니다." }] },
+    rina: { faction: "빅토리아 하우스키핑", teams: [{ name: "감전 지원", members: ["grace", "rina", "anton"], note: "관통과 감전 보조로 전기 파티를 지원합니다." }] },
+    soukaku: { faction: "대공동 6과", teams: [{ name: "얼음 지원", members: ["ellen", "lycaon", "soukaku"], note: "얼음 딜러의 공격력과 운용 안정성을 보조합니다." }] },
+    miyabi: {
+      faction: "대공동 6과",
+      teams: [
+        { name: "Miyabi 혼돈", members: ["miyabi", "yanagi", "astra"], note: "이상 교대와 지원 버프를 함께 보는 구성입니다." },
+        { name: "Miyabi 얼음", members: ["miyabi", "lycaon", "soukaku"], note: "얼음/서리 중심의 안정형 구성입니다." },
+      ],
+    },
+    harumasa: { faction: "대공동 6과", teams: [{ name: "전기 강공", members: ["harumasa", "qingyi", "rina"], note: "격파 후 전기 딜을 압축하는 구성입니다." }] },
+    jane: {
+      faction: "치안국 특수대응팀",
+      teams: [
+        { name: "Jane 강타", members: ["jane", "seth", "rina"], note: "실드와 관통 지원을 받아 강타를 반복합니다." },
+        { name: "Jane 혼돈", members: ["jane", "burnice", "seth"], note: "물리와 불 이상을 교차해 혼돈을 노립니다." },
+      ],
+    },
+    seth: { faction: "치안국 특수대응팀", teams: [{ name: "이상 방어", members: ["jane", "seth", "burnice"], note: "이상 캐릭터를 보호하고 보조하는 방어 슬롯입니다." }] },
+    burnice: { faction: "칼리돈의 자손", teams: [{ name: "불 혼돈", members: ["jane", "burnice", "seth"], note: "오프필드 불 이상으로 혼돈을 유도합니다." }] },
+    lighter: { faction: "칼리돈의 자손", teams: [{ name: "불/얼음 격파", members: ["ellen", "lighter", "soukaku"], note: "그로기 창을 확장해 딜 타이밍을 크게 잡습니다." }] },
+    astra: { faction: "리라의 별", teams: [{ name: "범용 지원", members: ["miyabi", "yanagi", "astra"], note: "버프 의존 딜러와 잘 맞는 범용 지원 구성입니다." }] },
+    yanagi: { faction: "대공동 6과", teams: [{ name: "Miyabi 혼돈", members: ["miyabi", "yanagi", "astra"], note: "전기 이상으로 혼돈 트리거를 보조합니다." }] },
+    yixuan: { faction: "운규산", teams: [{ name: "운규 명파", members: ["yixuan", "ju-fufu", "pan-yinhu"], note: "명파 딜러와 전용 지원을 함께 운용합니다." }] },
+    "ju-fufu": { faction: "운규산", teams: [{ name: "운규 명파", members: ["yixuan", "ju-fufu", "pan-yinhu"], note: "그로기와 치명타 피해 보조를 담당합니다." }] },
+    "pan-yinhu": { faction: "운규산", teams: [{ name: "운규 명파", members: ["yixuan", "ju-fufu", "pan-yinhu"], note: "생존과 보조를 담당하는 방어 슬롯입니다." }] },
+    yuzuha: { faction: "스푸크 샥", teams: [{ name: "물리 이상", members: ["alice", "yuzuha", "jane"], note: "물리 이상 딜러를 지원하는 구성입니다." }] },
+    alice: { faction: "스푸크 샥", teams: [{ name: "물리 이상", members: ["alice", "yuzuha", "jane"], note: "지원과 강타를 함께 보는 물리 이상 구성입니다." }] },
+    ben: { faction: "벨로보그 중공업", teams: [{ name: "벨로보그 코어", members: ["koleda", "ben", "grace"], note: "방어와 격파를 함께 쓰는 벨로보그 구성입니다." }] },
+    corin: { faction: "빅토리아 하우스키핑", teams: [{ name: "빅토리아 물리", members: ["corin", "lycaon", "rina"], note: "그로기 창에 물리 강공 피해를 집중합니다." }] },
+    grace: { faction: "벨로보그 중공업", teams: [{ name: "감전 코어", members: ["grace", "rina", "anton"], note: "감전 유지와 전기 후속 피해를 보는 구성입니다." }] },
+    koleda: { faction: "벨로보그 중공업", teams: [{ name: "벨로보그 코어", members: ["koleda", "ben", "grace"], note: "격파와 방어 유틸을 함께 제공합니다." }] },
+    nekomata: { faction: "교활한 토끼굴", teams: [{ name: "교활한 토끼굴 버스트", members: ["nekomata", "anby", "nicole"], note: "방어 감소와 그로기 창을 활용하는 물리 버스트 구성입니다." }] },
+    "soldier-11": { faction: "오볼로스 소대", teams: [{ name: "불 강공", members: ["soldier-11", "lighter", "lucy"], note: "불 피해 딜러에 격파와 지원 슬롯을 붙입니다." }] },
+    lucy: { faction: "칼리돈의 자손", teams: [{ name: "칼리돈 불", members: ["burnice", "lighter", "lucy"], note: "불 속성 파티를 보조하는 지원 선택지입니다." }] },
+    piper: { faction: "칼리돈의 자손", teams: [{ name: "저비용 강타", members: ["piper", "lucy", "seth"], note: "접근성 좋은 물리 이상 구성입니다." }] },
+    caesar: { faction: "칼리돈의 자손", teams: [{ name: "칼리돈 가드", members: ["burnice", "caesar", "lucy"], note: "실드, 피해 증가, 불/이상 압박을 함께 봅니다." }] },
+    evelyn: { faction: "리라의 별", teams: [{ name: "리라의 별", members: ["evelyn", "lighter", "astra"], note: "강력한 지원 창을 활용하는 불 강공 구성입니다." }] },
+    trigger: { faction: "오볼로스 소대", teams: [{ name: "오볼로스 전기", members: ["harumasa", "trigger", "rina"], note: "전기 강공 파티를 위한 격파 슬롯입니다." }] },
+    pulchra: { faction: "칼리돈의 자손", teams: [{ name: "물리 격파", members: ["jane", "pulchra", "seth"], note: "강타 파티를 위한 물리 격파 지원입니다." }] },
+    hugo: { faction: "모킹버드", teams: [{ name: "모킹버드 얼음", members: ["hugo", "lycaon", "rina"], note: "얼음 강공 딜러에 격파와 지원을 붙입니다." }] },
+    vivian: { faction: "모킹버드", teams: [{ name: "에테르 이상", members: ["vivian", "astra", "yanagi"], note: "에테르 이상 압박과 혼돈 트리거를 함께 봅니다." }] },
+    pyrois: { faction: "파에톤", teams: [{ name: "Pyrois 3.0 코어", members: ["pyrois", "velina", "norma"], note: "에테르 강공에 바람 이상과 불 격파 슬롯을 붙이는 3.0 구성입니다." }] },
+    velina: { faction: "대외전략부", teams: [{ name: "바람 이상", members: ["velina", "pyrois", "astra"], note: "바람 이상 운용과 범용 혼돈 루트를 지원합니다." }] },
+    norma: { faction: "대외전략부", teams: [{ name: "3.0 격파 프리뷰", members: ["norma", "pyrois", "velina"], note: "불 격파 프리뷰 슬롯입니다. 정식 세부 정보에 따라 바뀔 수 있습니다." }] },
+  };
+
+  const discKoreanDisplay = {
+    none: { kr: "없음", two: "없음", four: "없음" },
+    "fanged-metal": { kr: "송곳니 메탈", two: "물리 피해 +10%", four: "강타 후 대상이 받는 피해 증가" },
+    "polar-metal": { kr: "극지 메탈", two: "얼음 피해 +10%", four: "일반/대시 공격 피해 증가, 빙결/쇄빙 후 추가 보정" },
+    "thunder-metal": { kr: "썬더 메탈", two: "전기 피해 +10%", four: "감전 대상이 있을 때 공격력 증가" },
+    "chaotic-metal": { kr: "카오스 메탈", two: "에테르 피해 +10%", four: "치명타 피해 증가, 침식 피해 후 추가 중첩" },
+    "inferno-metal": { kr: "불지옥 메탈", two: "불 피해 +10%", four: "연소 대상 공격 시 치명타 확률 증가" },
+    "swing-jazz": { kr: "스윙 재즈", two: "에너지 자동 회복 +20%", four: "콤보 스킬/궁극기 후 파티 피해 증가" },
+    "soul-rock": { kr: "소울 록", two: "방어력 +16%", four: "피격 후 받는 피해 감소" },
+    "hormone-punk": { kr: "호르몬 펑크", two: "공격력 +10%", four: "전투 진입/교대 후 공격력 증가" },
+    "freedom-blues": { kr: "자유의 블루스", two: "이상 숙련 +30", four: "EX 특수 스킬 명중 시 이상 축적 저항 감소" },
+    "shockstar-disco": { kr: "쇼크스타 디스코", two: "충격력 +6%", four: "일반/대시/회피 반격의 그로기 축적 증가" },
+    "puffer-electro": { kr: "복어 일렉트로", two: "관통률 +8%", four: "궁극기 피해 증가 및 궁극기 후 공격력 증가" },
+    "woodpecker-electro": { kr: "딱따구리 일렉트로", two: "치명타 확률 +8%", four: "치명타 적중 시 공격력 중첩 증가" },
+    "proto-punk": { kr: "원시 펑크", two: "실드량 +15%", four: "지원 방어/회피 지원 후 파티 피해 증가" },
+    "chaos-jazz": { kr: "카오스 재즈", two: "이상 숙련 +30", four: "불/전기 피해 및 오프필드 EX/지원 피해 증가" },
+    "astral-voice": { kr: "고요 속의 별", two: "공격력 +10%", four: "퀵 지원 진입 시 고요 중첩 획득" },
+    "branch-blade": { kr: "나뭇가지 검의 노래", two: "치명타 피해 +16%", four: "높은 이상 장악과 빙결/쇄빙 조건에서 치명 보정" },
+    "shadow-harmony": { kr: "그림자처럼 함께", two: "여진/대시 공격 피해 +15%", four: "여진/대시 공격 적중 시 공격력 및 치명타 확률 증가" },
+    "phaethon-melody": { kr: "파에톤의 노래", two: "이상 장악 +8%", four: "EX 특수 스킬 후 이상 숙련 및 에테르 피해 증가" },
+    "yunkui-tales": { kr: "운규 이야기", two: "HP +10%", four: "EX/콤보/궁극기 후 치명타 확률 증가, 최대 중첩 시 순수 피해 증가" },
+    "king-summit": { kr: "산림의 왕", two: "그로기 수치 +6%", four: "격파 캐릭터 사용 시 파티 치명타 피해 증가" },
+    "moonlight-lullaby": { kr: "달빛 기사의 칭송", two: "에너지 자동 회복 +20%", four: "지원 캐릭터의 EX 특수 스킬/궁극기 후 파티 피해 증가" },
   };
 
   const discBuffPresets = {
-    "fanged-metal": { label: "Fanged Metal 4pc", dmgBonus: 35, note: "After Assault" },
-    "polar-metal": { label: "Polar Metal 4pc", dmgBonus: 20, note: "Basic/Dash focus" },
-    "thunder-metal": { label: "Thunder Metal 4pc", atkPct: 28, note: "Shocked enemy" },
-    "chaotic-metal": { label: "Chaotic Metal 4pc", critDmg: 20, note: "Corruption stacks" },
-    "inferno-metal": { label: "Inferno Metal 4pc", critRate: 28, note: "Burning enemy" },
-    "swing-jazz": { label: "Swing Jazz 4pc", dmgBonus: 15, note: "After Chain/Ultimate" },
-    "hormone-punk": { label: "Hormone Punk 4pc", atkPct: 25, note: "Combat entry/swap-in" },
-    "puffer-electro": { label: "Puffer Electro 4pc", dmgBonus: 20, atkPct: 15, note: "Ultimate window" },
-    "woodpecker-electro": { label: "Woodpecker Electro 4pc", atkPct: 27, note: "3 CRIT stacks" },
-    "proto-punk": { label: "Proto Punk 4pc", dmgBonus: 15, note: "After Assist" },
-    "chaos-jazz": { label: "Chaos Jazz 4pc", dmgBonus: 15, note: "Off-field/EX window" },
-    "astral-voice": { label: "Astral Voice 4pc", dmgBonus: 24, note: "Astral stacks" },
-    "branch-blade": { label: "Branch & Blade Song 4pc", critRate: 12, critDmg: 30, note: "Freeze/Shatter window" },
-    "shadow-harmony": { label: "Shadow Harmony 4pc", atkPct: 20, critRate: 12, note: "Aftershock/Dash hits" },
-    "phaethon-melody": { label: "Phaethon's Melody 4pc", dmgBonus: 18, anomalyProficiency: 60, note: "EX sequence" },
-    "yunkui-tales": { label: "Yunkui Tales 4pc", critRate: 12, dmgBonus: 20, note: "Sheer DMG route" },
-    "king-summit": { label: "King of the Summit 4pc", critDmg: 30, note: "Stun specialty support" },
-    "moonlight-lullaby": { label: "Moonlight Lullaby 4pc", dmgBonus: 18, note: "Support EX/Ultimate" },
+    "fanged-metal": { label: "송곳니 메탈 4세트", dmgBonus: 35, note: "강타 후" },
+    "polar-metal": { label: "극지 메탈 4세트", dmgBonus: 20, note: "일반/대시 공격 중심" },
+    "thunder-metal": { label: "썬더 메탈 4세트", atkPct: 28, note: "감전 대상" },
+    "chaotic-metal": { label: "카오스 메탈 4세트", critDmg: 20, note: "침식 중첩" },
+    "inferno-metal": { label: "불지옥 메탈 4세트", critRate: 28, note: "연소 대상" },
+    "swing-jazz": { label: "스윙 재즈 4세트", dmgBonus: 15, note: "콤보/궁극기 후" },
+    "hormone-punk": { label: "호르몬 펑크 4세트", atkPct: 25, note: "전투 진입/교대" },
+    "puffer-electro": { label: "복어 일렉트로 4세트", dmgBonus: 20, atkPct: 15, note: "궁극기 창" },
+    "woodpecker-electro": { label: "딱따구리 일렉트로 4세트", atkPct: 27, note: "치명타 3중첩" },
+    "proto-punk": { label: "원시 펑크 4세트", dmgBonus: 15, note: "지원 후" },
+    "chaos-jazz": { label: "카오스 재즈 4세트", dmgBonus: 15, note: "오프필드/EX 창" },
+    "astral-voice": { label: "고요 속의 별 4세트", dmgBonus: 24, note: "고요 중첩" },
+    "branch-blade": { label: "나뭇가지 검의 노래 4세트", critRate: 12, critDmg: 30, note: "빙결/쇄빙 창" },
+    "shadow-harmony": { label: "그림자처럼 함께 4세트", atkPct: 20, critRate: 12, note: "여진/대시 적중" },
+    "phaethon-melody": { label: "파에톤의 노래 4세트", dmgBonus: 18, anomalyProficiency: 60, note: "EX 연계" },
+    "yunkui-tales": { label: "운규 이야기 4세트", critRate: 12, dmgBonus: 20, note: "순수 피해 루트" },
+    "king-summit": { label: "산림의 왕 4세트", critDmg: 30, note: "격파 지원" },
+    "moonlight-lullaby": { label: "달빛 기사의 칭송 4세트", dmgBonus: 18, note: "지원 EX/궁극기" },
   };
 
   const teamBuffPresets = {
-    astra: { label: "Astra Yao", atkPct: 15, dmgBonus: 30, note: "Support buff window" },
-    nicole: { label: "Nicole Demara", defReduction: 40, dmgBonus: 10, note: "Ether field / DEF shred" },
-    rina: { label: "Alexandrina Sebastiane", penRatio: 20, dmgBonus: 10, note: "PEN support" },
-    soukaku: { label: "Soukaku", atkPct: 20, dmgBonus: 10, note: "ATK support" },
-    lucy: { label: "Lucy", atkPct: 15, note: "Cheer On!" },
-    caesar: { label: "Caesar King", atkPct: 15, dmgBonus: 25, note: "Shield support" },
-    seth: { label: "Seth Lowell", anomalyProficiency: 100, dmgBonus: 10, note: "Anomaly shield support" },
-    yuzuha: { label: "Ukinami Yuzuha", anomalyProficiency: 120, dmgBonus: 15, note: "Physical Anomaly support" },
-    "pan-yinhu": { label: "Pan Yinhu", dmgBonus: 12, note: "Defensive utility support" },
-    "ju-fufu": { label: "Ju Fufu", critDmg: 30, stunDmg: 10, note: "Stun support" },
-    lighter: { label: "Lighter", stunDmg: 15, dmgBonus: 15, note: "Stun window support" },
-    qingyi: { label: "Qingyi", stunDmg: 20, note: "High stun multiplier window" },
-    lycaon: { label: "Von Lycaon", stunDmg: 15, dmgBonus: 10, note: "Stun support" },
-    anby: { label: "Anby Demara", stunDmg: 10, note: "Starter stun support" },
-    koleda: { label: "Koleda Belobog", stunDmg: 15, note: "Fire stun support" },
-    pulchra: { label: "Pulchra Fellini", stunDmg: 12, note: "Physical stun support" },
-    norma: { label: "Norma Hollowell", stunDmg: 15, critRate: 8, note: "Preview Fire stun support" },
-    velina: { label: "Velina Airgid", anomalyMastery: 84, dmgBonus: 15, note: "Wind Anomaly support" },
+    astra: { label: "Astra Yao", atkPct: 15, dmgBonus: 30, note: "지원 버프 창" },
+    nicole: { label: "Nicole Demara", defReduction: 40, dmgBonus: 10, note: "에테르 필드 / 방어 감소" },
+    rina: { label: "Alexandrina Sebastiane", penRatio: 20, dmgBonus: 10, note: "관통 지원" },
+    soukaku: { label: "Soukaku", atkPct: 20, dmgBonus: 10, note: "공격력 지원" },
+    lucy: { label: "Lucy", atkPct: 15, note: "응원 버프" },
+    caesar: { label: "Caesar King", atkPct: 15, dmgBonus: 25, note: "실드 지원" },
+    seth: { label: "Seth Lowell", anomalyProficiency: 100, dmgBonus: 10, note: "이상 실드 지원" },
+    yuzuha: { label: "Ukinami Yuzuha", anomalyProficiency: 120, dmgBonus: 15, note: "물리 이상 지원" },
+    "pan-yinhu": { label: "Pan Yinhu", dmgBonus: 12, note: "방어 유틸 지원" },
+    "ju-fufu": { label: "Ju Fufu", critDmg: 30, stunDmg: 10, note: "격파 지원" },
+    lighter: { label: "Lighter", stunDmg: 15, dmgBonus: 15, note: "그로기 창 지원" },
+    qingyi: { label: "Qingyi", stunDmg: 20, note: "고배율 그로기 창" },
+    lycaon: { label: "Von Lycaon", stunDmg: 15, dmgBonus: 10, note: "격파 지원" },
+    anby: { label: "Anby Demara", stunDmg: 10, note: "초반 격파 지원" },
+    koleda: { label: "Koleda Belobog", stunDmg: 15, note: "불 격파 지원" },
+    pulchra: { label: "Pulchra Fellini", stunDmg: 12, note: "물리 격파 지원" },
+    norma: { label: "Norma Hollowell", stunDmg: 15, critRate: 8, note: "불 격파 프리뷰 지원" },
+    velina: { label: "Velina Airgid", anomalyMastery: 84, dmgBonus: 15, note: "바람 이상 지원" },
   };
 
   const buffFields = ["atkPct", "dmgBonus", "critRate", "critDmg", "penRatio", "flatPen", "defReduction", "anomalyProficiency", "anomalyMastery", "stunDmg"];
 
   function needsEnglishText(value) {
-    return typeof value === "string" && /[^\x00-\x7F]/.test(value);
+    return typeof value === "string" && value.includes("�");
   }
 
-  function applyEnglishData() {
+  function localizeDiscCombo(value) {
+    return driveDiscs.reduce((label, disc) => {
+      const koreanName = discKoreanDisplay[disc.id]?.kr || disc.en;
+      return label.replaceAll(disc.en, koreanName);
+    }, value);
+  }
+
+  function applyDisplayData() {
     agents.forEach((agent) => {
       agent.kr = agent.en;
       const recommendation = englishAgentRecommendations[agent.id];
@@ -1005,51 +1079,61 @@
         agent.discs = recommendation.discs;
         agent.teams = recommendation.teams;
       }
-      if (needsEnglishText(agent.faction)) agent.faction = "Unknown";
+      const koreanDisplay = koreanAgentDisplay[agent.id];
+      if (koreanDisplay) {
+        agent.faction = koreanDisplay.faction;
+        agent.teams = koreanDisplay.teams;
+      } else if (needsEnglishText(agent.faction)) {
+        agent.faction = "미확인";
+      }
       agent.teams = agent.teams.map((team) => ({
         ...team,
-        name: needsEnglishText(team.name) ? `${agent.en} Core` : team.name,
-        note: needsEnglishText(team.note) ? "Starter recommendation; verify rotations against current endgame data." : team.note,
+        name: needsEnglishText(team.name) ? `${agent.en} 코어` : team.name,
+        note: needsEnglishText(team.note) ? "초안 추천 구성입니다. 최신 엔드게임 데이터 기준으로 검증이 필요합니다." : team.note,
       }));
+      agent.discs = agent.discs.map(localizeDiscCombo);
     });
 
     engines.forEach((engine) => {
-      engine.kr = engine.en;
       if (engine.id === "manual") {
-        engine.effect = "Manual stat input only.";
-      } else if (needsEnglishText(engine.effect)) {
-        engine.effect = "Effect text pending English verification; calculator uses the structured stat fields.";
+        engine.kr = "수동 입력";
+        engine.effect = "수동 입력값만 반영합니다.";
+        return;
+      }
+      engine.kr = engine.en;
+      if (needsEnglishText(engine.effect)) {
+        engine.effect = "효과 설명은 검증 대기 중이며, 계산기는 구조화된 스탯 필드를 사용합니다.";
       }
     });
 
     driveDiscs.forEach((disc) => {
-      const effects = discEnglishEffects[disc.id] || {};
-      disc.kr = disc.en;
+      const effects = discKoreanDisplay[disc.id] || {};
+      disc.kr = effects.kr || disc.en;
       disc.two = effects.two || disc.two;
       disc.four = effects.four || disc.four;
     });
 
     materialNames.role = {
-      attack: ["Basic Attack Certification Seal", "Advanced Attack Certification Seal", "Pioneer's Certification Seal"],
-      stun: ["Basic Stun Certification Seal", "Advanced Stun Certification Seal", "Buster Certification Seal"],
-      anomaly: ["Basic Anomaly Certification Seal", "Advanced Anomaly Certification Seal", "Controller Certification Seal"],
-      support: ["Basic Support Certification Seal", "Advanced Support Certification Seal", "Ruler Certification Seal"],
-      defense: ["Basic Defense Certification Seal", "Advanced Defense Certification Seal", "Defender Certification Seal"],
-      rupture: ["Basic Rupture Certification Seal", "Advanced Rupture Certification Seal", "Arbiter Certification Seal"],
+      attack: ["초급 강공 휘장", "고급 강공 휘장", "선구자 휘장"],
+      stun: ["초급 격파 휘장", "고급 격파 휘장", "파괴자 휘장"],
+      anomaly: ["초급 이상 휘장", "고급 이상 휘장", "지배자 휘장"],
+      support: ["초급 지원 휘장", "고급 지원 휘장", "통솔자 휘장"],
+      defense: ["초급 방어 휘장", "고급 방어 휘장", "수호자 휘장"],
+      rupture: ["초급 명파 휘장", "고급 명파 휘장", "판결자 휘장"],
     };
     materialNames.chips = {
-      physical: ["Basic Physical Chip", "Advanced Physical Chip", "Specialized Physical Chip"],
-      fire: ["Basic Burn Chip", "Advanced Burn Chip", "Specialized Burn Chip"],
-      ice: ["Basic Freeze Chip", "Advanced Freeze Chip", "Specialized Freeze Chip"],
-      frost: ["Basic Freeze Chip", "Advanced Freeze Chip", "Specialized Freeze Chip"],
-      electric: ["Basic Shock Chip", "Advanced Shock Chip", "Specialized Shock Chip"],
-      ether: ["Basic Ether Chip", "Advanced Ether Chip", "Specialized Ether Chip"],
-      wind: ["Basic Wind Chip", "Advanced Wind Chip", "Specialized Wind Chip"],
-      auricInk: ["Basic Auric Ink Chip", "Advanced Auric Ink Chip", "Specialized Auric Ink Chip"],
+      physical: ["기본 물리 칩", "심화 물리 칩", "특화 물리 칩"],
+      fire: ["기본 화상 칩", "심화 화상 칩", "특화 화상 칩"],
+      ice: ["기본 빙결 칩", "심화 빙결 칩", "특화 빙결 칩"],
+      frost: ["기본 빙결 칩", "심화 빙결 칩", "특화 빙결 칩"],
+      electric: ["기본 감전 칩", "심화 감전 칩", "특화 감전 칩"],
+      ether: ["기본 에테르 칩", "심화 에테르 칩", "특화 에테르 칩"],
+      wind: ["기본 바람 칩", "심화 바람 칩", "특화 바람 칩"],
+      auricInk: ["기본 현묵 칩", "심화 현묵 칩", "특화 현묵 칩"],
     };
   }
 
-  applyEnglishData();
+  applyDisplayData();
 
   const tables = {
     agentPromotion: [
@@ -1153,16 +1237,16 @@
 
   function buffParts(buff) {
     const labels = {
-      atkPct: "ATK",
-      dmgBonus: "DMG",
-      critRate: "CRIT Rate",
-      critDmg: "CRIT DMG",
-      penRatio: "PEN Ratio",
-      flatPen: "Flat PEN",
-      defReduction: "DEF Shred",
-      anomalyProficiency: "Anomaly Proficiency",
-      anomalyMastery: "Anomaly Mastery",
-      stunDmg: "Stun DMG",
+      atkPct: "공격력",
+      dmgBonus: "피해",
+      critRate: "치명타 확률",
+      critDmg: "치명타 피해",
+      penRatio: "관통률",
+      flatPen: "관통 수치",
+      defReduction: "방어 감소",
+      anomalyProficiency: "이상 숙련",
+      anomalyMastery: "이상 장악",
+      stunDmg: "그로기 피해",
     };
     return buffFields
       .filter((field) => Number(buff[field] || 0) !== 0)
@@ -1177,19 +1261,19 @@
     const sources = [];
     if ($("#auto-disc-buffs")?.checked) {
       const discBuff = discBuffPresets[discFour.id];
-      if (discBuff) sources.push({ type: "Drive Disc", ...discBuff });
+      if (discBuff) sources.push({ type: "디스크", ...discBuff });
     }
 
     if ($("#auto-team-buffs")?.checked) {
       selectedPartyIds().forEach((id) => {
         const teamBuff = teamBuffPresets[id];
-        if (teamBuff) sources.push({ type: "Party", ...teamBuff });
+        if (teamBuff) sources.push({ type: "파티", ...teamBuff });
       });
     }
 
     const manualBuff = {
-      type: "Manual",
-      label: "Manual Buffs",
+      type: "수동",
+      label: "수동 버프",
       atkPct: number("#manual-atk-buff"),
       dmgBonus: number("#team-bonus"),
       critRate: number("#manual-crit-rate-buff"),
@@ -1201,8 +1285,8 @@
   }
 
   function summarizeBuffs(sources) {
-    if (sources.length === 0) return "No presets";
-    return `${sources.length} active`;
+    if (sources.length === 0) return "프리셋 없음";
+    return `${sources.length}개 적용`;
   }
 
   function syncDamagePartyFromAgent(agentId) {
@@ -1227,7 +1311,7 @@
 
   function fillCoreSelect(select) {
     const items = [
-      { id: 0, label: "None" },
+      { id: 0, label: "없음" },
       { id: 1, label: "A" },
       { id: 2, label: "B" },
       { id: 3, label: "C" },
@@ -1262,7 +1346,7 @@
       return roleOk && attrOk;
     });
 
-    $("#agent-count").textContent = `${filtered.length} Agents`;
+    $("#agent-count").textContent = `${filtered.length}명`;
     $("#agent-grid").replaceChildren(
       ...filtered.map((agent) => {
         const card = document.createElement("button");
@@ -1318,17 +1402,17 @@
           <span class="pill muted">${agent.faction}</span>
         </div>
         <dl class="mini-stats">
-          <div><dt>ATK</dt><dd>${fmt.format(agent.stats.atk)}</dd></div>
-          <div><dt>CRIT Rate</dt><dd>${fmt1.format(agent.stats.critRate)}%</dd></div>
-          <div><dt>Impact</dt><dd>${fmt.format(agent.stats.impact)}</dd></div>
-          <div><dt>Anomaly Mastery</dt><dd>${fmt.format(agent.stats.anomalyMastery)}</dd></div>
+          <div><dt>공격력</dt><dd>${fmt.format(agent.stats.atk)}</dd></div>
+          <div><dt>치확</dt><dd>${fmt1.format(agent.stats.critRate)}%</dd></div>
+          <div><dt>충격</dt><dd>${fmt.format(agent.stats.impact)}</dd></div>
+          <div><dt>이상 장악</dt><dd>${fmt.format(agent.stats.anomalyMastery)}</dd></div>
         </dl>
         <div class="recommend-block">
           <span>W-Engine</span>
           <strong>${agent.engines.join(" / ")}</strong>
         </div>
         <div class="recommend-block">
-          <span>Drive Disc</span>
+          <span>디스크</span>
           <strong>${agent.discs.join(" / ")}</strong>
         </div>
       </div>
@@ -1344,7 +1428,7 @@
         card.innerHTML = `
           <div class="section-heading compact">
             <h3>${team.name}</h3>
-            <button class="ghost-button apply-team" type="button">Apply</button>
+            <button class="ghost-button apply-team" type="button">적용</button>
           </div>
           <div class="team-chip-row">${team.members.map(teamMemberChip).join("")}</div>
           <p>${team.note}</p>
@@ -1368,7 +1452,7 @@
     $("#party-slot-2").value = damageMembers[1] || "none";
     $("#guide-title").value = team.name;
     $("#guide-body").value = team.note;
-    $("#guide-tags").value = `${roleLabels[getAgent(selectedAgentId).role]}, Recommended Team`;
+    $("#guide-tags").value = `${roleLabels[getAgent(selectedAgentId).role]}, 추천 파티`;
     updateIssueLink();
     switchTab("community");
   }
@@ -1493,19 +1577,19 @@
             `;
             return item;
           })
-        : [Object.assign(document.createElement("div"), { className: "empty-state", textContent: "No automatic buffs active." })]),
+        : [Object.assign(document.createElement("div"), { className: "empty-state", textContent: "자동 버프가 없습니다." })]),
     );
 
     const lines = [
-      ["Total ATK", fmt.format(result.totalAtk)],
-      ["CRIT", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
-      ["DMG Bonus", `${fmt1.format(result.baseDmgBonus)}%`],
-      ["PEN / DEF Shred", `${fmt1.format(result.penRatio)}% / ${fmt1.format(result.defReduction)}%`],
-      ["DEF Multiplier", fmt1.format(result.defMultiplier)],
-      ["RES Multiplier", fmt1.format(result.resMultiplier)],
-      ["Stun Multiplier", fmt1.format(result.stunMultiplier)],
-      ["Anomaly Mastery", fmt1.format(result.anomalyMastery)],
-      ["Anomaly Proficiency", fmt1.format(result.anomalyProficiency)],
+      ["총 공격력", fmt.format(result.totalAtk)],
+      ["치명타", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
+      ["피해 보너스", `${fmt1.format(result.baseDmgBonus)}%`],
+      ["관통 / 방어 감소", `${fmt1.format(result.penRatio)}% / ${fmt1.format(result.defReduction)}%`],
+      ["방어 배율", fmt1.format(result.defMultiplier)],
+      ["저항 배율", fmt1.format(result.resMultiplier)],
+      ["그로기 배율", fmt1.format(result.stunMultiplier)],
+      ["이상 장악", fmt1.format(result.anomalyMastery)],
+      ["이상 숙련", fmt1.format(result.anomalyProficiency)],
     ];
 
     $("#damage-breakdown").replaceChildren(
@@ -1527,7 +1611,7 @@
   function addExpResources(map, label, exp) {
     if (exp <= 0) return;
     addResource(map, `${label} EXP`, Math.round(exp));
-    addResource(map, label === "Agent" ? "Senior Investigator Log Equivalent" : "W-Engine Energy Module Equivalent", Math.ceil(exp / 3000));
+    addResource(map, label === "에이전트" ? "선임 조사원 기록 환산" : "W-Engine 에너지 모듈 환산", Math.ceil(exp / 3000));
   }
 
   function expBetween(table, current, target) {
@@ -1550,12 +1634,12 @@
     const roleMats = materialNames.role[agent.role] || materialNames.role.attack;
     const chipMats = materialNames.chips[agent.attribute] || materialNames.chips.physical;
 
-    addExpResources(resources, "Agent", expBetween(tables.agentExpByBand, currentLevel, targetLevel));
+    addExpResources(resources, "에이전트", expBetween(tables.agentExpByBand, currentLevel, targetLevel));
 
     for (const step of tables.agentPromotion) {
       if (currentLevel < step.level && targetLevel >= step.level) {
         addResource(resources, roleMats[step.tier], step.count);
-        addResource(resources, "Denny", step.denny);
+        addResource(resources, "데니", step.denny);
       }
     }
 
@@ -1565,8 +1649,8 @@
     for (const step of tables.skill) {
       if (currentSkill < step.to && targetSkill >= step.to) {
         addResource(resources, chipMats[step.tier], step.count * skillCount);
-        addResource(resources, "Denny", step.denny * skillCount);
-        addResource(resources, "Hamster Cage Pass", (step.hamster || 0) * skillCount);
+        addResource(resources, "데니", step.denny * skillCount);
+        addResource(resources, "햄스터 케이지 패스", (step.hamster || 0) * skillCount);
       }
     }
 
@@ -1574,9 +1658,9 @@
     const targetCore = Number($("#target-core").value);
     for (const step of tables.core) {
       if (currentCore < step.to && targetCore >= step.to) {
-        addResource(resources, "Denny", step.denny);
-        addResource(resources, "Agent High-Dimensional Data", step.highDim || 0);
-        addResource(resources, "Agent Weekly Boss Material", step.weekly || 0);
+        addResource(resources, "데니", step.denny);
+        addResource(resources, "에이전트별 고차원 데이터", step.highDim || 0);
+        addResource(resources, "에이전트별 주간 보스 재료", step.weekly || 0);
       }
     }
 
@@ -1585,8 +1669,8 @@
     addExpResources(resources, "W-Engine", expBetween(tables.engineExpByBand, currentEngineLevel, targetEngineLevel));
     for (const step of tables.enginePromotion) {
       if (currentEngineLevel < step.level && targetEngineLevel >= step.level) {
-        addResource(resources, step.advanced ? "Specialized W-Engine Component" : "W-Engine Component", step.part);
-        addResource(resources, "Denny", step.denny);
+        addResource(resources, step.advanced ? "특화 W-Engine 부품" : "강화 W-Engine 부품", step.part);
+        addResource(resources, "데니", step.denny);
       }
     }
 
@@ -1598,9 +1682,9 @@
     $("#growth-agent-meta").textContent = `${attributeLabels[agent.attribute]} / ${roleLabels[agent.role]}`;
     const rows = Array.from(resources.entries())
       .sort(([a], [b]) => {
-        if (a === "Denny") return -1;
-        if (b === "Denny") return 1;
-        return a.localeCompare(b, "en");
+        if (a === "데니") return -1;
+        if (b === "데니") return 1;
+        return a.localeCompare(b, "ko");
       })
       .map(([name, amount]) => {
         const row = document.createElement("div");
@@ -1628,8 +1712,8 @@
   function guidePayloadFromForm() {
     return {
       id: `guide-${Date.now()}`,
-      author: $("#guide-author").value.trim() || "Anonymous",
-      title: $("#guide-title").value.trim() || `${getAgent($("#guide-agent").value).kr} Team`,
+      author: $("#guide-author").value.trim() || "익명",
+      title: $("#guide-title").value.trim() || `${getAgent($("#guide-agent").value).kr} 조합`,
       agentId: $("#guide-agent").value,
       team: [$("#guide-slot-1").value, $("#guide-slot-2").value, $("#guide-slot-3").value],
       tags: $("#guide-tags").value.trim(),
@@ -1640,7 +1724,7 @@
 
   function renderGuides() {
     if (guides.length === 0) {
-      $("#guide-list").innerHTML = `<div class="empty-state">No saved guides yet.</div>`;
+      $("#guide-list").innerHTML = `<div class="empty-state">저장된 공략이 없습니다.</div>`;
       return;
     }
 
@@ -1652,11 +1736,11 @@
         card.innerHTML = `
           <div class="section-heading compact">
             <h3>${guide.title}</h3>
-            <button class="ghost-button delete-guide" type="button">Delete</button>
+            <button class="ghost-button delete-guide" type="button">삭제</button>
           </div>
           <div class="guide-meta">${guide.author} / ${mainAgent.kr}${guide.tags ? ` / ${guide.tags}` : ""}</div>
           <div class="team-chip-row">${guide.team.map(teamMemberChip).join("")}</div>
-          <p>${guide.body || "No content"}</p>
+          <p>${guide.body || "내용 없음"}</p>
         `;
         card.querySelector(".delete-guide").addEventListener("click", () => {
           guides = guides.filter((item) => item.id !== guide.id);
@@ -1674,15 +1758,15 @@
   function updateIssueLink() {
     const guide = guidePayloadFromForm();
     const body = [
-      `Author: ${guide.author}`,
-      `Main Agent: ${getAgent(guide.agentId).kr}`,
-      `Team: ${guide.team.map((id) => getAgent(id).kr).join(" / ")}`,
-      `Tags: ${guide.tags}`,
+      `작성자: ${guide.author}`,
+      `중심 에이전트: ${getAgent(guide.agentId).kr}`,
+      `파티: ${guide.team.map((id) => getAgent(id).kr).join(" / ")}`,
+      `태그: ${guide.tags}`,
       "",
       guide.body,
     ].join("\n");
     const params = new URLSearchParams({
-      title: `[Guide] ${guide.title}`,
+      title: `[공략] ${guide.title}`,
       body,
       labels: "community-guide",
     });
@@ -1720,7 +1804,7 @@
         .filter((engine) => matches([engine.kr, engine.en, engine.role, engine.effect]))
         .map((engine) => {
           const row = document.createElement("tr");
-          row.innerHTML = `<td><strong>${engine.kr}</strong><br>${engine.en}</td><td><span class="pill">${engine.rank}</span></td><td>${roleLabels[engine.role] || "All"}</td><td>${fmt.format(engine.baseAtk)}</td>`;
+          row.innerHTML = `<td><strong>${engine.kr}</strong><br>${engine.en}</td><td><span class="pill">${engine.rank}</span></td><td>${roleLabels[engine.role] || "전체"}</td><td>${fmt.format(engine.baseAtk)}</td>`;
           return row;
         }),
     );
@@ -1787,9 +1871,9 @@
     const { resources } = calculateGrowth();
     const text = Array.from(resources.entries()).map(([name, amount]) => `${name}: ${fmt.format(amount)}`).join("\n");
     await navigator.clipboard.writeText(text);
-    $("#copy-growth").textContent = "Copied";
+    $("#copy-growth").textContent = "완료";
     window.setTimeout(() => {
-      $("#copy-growth").textContent = "Copy";
+      $("#copy-growth").textContent = "복사";
     }, 1200);
   }
 
@@ -1811,10 +1895,10 @@
     fillSelect($("#guide-slot-1"), agents, (agent) => agent.kr);
     fillSelect($("#guide-slot-2"), agents, (agent) => agent.kr);
     fillSelect($("#guide-slot-3"), agents, (agent) => agent.kr);
-    const partyOptions = [{ id: "none", kr: "None" }, ...agents];
+    const partyOptions = [{ id: "none", kr: "없음" }, ...agents];
     fillSelect($("#party-slot-1"), partyOptions, (agent) => agent.kr);
     fillSelect($("#party-slot-2"), partyOptions, (agent) => agent.kr);
-    fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} / ${roleLabels[engine.role] || "All"}`);
+    fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} / ${roleLabels[engine.role] || "전체"}`);
     fillSelect($("#disc-four"), driveDiscs, (disc) => disc.kr);
     fillSelect($("#disc-two"), driveDiscs, (disc) => disc.kr);
     fillCoreSelect($("#current-core"));
