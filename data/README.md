@@ -17,7 +17,17 @@ That means the practical approach is:
 ## Files
 
 - `effect-db.schema.json`: schema for Agent Mindscape and W-Engine refinement effects.
-- `effects.mock.json`: starter mock data showing the target shape.
+- `effects.mock.json`: full mock coverage for the app's current Agent and W-Engine IDs.
+
+## Regeneration
+
+Run this after the built-in Agent or W-Engine list changes:
+
+```powershell
+node scripts/generate-effect-mock.mjs
+```
+
+The generator creates M0-M6 rows for every Agent and R1-R5 rows for every W-Engine. Generated rows are source-pending placeholders, not verified gameplay values.
 
 ## Consumption shape
 

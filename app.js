@@ -11,6 +11,7 @@
   };
   const GUIDE_STORAGE_KEY = "zzz-calc-community-guides";
   const STATE_STORAGE_KEY = "zzz-calc-state";
+  const EFFECT_DB_URL = "data/effects.mock.json";
   const REPO_ISSUE_URL = "https://github.com/suhyeong10/zzz-calc/issues/new";
   const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
 
@@ -1073,7 +1074,20 @@
     velina: { label: "Velina Airgid", anomalyMastery: 84, dmgBonus: 15, note: "바람 이상 지원" },
   };
 
-  const buffFields = ["atkPct", "dmgBonus", "critRate", "critDmg", "penRatio", "flatPen", "defReduction", "anomalyProficiency", "anomalyMastery", "stunDmg"];
+  const buffFields = [
+    "atkPct",
+    "dmgBonus",
+    "critRate",
+    "critDmg",
+    "penRatio",
+    "flatPen",
+    "defReduction",
+    "anomalyProficiency",
+    "anomalyMastery",
+    "stunDmg",
+    "impactPct",
+    "energyRegenPct",
+  ];
 
   function needsEnglishText(value) {
     return typeof value === "string" && value.includes("�");
@@ -1213,6 +1227,8 @@
 
   let selectedAgentId = agents[0].id;
   let guides = [];
+  let effectDb = { mindscapes: {}, wEngines: {}, status: "unloaded" };
+  let effectDbLoadStatus = "unloaded";
 
   function number(id) {
     const value = Number($(id).value);
@@ -1221,6 +1237,20 @@
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
+  }
+
+  async function loadEffectDb() {
+    effectDbLoadStatus = "loading";
+    try {
+      const response = await fetch(EFFECT_DB_URL, { cache: "no-store" });
+      if (!response.ok) throw new Error(`Effect DB HTTP ${response.status}`);
+      effectDb = await response.json();
+      effectDbLoadStatus = effectDb.status || "loaded";
+    } catch (error) {
+      effectDb = { mindscapes: {}, wEngines: {}, status: "unavailable" };
+      effectDbLoadStatus = "unavailable";
+      console.warn("Effect DB could not be loaded.", error);
+    }
   }
 
   function getAgent(id) {
@@ -1263,6 +1293,74 @@
     return Number($("#mindscape-level")?.value || 0);
   }
 
+  function selectedEngineRefinement() {
+    return Number($("#engine-refinement")?.value || 1);
+  }
+
+  function normalizeDbStats(stats = {}) {
+    return Object.fromEntries(buffFields.map((field) => [field, Number(stats[field] || 0)]));
+  }
+
+  function dbSourceNote(item, verification) {
+    return [
+      verification === "mock" ? "mock DB" : "",
+      item.mockValue ? "수치 검증 대기" : "",
+      item.condition || "",
+      item.notes || "",
+    ]
+      .filter(Boolean)
+      .join(" / ");
+  }
+
+  function dbBuffSource(type, labelPrefix, buff, verification) {
+    return {
+      type,
+      label: `${labelPrefix} / ${buff.label || buff.id}`,
+      note: dbSourceNote(buff, verification),
+      isDbEffect: true,
+      isMock: Boolean(buff.mockValue),
+      ...normalizeDbStats(buff.stats),
+    };
+  }
+
+  function dbDamageHookSource(type, labelPrefix, hook, verification) {
+    return {
+      type,
+      label: `${labelPrefix} / ${hook.id}`,
+      note: dbSourceNote(hook, verification) || hook.formula || "계산식 연결 대기",
+      isDbEffect: true,
+      isDamageHook: true,
+      isMock: Boolean(hook.mockValue),
+      ...normalizeDbStats({}),
+    };
+  }
+
+  function selectedMindscapeDbSources() {
+    if (!$("#auto-mindscape-buffs")?.checked) return [];
+    const entry = effectDb.mindscapes?.[$("#agent-select")?.value];
+    if (!entry) return [];
+    const selectedLevel = selectedMindscapeLevel();
+    return (entry.levels || [])
+      .filter((level) => level.level > 0 && level.level <= selectedLevel)
+      .flatMap((level) => [
+        ...(level.buffs || []).map((buff) => dbBuffSource("돌파 DB", `${level.label} 자동`, buff, entry.verification)),
+        ...(level.damageHooks || []).map((hook) => dbDamageHookSource("돌파 DB", `${level.label} 자동`, hook, entry.verification)),
+      ]);
+  }
+
+  function selectedWEngineDbSources() {
+    if (!$("#auto-engine-buffs")?.checked) return [];
+    const entry = effectDb.wEngines?.[$("#engine-select")?.value];
+    if (!entry) return [];
+    const refinement = selectedEngineRefinement();
+    const row = (entry.refinements || []).find((item) => item.refinement === refinement);
+    if (!row) return [];
+    return [
+      ...(row.buffs || []).map((buff) => dbBuffSource("W-Engine DB", `${row.label} 자동`, buff, entry.verification)),
+      ...(row.damageHooks || []).map((hook) => dbDamageHookSource("W-Engine DB", `${row.label} 자동`, hook, entry.verification)),
+    ];
+  }
+
   function mindscapeBuffSource() {
     const level = selectedMindscapeLevel();
     const buff = {
@@ -1299,6 +1397,8 @@
       anomalyProficiency: "이상 숙련",
       anomalyMastery: "이상 장악",
       stunDmg: "그로기 피해",
+      impactPct: "충격력",
+      energyRegenPct: "에너지 자동 회복",
     };
     return buffFields
       .filter((field) => Number(buff[field] || 0) !== 0)
@@ -1307,6 +1407,35 @@
         const suffix = field === "flatPen" || field === "anomalyProficiency" || field === "anomalyMastery" ? "" : "%";
         return `${labels[field]} +${fmt1.format(value)}${suffix}`;
       });
+  }
+
+  function effectText(source) {
+    const parts = buffParts(source);
+    if (parts.length > 0) return parts.join(" / ");
+    if (source.isDamageHook) return source.note || "계수 테이블 연결 대기";
+    if (source.isMock) return source.note || "mock DB: 수치 검증 대기";
+    return source.note || "구조화된 효과 없음";
+  }
+
+  function renderEffectList(selector, sources, emptyText) {
+    const target = $(selector);
+    if (!target) return;
+    target.replaceChildren(
+      ...(sources.length
+        ? sources.map((source) => {
+            const item = document.createElement("article");
+            item.className = "buff-chip";
+            item.innerHTML = `
+              <div>
+                <strong>${source.label}</strong>
+                <span>${source.type}${source.isMock ? " / mock" : ""}</span>
+              </div>
+              <p>${effectText(source)}</p>
+            `;
+            return item;
+          })
+        : [Object.assign(document.createElement("div"), { className: "empty-state", textContent: emptyText })]),
+    );
   }
 
   function collectBuffSources(discFour) {
@@ -1326,6 +1455,9 @@
     if ($("#auto-party-disc-buffs")?.checked) {
       sources.push(...selectedPartyDiscSources());
     }
+
+    sources.push(...selectedWEngineDbSources());
+    sources.push(...selectedMindscapeDbSources());
 
     const mindscapeBuff = mindscapeBuffSource();
     if (mindscapeBuff) sources.push(mindscapeBuff);
@@ -1623,12 +1755,15 @@
     const result = calculateDamage();
     $("#agent-meta").textContent = `${attributeLabels[result.agent.attribute]} / ${roleLabels[result.agent.role]} / ${result.agent.faction}`;
     $("#mindscape-summary").textContent = `M${selectedMindscapeLevel()}`;
+    $("#engine-effect-summary").textContent = `R${selectedEngineRefinement()} / ${effectDbLoadStatus}`;
     $("#disc-summary").textContent = `${result.discFour.kr} 4 / ${result.discTwo.kr} 2`;
     $("#party-buff-summary").textContent = summarizeBuffs(result.buffSources);
     $("#normal-damage").textContent = fmt.format(result.nonCrit);
     $("#crit-damage").textContent = fmt.format(result.crit);
     $("#expected-damage").textContent = fmt.format(result.expected);
     $("#anomaly-damage").textContent = fmt.format(result.anomaly);
+    renderEffectList("#engine-effect-list", selectedWEngineDbSources(), "선택한 W-Engine의 DB 효과가 없습니다.");
+    renderEffectList("#mindscape-effect-list", selectedMindscapeDbSources(), "선택한 돌파 단계의 DB 효과가 없습니다.");
     $("#buff-list").replaceChildren(
       ...(result.buffSources.length
         ? result.buffSources.map((buff) => {
@@ -1639,7 +1774,7 @@
                 <strong>${buff.label}</strong>
                 <span>${buff.type}${buff.note ? ` / ${buff.note}` : ""}</span>
               </div>
-              <p>${buffParts(buff).join(" / ")}</p>
+              <p>${effectText(buff)}</p>
             `;
             return item;
           })
@@ -1969,6 +2104,8 @@
     fillSelect($("#party-disc-2"), partyDiscOptions, (disc) => disc.kr);
     const mindscapeOptions = Array.from({ length: 7 }, (_, level) => ({ id: String(level), label: `M${level}` }));
     fillSelect($("#mindscape-level"), mindscapeOptions, (item) => item.label);
+    const refinementOptions = Array.from({ length: 5 }, (_, index) => ({ id: String(index + 1), label: `R${index + 1}` }));
+    fillSelect($("#engine-refinement"), refinementOptions, (item) => item.label);
     fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} / ${roleLabels[engine.role] || "전체"}`);
     fillSelect($("#disc-four"), driveDiscs, (disc) => disc.kr);
     fillSelect($("#disc-two"), driveDiscs, (disc) => disc.kr);
@@ -2060,11 +2197,13 @@
     });
   }
 
-  function init() {
+  async function init() {
     initSelects();
+    await loadEffectDb();
     loadGuides();
     restoreSnapshot();
     normalizeSelectValue("#engine-select", "manual");
+    normalizeSelectValue("#engine-refinement", "1");
     normalizeSelectValue("#disc-four", "woodpecker-electro");
     normalizeSelectValue("#disc-two", "hormone-punk");
     normalizeSelectValue("#mindscape-level", "0");
@@ -2081,5 +2220,7 @@
     renderGuides();
   }
 
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", () => {
+    void init();
+  });
 })();
