@@ -1,13 +1,13 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-05-v0.3-prydwen-2026-06-16";
+  const DATA_VERSION = "2026-07-05-v0.4-en-3.0";
   const DATA_PROFILE = {
     label: "3.0",
-    agents: 37,
+    agents: 40,
     wEngines: 93,
     driveDiscs: 21,
-    naming: "English source names are kept when Korean names are not verified.",
+    naming: "English source names are used throughout the app.",
   };
   const GUIDE_STORAGE_KEY = "zzz-calc-community-guides";
   const STATE_STORAGE_KEY = "zzz-calc-state";
@@ -15,25 +15,25 @@
   const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "database-search"]);
 
   const roleLabels = {
-    all: "전체",
-    attack: "강공",
-    stun: "격파",
-    anomaly: "이상",
-    support: "지원",
-    defense: "방어",
-    rupture: "명파",
+    all: "All",
+    attack: "Attack",
+    stun: "Stun",
+    anomaly: "Anomaly",
+    support: "Support",
+    defense: "Defense",
+    rupture: "Rupture",
   };
 
   const attributeLabels = {
-    all: "전체",
-    physical: "물리",
-    fire: "불",
-    ice: "얼음",
-    frost: "서리",
-    electric: "전기",
-    ether: "에테르",
-    wind: "바람",
-    auricInk: "현묵",
+    all: "All",
+    physical: "Physical",
+    fire: "Fire",
+    ice: "Ice",
+    frost: "Frost",
+    electric: "Electric",
+    ether: "Ether",
+    wind: "Wind",
+    auricInk: "Auric Ink",
   };
 
   function fandomAvatar(fileName) {
@@ -582,6 +582,48 @@
       discs: ["Chaotic Metal 4 + Freedom Blues 2"],
       teams: [{ name: "Ether Anomaly", members: ["vivian", "astra", "yanagi"], note: "Ether anomaly pressure with support and Disorder triggers." }],
     },
+    {
+      id: "pyrois",
+      kr: "Pyrois",
+      en: "Pyrois",
+      rank: "I",
+      attribute: "ether",
+      role: "attack",
+      faction: "Phaethon",
+      image: fandomAvatar("Avatar Pyrois.png"),
+      stats: { hp: 7673, def: 612, atk: 849, critRate: 5, critDmg: 50, penRatio: 0, impact: 90, anomalyMastery: 92, energy: 1.2 },
+      engines: ["Sol Exuvia", "The Brimstone"],
+      discs: ["Chaotic Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Pyrois 3.0 Core", members: ["pyrois", "velina", "norma"], note: "Version 3.0 Ether Attack core with Wind Anomaly and Fire Stun support slots." }],
+    },
+    {
+      id: "velina",
+      kr: "Velina Airgid",
+      en: "Velina Airgid",
+      rank: "S",
+      attribute: "wind",
+      role: "anomaly",
+      faction: "External Strategy Department",
+      image: fandomAvatar("Avatar Velina Airgid.png"),
+      stats: { hp: 7788, def: 612, atk: 797, critRate: 5, critDmg: 50, penRatio: 0, impact: 86, anomalyMastery: 148, energy: 1.2 },
+      engines: ["Joyau Dore", "Fusion Compiler"],
+      discs: ["Freedom Blues 4 + Swing Jazz 2"],
+      teams: [{ name: "Wind Anomaly", members: ["velina", "pyrois", "astra"], note: "Wind Anomaly routing for Pyrois and general Disorder setups." }],
+    },
+    {
+      id: "norma",
+      kr: "Norma Hollowell",
+      en: "Norma Hollowell",
+      rank: "S",
+      attribute: "fire",
+      role: "stun",
+      faction: "External Strategy Department",
+      image: fandomAvatar("Avatar Norma Hollowell.png"),
+      stats: { hp: 7799, def: 582, atk: 687, critRate: 5, critDmg: 50, penRatio: 0, impact: 137, anomalyMastery: 91, energy: 1.2 },
+      engines: ["Chief Sidekick", "Hellfire Gears"],
+      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      teams: [{ name: "3.0 Stun Preview", members: ["norma", "pyrois", "velina"], note: "Preview Fire Stun slot; details may change before full release data is published." }],
+    },
   );
 
   const engines = [
@@ -727,6 +769,244 @@
     },
   };
 
+  const englishAgentRecommendations = {
+    anby: {
+      faction: "Cunning Hares",
+      engines: ["Demara Battery Mark II", "Hellfire Gears", "The Restrained"],
+      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      teams: [{ name: "Starter Electric", members: ["anby", "anton", "nicole"], note: "Stun first, then swap into the Electric Attack damage window." }],
+    },
+    anton: {
+      faction: "Belobog Heavy Industries",
+      engines: ["Drill Rig - Red Axis", "The Brimstone"],
+      discs: ["Thunder Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Electric Attack", members: ["anton", "anby", "rina"], note: "Keep Shock active and burst during the stun window." }],
+    },
+    billy: {
+      faction: "Cunning Hares",
+      engines: ["Starlight Engine Replica", "Steel Cushion"],
+      discs: ["Fanged Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Cunning Hares", members: ["billy", "anby", "nicole"], note: "Free-agent core for early Physical Attack routing." }],
+    },
+    nicole: {
+      faction: "Cunning Hares",
+      engines: ["The Vault", "Weeping Cradle"],
+      discs: ["Swing Jazz 4 + Chaotic Metal 2"],
+      teams: [{ name: "Ether Burst", members: ["zhu-yuan", "qingyi", "nicole"], note: "Group enemies and apply DEF reduction before Zhu Yuan's burst." }],
+    },
+    "zhu-yuan": {
+      faction: "Criminal Investigation Special Response Team",
+      engines: ["Riot Suppressor Mark VI", "The Brimstone"],
+      discs: ["Chaotic Metal 4 + Woodpecker Electro 2"],
+      teams: [
+        { name: "Zhu Yuan Standard", members: ["zhu-yuan", "qingyi", "nicole"], note: "Load shotgun shells into the stun window." },
+        { name: "Zhu Yuan Support Burst", members: ["zhu-yuan", "anby", "astra"], note: "Support-heavy burst shell for buffed damage windows." },
+      ],
+    },
+    qingyi: {
+      faction: "Criminal Investigation Special Response Team",
+      engines: ["Ice-Jade Teapot", "Hellfire Gears"],
+      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      teams: [{ name: "Stun Core", members: ["zhu-yuan", "qingyi", "nicole"], note: "High-output stun slot for burst-focused teams." }],
+    },
+    ellen: {
+      faction: "Victoria Housekeeping Co.",
+      engines: ["Deep Sea Visitor", "The Brimstone"],
+      discs: ["Polar Metal 4 + Woodpecker Electro 2"],
+      teams: [
+        { name: "Ellen Freeze", members: ["ellen", "lycaon", "soukaku"], note: "Classic Ice Attack shell with reliable stun and ATK support." },
+        { name: "Ellen Buff Window", members: ["ellen", "lighter", "soukaku"], note: "Lighter expands the damage window when available." },
+      ],
+    },
+    lycaon: {
+      faction: "Victoria Housekeeping Co.",
+      engines: ["The Restrained", "Hellfire Gears"],
+      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      teams: [{ name: "Ice Stun", members: ["ellen", "lycaon", "soukaku"], note: "Ice stun slot that pairs naturally with Ellen." }],
+    },
+    rina: {
+      faction: "Victoria Housekeeping Co.",
+      engines: ["Weeping Cradle", "Elegant Vanity"],
+      discs: ["Swing Jazz 4 + Puffer Electro 2"],
+      teams: [{ name: "Shock Support", members: ["grace", "rina", "anton"], note: "PEN and Shock support for Electric teams." }],
+    },
+    soukaku: {
+      faction: "Hollow Special Operations Section 6",
+      engines: ["Unfettered Game Ball", "Weeping Cradle"],
+      discs: ["Swing Jazz 4 + Polar Metal 2"],
+      teams: [{ name: "Ice Support", members: ["ellen", "lycaon", "soukaku"], note: "ATK support for Ice damage dealers." }],
+    },
+    miyabi: {
+      faction: "Hollow Special Operations Section 6",
+      engines: ["Hailstorm Shrine", "Fusion Compiler"],
+      discs: ["Branch & Blade Song 4 + Woodpecker Electro 2"],
+      teams: [
+        { name: "Miyabi Disorder", members: ["miyabi", "yanagi", "astra"], note: "Anomaly swap routing with strong support buffs." },
+        { name: "Miyabi Ice", members: ["miyabi", "lycaon", "soukaku"], note: "Stable Frost/Ice route with traditional stun support." },
+      ],
+    },
+    harumasa: {
+      faction: "Hollow Special Operations Section 6",
+      engines: ["Zanshin Herb Case", "The Brimstone"],
+      discs: ["Thunder Metal 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Electric Attack", members: ["harumasa", "qingyi", "rina"], note: "Compress Electric damage into stun windows." }],
+    },
+    jane: {
+      faction: "Criminal Investigation Special Response Team",
+      engines: ["Sharpened Stinger", "Fusion Compiler"],
+      discs: ["Fanged Metal 4 + Freedom Blues 2"],
+      teams: [
+        { name: "Jane Assault", members: ["jane", "seth", "rina"], note: "Shield and PEN support for repeated Assault triggers." },
+        { name: "Jane Disorder", members: ["jane", "burnice", "seth"], note: "Cross Physical and Fire Anomaly applications." },
+      ],
+    },
+    seth: {
+      faction: "Criminal Investigation Special Response Team",
+      engines: ["Peacekeeper - Specialized", "Original Transmorpher"],
+      discs: ["Proto Punk 4 + Freedom Blues 2"],
+      teams: [{ name: "Anomaly Defense", members: ["jane", "seth", "burnice"], note: "Defensive utility and support for Anomaly teams." }],
+    },
+    burnice: {
+      faction: "Sons of Calydon",
+      engines: ["Flamemaker Shaker", "Fusion Compiler"],
+      discs: ["Chaos Jazz 4 + Freedom Blues 2"],
+      teams: [{ name: "Fire Disorder", members: ["jane", "burnice", "seth"], note: "Off-field Fire Anomaly pressure for Disorder triggers." }],
+    },
+    lighter: {
+      faction: "Sons of Calydon",
+      engines: ["Blazing Laurel", "Hellfire Gears"],
+      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      teams: [{ name: "Fire/Ice Stun", members: ["ellen", "lighter", "soukaku"], note: "Extended stun-window routing for Fire and Ice teams." }],
+    },
+    astra: {
+      faction: "Stars of Lyra",
+      engines: ["Elegant Vanity", "Weeping Cradle"],
+      discs: ["Astral Voice 4 + Swing Jazz 2"],
+      teams: [{ name: "Universal Support", members: ["miyabi", "yanagi", "astra"], note: "Strong support slot for buff-dependent damage dealers." }],
+    },
+    yanagi: {
+      faction: "Hollow Special Operations Section 6",
+      engines: ["Timeweaver", "Fusion Compiler"],
+      discs: ["Chaos Jazz 4 + Freedom Blues 2"],
+      teams: [{ name: "Miyabi Disorder", members: ["miyabi", "yanagi", "astra"], note: "Electric Anomaly route for Disorder triggers." }],
+    },
+    yixuan: {
+      faction: "Yunkui Summit",
+      engines: ["Cloudcleave Radiance", "Kraken's Cradle"],
+      discs: ["Yunkui Tales 4 + Woodpecker Electro 2"],
+      teams: [{ name: "Yunkui Rupture", members: ["yixuan", "ju-fufu", "pan-yinhu"], note: "Rupture DPS with dedicated stun and sustain support." }],
+    },
+    "ju-fufu": {
+      faction: "Yunkui Summit",
+      engines: ["Chief Sidekick", "Hellfire Gears"],
+      discs: ["King of the Summit 4 + Shockstar Disco 2"],
+      teams: [{ name: "Yunkui Rupture", members: ["yixuan", "ju-fufu", "pan-yinhu"], note: "Stun support and CRIT DMG utility for Yunkui teams." }],
+    },
+    "pan-yinhu": {
+      faction: "Yunkui Summit",
+      engines: ["Radiowave Journey", "Original Transmorpher"],
+      discs: ["Proto Punk 4 + Yunkui Tales 2"],
+      teams: [{ name: "Yunkui Rupture", members: ["yixuan", "ju-fufu", "pan-yinhu"], note: "Defensive utility and survival support slot." }],
+    },
+    yuzuha: {
+      faction: "Spook Shack",
+      engines: ["Metanukimorphosis", "Elegant Vanity"],
+      discs: ["Moonlight Lullaby 4 + Fanged Metal 2"],
+      teams: [{ name: "Physical Anomaly", members: ["alice", "yuzuha", "jane"], note: "Support route for Physical Anomaly damage dealers." }],
+    },
+    alice: {
+      faction: "Spook Shack",
+      engines: ["Practiced Perfection", "Fusion Compiler"],
+      discs: ["Fanged Metal 4 + Freedom Blues 2"],
+      teams: [{ name: "Physical Anomaly", members: ["alice", "yuzuha", "jane"], note: "Support and Assault-focused Physical Anomaly route." }],
+    },
+  };
+
+  const discEnglishEffects = {
+    none: { kr: "None", two: "None", four: "None" },
+    "fanged-metal": { two: "Physical DMG +10%", four: "After Assault, the target takes increased damage." },
+    "polar-metal": { two: "Ice DMG +10%", four: "Basic and Dash Attack DMG increases, with extra value after Freeze/Shatter." },
+    "thunder-metal": { two: "Electric DMG +10%", four: "ATK increases while an enemy is Shocked." },
+    "chaotic-metal": { two: "Ether DMG +10%", four: "CRIT DMG increases, with extra stacks after Corruption damage." },
+    "inferno-metal": { two: "Fire DMG +10%", four: "CRIT Rate increases against Burning enemies." },
+    "swing-jazz": { two: "Energy Regen +20%", four: "Chain Attack or Ultimate increases squad DMG." },
+    "soul-rock": { two: "DEF +16%", four: "Taking damage reduces incoming damage briefly." },
+    "hormone-punk": { two: "ATK +10%", four: "ATK increases on combat entry or swap-in." },
+    "freedom-blues": { two: "Anomaly Proficiency +30", four: "EX Special Attack hits reduce Anomaly Buildup RES." },
+    "shockstar-disco": { two: "Impact +6%", four: "Basic, Dash, and Dodge Counter Daze increases." },
+    "puffer-electro": { two: "PEN Ratio +8%", four: "Ultimate DMG increases and grants ATK after Ultimate." },
+    "woodpecker-electro": { two: "CRIT Rate +8%", four: "CRIT hits grant stacking ATK." },
+    "proto-punk": { two: "Shield Effect +15%", four: "Defensive or Evasive Assist increases squad DMG." },
+    "chaos-jazz": { two: "Anomaly Proficiency +30", four: "Fire/Electric DMG and off-field EX/Assist DMG increase." },
+    "astral-voice": { two: "ATK +10%", four: "Quick Assist entries grant Astral stacks." },
+    "branch-blade": { two: "CRIT DMG +16%", four: "High Anomaly Mastery and Freeze/Shatter boost CRIT." },
+    "shadow-harmony": { two: "Aftershock and Dash Attack DMG +15%", four: "Aftershock or Dash hits grant ATK and CRIT Rate." },
+    "phaethon-melody": { two: "Anomaly Mastery +8%", four: "EX Special Attacks increase Anomaly Proficiency and Ether DMG." },
+    "yunkui-tales": { two: "HP +10%", four: "EX, Chain, or Ultimate grants CRIT Rate; max stacks boost Sheer DMG." },
+    "king-summit": { two: "Daze +6%", four: "Stun specialty users boost squad CRIT DMG." },
+    "moonlight-lullaby": { two: "Energy Regen +20%", four: "Support EX Special Attack or Ultimate increases squad DMG." },
+  };
+
+  function needsEnglishText(value) {
+    return typeof value === "string" && /[^\x00-\x7F]/.test(value);
+  }
+
+  function applyEnglishData() {
+    agents.forEach((agent) => {
+      agent.kr = agent.en;
+      const recommendation = englishAgentRecommendations[agent.id];
+      if (recommendation) {
+        agent.faction = recommendation.faction;
+        agent.engines = recommendation.engines;
+        agent.discs = recommendation.discs;
+        agent.teams = recommendation.teams;
+      }
+      if (needsEnglishText(agent.faction)) agent.faction = "Unknown";
+      agent.teams = agent.teams.map((team) => ({
+        ...team,
+        name: needsEnglishText(team.name) ? `${agent.en} Core` : team.name,
+        note: needsEnglishText(team.note) ? "Starter recommendation; verify rotations against current endgame data." : team.note,
+      }));
+    });
+
+    engines.forEach((engine) => {
+      engine.kr = engine.en;
+      if (engine.id === "manual") {
+        engine.effect = "Manual stat input only.";
+      } else if (needsEnglishText(engine.effect)) {
+        engine.effect = "Effect text pending English verification; calculator uses the structured stat fields.";
+      }
+    });
+
+    driveDiscs.forEach((disc) => {
+      const effects = discEnglishEffects[disc.id] || {};
+      disc.kr = disc.en;
+      disc.two = effects.two || disc.two;
+      disc.four = effects.four || disc.four;
+    });
+
+    materialNames.role = {
+      attack: ["Basic Attack Certification Seal", "Advanced Attack Certification Seal", "Pioneer's Certification Seal"],
+      stun: ["Basic Stun Certification Seal", "Advanced Stun Certification Seal", "Buster Certification Seal"],
+      anomaly: ["Basic Anomaly Certification Seal", "Advanced Anomaly Certification Seal", "Controller Certification Seal"],
+      support: ["Basic Support Certification Seal", "Advanced Support Certification Seal", "Ruler Certification Seal"],
+      defense: ["Basic Defense Certification Seal", "Advanced Defense Certification Seal", "Defender Certification Seal"],
+      rupture: ["Basic Rupture Certification Seal", "Advanced Rupture Certification Seal", "Arbiter Certification Seal"],
+    };
+    materialNames.chips = {
+      physical: ["Basic Physical Chip", "Advanced Physical Chip", "Specialized Physical Chip"],
+      fire: ["Basic Burn Chip", "Advanced Burn Chip", "Specialized Burn Chip"],
+      ice: ["Basic Freeze Chip", "Advanced Freeze Chip", "Specialized Freeze Chip"],
+      frost: ["Basic Freeze Chip", "Advanced Freeze Chip", "Specialized Freeze Chip"],
+      electric: ["Basic Shock Chip", "Advanced Shock Chip", "Specialized Shock Chip"],
+      ether: ["Basic Ether Chip", "Advanced Ether Chip", "Specialized Ether Chip"],
+      wind: ["Basic Wind Chip", "Advanced Wind Chip", "Specialized Wind Chip"],
+      auricInk: ["Basic Auric Ink Chip", "Advanced Auric Ink Chip", "Specialized Auric Ink Chip"],
+    };
+  }
+
+  applyEnglishData();
+
   const tables = {
     agentPromotion: [
       { level: 20, tier: 0, count: 4, denny: 24000 },
@@ -823,7 +1103,7 @@
 
   function fillCoreSelect(select) {
     const items = [
-      { id: 0, label: "없음" },
+      { id: 0, label: "None" },
       { id: 1, label: "A" },
       { id: 2, label: "B" },
       { id: 3, label: "C" },
@@ -857,7 +1137,7 @@
       return roleOk && attrOk;
     });
 
-    $("#agent-count").textContent = `${filtered.length}명`;
+    $("#agent-count").textContent = `${filtered.length} Agents`;
     $("#agent-grid").replaceChildren(
       ...filtered.map((agent) => {
         const card = document.createElement("button");
@@ -871,7 +1151,7 @@
           </div>
           <div class="agent-card-body">
             <strong>${agent.kr}</strong>
-            <span>${attributeLabels[agent.attribute]} · ${roleLabels[agent.role]}</span>
+            <span>${attributeLabels[agent.attribute]} / ${roleLabels[agent.role]}</span>
           </div>
           <span class="rank-badge">${agent.rank}</span>
         `;
@@ -913,17 +1193,17 @@
           <span class="pill muted">${agent.faction}</span>
         </div>
         <dl class="mini-stats">
-          <div><dt>공격력</dt><dd>${fmt.format(agent.stats.atk)}</dd></div>
-          <div><dt>치확</dt><dd>${fmt1.format(agent.stats.critRate)}%</dd></div>
-          <div><dt>충격</dt><dd>${fmt.format(agent.stats.impact)}</dd></div>
-          <div><dt>이상 장악</dt><dd>${fmt.format(agent.stats.anomalyMastery)}</dd></div>
+          <div><dt>ATK</dt><dd>${fmt.format(agent.stats.atk)}</dd></div>
+          <div><dt>CRIT Rate</dt><dd>${fmt1.format(agent.stats.critRate)}%</dd></div>
+          <div><dt>Impact</dt><dd>${fmt.format(agent.stats.impact)}</dd></div>
+          <div><dt>Anomaly Mastery</dt><dd>${fmt.format(agent.stats.anomalyMastery)}</dd></div>
         </dl>
         <div class="recommend-block">
-          <span>W-엔진</span>
+          <span>W-Engine</span>
           <strong>${agent.engines.join(" / ")}</strong>
         </div>
         <div class="recommend-block">
-          <span>디스크</span>
+          <span>Drive Disc</span>
           <strong>${agent.discs.join(" / ")}</strong>
         </div>
       </div>
@@ -939,7 +1219,7 @@
         card.innerHTML = `
           <div class="section-heading compact">
             <h3>${team.name}</h3>
-            <button class="ghost-button apply-team" type="button">적용</button>
+            <button class="ghost-button apply-team" type="button">Apply</button>
           </div>
           <div class="team-chip-row">${team.members.map(teamMemberChip).join("")}</div>
           <p>${team.note}</p>
@@ -960,7 +1240,7 @@
     $("#guide-slot-3").value = team.members[2] || selectedAgentId;
     $("#guide-title").value = team.name;
     $("#guide-body").value = team.note;
-    $("#guide-tags").value = `${roleLabels[getAgent(selectedAgentId).role]}, 추천 파티`;
+    $("#guide-tags").value = `${roleLabels[getAgent(selectedAgentId).role]}, Recommended Team`;
     updateIssueLink();
     switchTab("community");
   }
@@ -1052,7 +1332,7 @@
 
   function renderDamage() {
     const result = calculateDamage();
-    $("#agent-meta").textContent = `${attributeLabels[result.agent.attribute]} · ${roleLabels[result.agent.role]} · ${result.agent.faction}`;
+    $("#agent-meta").textContent = `${attributeLabels[result.agent.attribute]} / ${roleLabels[result.agent.role]} / ${result.agent.faction}`;
     $("#disc-summary").textContent = `${result.discFour.kr} 4 / ${result.discTwo.kr} 2`;
     $("#normal-damage").textContent = fmt.format(result.nonCrit);
     $("#crit-damage").textContent = fmt.format(result.crit);
@@ -1060,14 +1340,14 @@
     $("#anomaly-damage").textContent = fmt.format(result.anomaly);
 
     const lines = [
-      ["총 공격력", fmt.format(result.totalAtk)],
-      ["치명타", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
-      ["피해 보너스", `${fmt1.format(result.baseDmgBonus)}%`],
-      ["방어 배율", fmt1.format(result.defMultiplier)],
-      ["저항 배율", fmt1.format(result.resMultiplier)],
-      ["그로기 배율", fmt1.format(result.stunMultiplier)],
-      ["이상 장악", fmt1.format(result.anomalyMastery)],
-      ["이상 숙련", fmt1.format(result.anomalyProficiency)],
+      ["Total ATK", fmt.format(result.totalAtk)],
+      ["CRIT", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
+      ["DMG Bonus", `${fmt1.format(result.baseDmgBonus)}%`],
+      ["DEF Multiplier", fmt1.format(result.defMultiplier)],
+      ["RES Multiplier", fmt1.format(result.resMultiplier)],
+      ["Stun Multiplier", fmt1.format(result.stunMultiplier)],
+      ["Anomaly Mastery", fmt1.format(result.anomalyMastery)],
+      ["Anomaly Proficiency", fmt1.format(result.anomalyProficiency)],
     ];
 
     $("#damage-breakdown").replaceChildren(
@@ -1089,7 +1369,7 @@
   function addExpResources(map, label, exp) {
     if (exp <= 0) return;
     addResource(map, `${label} EXP`, Math.round(exp));
-    addResource(map, label === "에이전트" ? "선임 조사원 기록 환산" : "W-엔진 에너지 모듈 환산", Math.ceil(exp / 3000));
+    addResource(map, label === "Agent" ? "Senior Investigator Log Equivalent" : "W-Engine Energy Module Equivalent", Math.ceil(exp / 3000));
   }
 
   function expBetween(table, current, target) {
@@ -1112,12 +1392,12 @@
     const roleMats = materialNames.role[agent.role] || materialNames.role.attack;
     const chipMats = materialNames.chips[agent.attribute] || materialNames.chips.physical;
 
-    addExpResources(resources, "에이전트", expBetween(tables.agentExpByBand, currentLevel, targetLevel));
+    addExpResources(resources, "Agent", expBetween(tables.agentExpByBand, currentLevel, targetLevel));
 
     for (const step of tables.agentPromotion) {
       if (currentLevel < step.level && targetLevel >= step.level) {
         addResource(resources, roleMats[step.tier], step.count);
-        addResource(resources, "데니", step.denny);
+        addResource(resources, "Denny", step.denny);
       }
     }
 
@@ -1127,8 +1407,8 @@
     for (const step of tables.skill) {
       if (currentSkill < step.to && targetSkill >= step.to) {
         addResource(resources, chipMats[step.tier], step.count * skillCount);
-        addResource(resources, "데니", step.denny * skillCount);
-        addResource(resources, "햄스터 케이지 패스", (step.hamster || 0) * skillCount);
+        addResource(resources, "Denny", step.denny * skillCount);
+        addResource(resources, "Hamster Cage Pass", (step.hamster || 0) * skillCount);
       }
     }
 
@@ -1136,19 +1416,19 @@
     const targetCore = Number($("#target-core").value);
     for (const step of tables.core) {
       if (currentCore < step.to && targetCore >= step.to) {
-        addResource(resources, "데니", step.denny);
-        addResource(resources, "캐릭터별 고차원 데이터", step.highDim || 0);
-        addResource(resources, "캐릭터별 주간 보스 재료", step.weekly || 0);
+        addResource(resources, "Denny", step.denny);
+        addResource(resources, "Agent High-Dimensional Data", step.highDim || 0);
+        addResource(resources, "Agent Weekly Boss Material", step.weekly || 0);
       }
     }
 
     const currentEngineLevel = number("#current-engine-level");
     const targetEngineLevel = number("#target-engine-level");
-    addExpResources(resources, "W-엔진", expBetween(tables.engineExpByBand, currentEngineLevel, targetEngineLevel));
+    addExpResources(resources, "W-Engine", expBetween(tables.engineExpByBand, currentEngineLevel, targetEngineLevel));
     for (const step of tables.enginePromotion) {
       if (currentEngineLevel < step.level && targetEngineLevel >= step.level) {
-        addResource(resources, step.advanced ? "특화 W-엔진 부품" : "강화 W-엔진 부품", step.part);
-        addResource(resources, "데니", step.denny);
+        addResource(resources, step.advanced ? "Specialized W-Engine Component" : "W-Engine Component", step.part);
+        addResource(resources, "Denny", step.denny);
       }
     }
 
@@ -1157,12 +1437,12 @@
 
   function renderGrowth() {
     const { agent, resources } = calculateGrowth();
-    $("#growth-agent-meta").textContent = `${attributeLabels[agent.attribute]} · ${roleLabels[agent.role]}`;
+    $("#growth-agent-meta").textContent = `${attributeLabels[agent.attribute]} / ${roleLabels[agent.role]}`;
     const rows = Array.from(resources.entries())
       .sort(([a], [b]) => {
-        if (a === "데니") return -1;
-        if (b === "데니") return 1;
-        return a.localeCompare(b, "ko");
+        if (a === "Denny") return -1;
+        if (b === "Denny") return 1;
+        return a.localeCompare(b, "en");
       })
       .map(([name, amount]) => {
         const row = document.createElement("div");
@@ -1190,8 +1470,8 @@
   function guidePayloadFromForm() {
     return {
       id: `guide-${Date.now()}`,
-      author: $("#guide-author").value.trim() || "익명",
-      title: $("#guide-title").value.trim() || `${getAgent($("#guide-agent").value).kr} 조합`,
+      author: $("#guide-author").value.trim() || "Anonymous",
+      title: $("#guide-title").value.trim() || `${getAgent($("#guide-agent").value).kr} Team`,
       agentId: $("#guide-agent").value,
       team: [$("#guide-slot-1").value, $("#guide-slot-2").value, $("#guide-slot-3").value],
       tags: $("#guide-tags").value.trim(),
@@ -1202,7 +1482,7 @@
 
   function renderGuides() {
     if (guides.length === 0) {
-      $("#guide-list").innerHTML = `<div class="empty-state">저장된 공략이 없습니다.</div>`;
+      $("#guide-list").innerHTML = `<div class="empty-state">No saved guides yet.</div>`;
       return;
     }
 
@@ -1214,11 +1494,11 @@
         card.innerHTML = `
           <div class="section-heading compact">
             <h3>${guide.title}</h3>
-            <button class="ghost-button delete-guide" type="button">삭제</button>
+            <button class="ghost-button delete-guide" type="button">Delete</button>
           </div>
-          <div class="guide-meta">${guide.author} · ${mainAgent.kr}${guide.tags ? ` · ${guide.tags}` : ""}</div>
+          <div class="guide-meta">${guide.author} / ${mainAgent.kr}${guide.tags ? ` / ${guide.tags}` : ""}</div>
           <div class="team-chip-row">${guide.team.map(teamMemberChip).join("")}</div>
-          <p>${guide.body || "내용 없음"}</p>
+          <p>${guide.body || "No content"}</p>
         `;
         card.querySelector(".delete-guide").addEventListener("click", () => {
           guides = guides.filter((item) => item.id !== guide.id);
@@ -1236,15 +1516,15 @@
   function updateIssueLink() {
     const guide = guidePayloadFromForm();
     const body = [
-      `작성자: ${guide.author}`,
-      `중심 캐릭터: ${getAgent(guide.agentId).kr}`,
-      `파티: ${guide.team.map((id) => getAgent(id).kr).join(" / ")}`,
-      `태그: ${guide.tags}`,
+      `Author: ${guide.author}`,
+      `Main Agent: ${getAgent(guide.agentId).kr}`,
+      `Team: ${guide.team.map((id) => getAgent(id).kr).join(" / ")}`,
+      `Tags: ${guide.tags}`,
       "",
       guide.body,
     ].join("\n");
     const params = new URLSearchParams({
-      title: `[공략] ${guide.title}`,
+      title: `[Guide] ${guide.title}`,
       body,
       labels: "community-guide",
     });
@@ -1282,7 +1562,7 @@
         .filter((engine) => matches([engine.kr, engine.en, engine.role, engine.effect]))
         .map((engine) => {
           const row = document.createElement("tr");
-          row.innerHTML = `<td><strong>${engine.kr}</strong><br>${engine.en}</td><td><span class="pill">${engine.rank}</span></td><td>${roleLabels[engine.role] || "전체"}</td><td>${fmt.format(engine.baseAtk)}</td>`;
+          row.innerHTML = `<td><strong>${engine.kr}</strong><br>${engine.en}</td><td><span class="pill">${engine.rank}</span></td><td>${roleLabels[engine.role] || "All"}</td><td>${fmt.format(engine.baseAtk)}</td>`;
           return row;
         }),
     );
@@ -1349,9 +1629,9 @@
     const { resources } = calculateGrowth();
     const text = Array.from(resources.entries()).map(([name, amount]) => `${name}: ${fmt.format(amount)}`).join("\n");
     await navigator.clipboard.writeText(text);
-    $("#copy-growth").textContent = "완료";
+    $("#copy-growth").textContent = "Copied";
     window.setTimeout(() => {
-      $("#copy-growth").textContent = "복사";
+      $("#copy-growth").textContent = "Copy";
     }, 1200);
   }
 
@@ -1366,14 +1646,14 @@
   }
 
   function initSelects() {
-    const agentLabel = (agent) => `${agent.kr} (${attributeLabels[agent.attribute]} · ${roleLabels[agent.role]})`;
+    const agentLabel = (agent) => `${agent.kr} (${attributeLabels[agent.attribute]} / ${roleLabels[agent.role]})`;
     fillSelect($("#agent-select"), agents, agentLabel);
     fillSelect($("#growth-agent-select"), agents, agentLabel);
     fillSelect($("#guide-agent"), agents, agentLabel);
     fillSelect($("#guide-slot-1"), agents, (agent) => agent.kr);
     fillSelect($("#guide-slot-2"), agents, (agent) => agent.kr);
     fillSelect($("#guide-slot-3"), agents, (agent) => agent.kr);
-    fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} · ${roleLabels[engine.role] || "전체"}`);
+    fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} / ${roleLabels[engine.role] || "All"}`);
     fillSelect($("#disc-four"), driveDiscs, (disc) => disc.kr);
     fillSelect($("#disc-two"), driveDiscs, (disc) => disc.kr);
     fillCoreSelect($("#current-core"));
