@@ -458,8 +458,7 @@ button:focus-visible {
 }
 
 .detail-copy p,
-.team-card p,
-.guide-card p {
+.team-card p {
   margin: 0;
   color: var(--muted);
   font-size: 14px;
@@ -489,7 +488,6 @@ button:focus-visible {
 .mini-stats div,
 .recommend-block,
 .team-card,
-.guide-card,
 .empty-state {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -508,8 +506,7 @@ button:focus-visible {
 }
 
 .mini-stats dt,
-.recommend-block span,
-.guide-meta {
+.recommend-block span {
   color: var(--muted);
   font-size: 12px;
   font-weight: 900;
@@ -528,14 +525,12 @@ button:focus-visible {
 }
 
 .team-list,
-.guide-list,
 .buff-list {
   display: grid;
   gap: 10px;
 }
 
-.team-card,
-.guide-card {
+.team-card {
   display: grid;
   gap: 10px;
   padding: 12px;
@@ -577,6 +572,7 @@ button:focus-visible {
 .buff-chip p {
   color: var(--ink);
   overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 
 .section-heading.compact {
@@ -608,10 +604,6 @@ h3 {
   height: 26px;
   border-radius: 999px;
   flex: 0 0 auto;
-}
-
-.guide-meta {
-  line-height: 1.35;
 }
 
 .empty-state {

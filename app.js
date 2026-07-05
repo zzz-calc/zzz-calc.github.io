@@ -6,13 +6,11 @@
     label: "3.0",
     agents: 40,
     wEngines: 93,
-    driveDiscs: 21,
+    driveDiscs: 28,
     naming: "에이전트 이름과 W-Engine 이름은 영어로 유지하고, 나머지 UI와 데이터 라벨은 한국어로 표시합니다.",
   };
-  const GUIDE_STORAGE_KEY = "zzz-calc-community-guides";
   const STATE_STORAGE_KEY = "zzz-calc-state";
   const EFFECT_DB_URL = "data/effects.mock.json";
-  const REPO_ISSUE_URL = "https://github.com/suhyeong10/zzz-calc/issues/new";
   const TRANSIENT_FIELD_IDS = new Set(["agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
 
   const roleLabels = {
@@ -602,7 +600,7 @@
       image: fandomAvatar("Avatar Pyrois.png"),
       stats: { hp: 7673, def: 612, atk: 849, critRate: 5, critDmg: 50, penRatio: 0, impact: 90, anomalyMastery: 92, energy: 1.2 },
       engines: ["Sol Exuvia", "The Brimstone"],
-      discs: ["Chaotic Metal 4 + Woodpecker Electro 2"],
+      discs: ["The Sky Ablaze 4 + Woodpecker Electro 2"],
       teams: [{ name: "Pyrois 3.0 Core", members: ["pyrois", "velina", "norma"], note: "Version 3.0 Ether Attack core with Wind Anomaly and Fire Stun support slots." }],
     },
     {
@@ -616,7 +614,7 @@
       image: fandomAvatar("Avatar Velina Airgid.png"),
       stats: { hp: 7788, def: 612, atk: 797, critRate: 5, critDmg: 50, penRatio: 0, impact: 86, anomalyMastery: 148, energy: 1.2 },
       engines: ["Joyau Dore", "Fusion Compiler"],
-      discs: ["Freedom Blues 4 + Swing Jazz 2"],
+      discs: ["Wuthering Salon 4 + Freedom Blues 2"],
       teams: [{ name: "Wind Anomaly", members: ["velina", "pyrois", "astra"], note: "Wind Anomaly routing for Pyrois and general Disorder setups." }],
     },
     {
@@ -630,7 +628,7 @@
       image: fandomAvatar("Avatar Norma Hollowell.png"),
       stats: { hp: 7799, def: 582, atk: 687, critRate: 5, critDmg: 50, penRatio: 0, impact: 137, anomalyMastery: 91, energy: 1.2 },
       engines: ["Chief Sidekick", "Hellfire Gears"],
-      discs: ["Shockstar Disco 4 + Swing Jazz 2"],
+      discs: ["King of the Summit 4 + Shockstar Disco 2"],
       teams: [{ name: "3.0 Stun Preview", members: ["norma", "pyrois", "velina"], note: "Preview Fire Stun slot; details may change before full release data is published." }],
     },
   );
@@ -692,7 +690,7 @@
     { id: "gilded-blossom", kr: "Gilded Blossom", en: "Gilded Blossom", rank: "A", role: "attack", baseAtk: 594, stats: { atkPct: 25 }, effect: "공격력 및 EX 피해 보정" },
     { id: "grill-owisp", kr: "Grill O'Wisp", en: "Grill O'Wisp", rank: "A", role: "rupture", baseAtk: 624, stats: { hpPct: 25 }, effect: "불 피해/HP 감소 치확 보정" },
     { id: "housekeeper", kr: "Housekeeper", en: "Housekeeper", rank: "A", role: "attack", baseAtk: 624, stats: { atkPct: 25 }, effect: "오프필드 에너지와 물리 피해 보정" },
-    { id: "iris-enigma", kr: "Iris Enigma", en: "Iris Enigma", rank: "A", role: "support", baseAtk: 594, stats: { atkPct: 25 }, effect: "궁극기 후 에너지 회복 보정" },
+    { id: "boisterous-echoes", kr: "Boisterous Echoes", en: "Boisterous Echoes", rank: "A", role: "anomaly", baseAtk: 594, stats: { anomalyProficiency: 75 }, effect: "Vortex 발동 시 에너지 회복 및 이상 대상 피해 증가" },
     { id: "kaboom-the-cannon", kr: "Kaboom the Cannon", en: "Kaboom the Cannon", rank: "A", role: "support", baseAtk: 624, stats: { energyRegen: 50 }, effect: "파티 공격력 보정" },
     { id: "marcato-desire", kr: "Marcato Desire", en: "Marcato Desire", rank: "A", role: "attack", baseAtk: 594, stats: { critRate: 20 }, effect: "EX/체인 후 공격력 보정" },
     { id: "original-transmorpher", kr: "Original Transmorpher", en: "Original Transmorpher", rank: "A", role: "defense", baseAtk: 594, stats: { hpPct: 25 }, effect: "HP 및 피격 후 충격력 보정" },
@@ -754,7 +752,14 @@
     { id: "phaethon-melody", kr: "파에톤의 노래", en: "Phaethon's Melody", two: "이상 장악 +8%", four: "EX 후 이상 숙련 및 에테르 피해 보정", stats: { anomalyMasteryPct: 8 } },
     { id: "yunkui-tales", kr: "운규 이야기", en: "Yunkui Tales", two: "HP +10%", four: "EX/콤보/궁극기 후 명파 피해 보정", stats: { hpPct: 10 } },
     { id: "king-summit", kr: "산림의 왕", en: "King of the Summit", two: "그로기 수치 +6%", four: "격파 캐릭터 파티 치명타 피해 보정", stats: { dazePct: 6 } },
+    { id: "dawns-bloom", kr: "여명의 꽃", en: "Dawn's Bloom", two: "일반 공격 피해 +15%", four: "강공 캐릭터 일반 공격 피해 보정", stats: { basicDmg: 15 } },
     { id: "moonlight-lullaby", kr: "달빛 기사의 칭송", en: "Moonlight Lullaby", two: "에너지 자동 회복 +20%", four: "지원 캐릭터 파티 피해 보정", stats: { energyRegenPct: 20 } },
+    { id: "white-water-ballad", kr: "물빛 노랫소리", en: "White Water Ballad", two: "물리 피해 +10%", four: "에테르 장막 중 치명타 확률 및 공격력 보정", stats: { physicalDmg: 10 } },
+    { id: "shining-aria", kr: "빛의 아리아", en: "Shining Aria", two: "에테르 피해 +10%", four: "일반 공격 명중 후 이상 마스터리 및 그로기 적 피해 보정", stats: { etherDmg: 10 } },
+    { id: "bunny-wonderland", kr: "이상한 나라의 눈토끼", en: "Bunny in Wonderland", two: "HP +10%", four: "방어 캐릭터 파티 피해 보정", stats: { hpPct: 10 } },
+    { id: "notes-chained", kr: "수감자 수기", en: "Notes From the Chained", two: "얼음 피해 +10%", four: "난개/빙결 후 이상 및 혼돈 피해 보정", stats: { iceDmg: 10 } },
+    { id: "wuthering-salon", kr: "울부짖는 살롱", en: "Wuthering Salon", two: "바람 피해 +10%", four: "EX 후 이상 마스터리 및 풍화 후 피해 보정", stats: { windDmg: 10 } },
+    { id: "sky-ablaze", kr: "새벽녘 여행기", en: "The Sky Ablaze", two: "에테르 피해 +10%", four: "에테르 캐릭터 치명타 피해 및 EX/궁극기 공격력 보정", stats: { etherDmg: 10 } },
   ];
 
   const materialNames = {
@@ -1020,7 +1025,14 @@
     "phaethon-melody": { kr: "파에톤의 노래", two: "이상 장악 +8%", four: "EX 특수 스킬 후 이상 숙련 및 에테르 피해 증가" },
     "yunkui-tales": { kr: "운규 이야기", two: "HP +10%", four: "EX/콤보/궁극기 후 치명타 확률 증가, 최대 중첩 시 순수 피해 증가" },
     "king-summit": { kr: "산림의 왕", two: "그로기 수치 +6%", four: "격파 캐릭터 사용 시 파티 치명타 피해 증가" },
+    "dawns-bloom": { kr: "여명의 꽃", two: "일반 공격 피해 +15%", four: "일반 공격 피해 증가, 강공 캐릭터는 EX/궁극기 후 추가 증가" },
     "moonlight-lullaby": { kr: "달빛 기사의 칭송", two: "에너지 자동 회복 +20%", four: "지원 캐릭터의 EX 특수 스킬/궁극기 후 파티 피해 증가" },
+    "white-water-ballad": { kr: "물빛 노랫소리", two: "물리 피해 +10%", four: "에테르 장막 중 치명타 확률 증가, 강공 캐릭터는 장막 발동/연장 시 치명타 확률 및 공격력 증가" },
+    "shining-aria": { kr: "빛의 아리아", two: "에테르 피해 +10%", four: "일반 공격 명중 시 이상 마스터리 증가, 적 그로기 시 피해 증가" },
+    "bunny-wonderland": { kr: "이상한 나라의 눈토끼", two: "HP +10%", four: "방어 캐릭터 장착 시 EX/지원 행동 후 파티 피해 증가" },
+    "notes-chained": { kr: "수감자 수기", two: "얼음 피해 +10%", four: "난개 후 이상 마스터리 증가, 빙결 후 이상 및 혼돈 피해 증가" },
+    "wuthering-salon": { kr: "울부짖는 살롱", two: "바람 피해 +10%", four: "EX 특수 스킬 후 이상 마스터리 증가, 풍화 후 피해 증가" },
+    "sky-ablaze": { kr: "새벽녘 여행기", two: "에테르 피해 +10%", four: "에테르 캐릭터 치명타 피해 증가, EX/궁극기 후 공격력 증가" },
   };
 
   const discBuffPresets = {
@@ -1041,7 +1053,14 @@
     "phaethon-melody": { label: "파에톤의 노래 4세트", dmgBonus: 18, anomalyProficiency: 60, note: "EX 연계" },
     "yunkui-tales": { label: "운규 이야기 4세트", critRate: 12, dmgBonus: 20, note: "순수 피해 루트" },
     "king-summit": { label: "산림의 왕 4세트", critDmg: 30, note: "격파 지원" },
+    "dawns-bloom": { label: "여명의 꽃 4세트", dmgBonus: 40, note: "일반 공격 조건 최대치" },
     "moonlight-lullaby": { label: "달빛 기사의 칭송 4세트", dmgBonus: 18, note: "지원 EX/궁극기" },
+    "white-water-ballad": { label: "물빛 노랫소리 4세트", critRate: 20, atkPct: 10, note: "에테르 장막 조건 최대치" },
+    "shining-aria": { label: "빛의 아리아 4세트", anomalyProficiency: 36, dmgBonus: 25, note: "일반 공격/그로기 조건" },
+    "bunny-wonderland": { label: "이상한 나라의 눈토끼 4세트", dmgBonus: 18, note: "방어 캐릭터 3중첩" },
+    "notes-chained": { label: "수감자 수기 4세트", anomalyProficiency: 48, dmgBonus: 16, note: "난개/빙결 조건" },
+    "wuthering-salon": { label: "울부짖는 살롱 4세트", anomalyProficiency: 50, dmgBonus: 18, note: "EX 2중첩 및 풍화 조건" },
+    "sky-ablaze": { label: "새벽녘 여행기 4세트", critDmg: 30, atkPct: 10, note: "에테르/EX 또는 궁극기 조건" },
   };
 
   const partyDiscBuffPresets = {
@@ -1051,6 +1070,7 @@
     "astral-voice": { label: "고요 속의 별 4세트", dmgBonus: 24, note: "퀵 지원 진입 후" },
     "king-summit": { label: "산림의 왕 4세트", critDmg: 30, note: "격파 캐릭터 발동 후" },
     "moonlight-lullaby": { label: "달빛 기사의 칭송 4세트", dmgBonus: 18, note: "지원 EX/궁극기 후" },
+    "bunny-wonderland": { label: "이상한 나라의 눈토끼 4세트", dmgBonus: 18, note: "방어 캐릭터 3중첩" },
   };
 
   const teamBuffPresets = {
@@ -1081,6 +1101,7 @@
     "critDmg",
     "penRatio",
     "flatPen",
+    "resShred",
     "defReduction",
     "anomalyProficiency",
     "anomalyMastery",
@@ -1226,7 +1247,6 @@
   const fmt1 = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 1 });
 
   let selectedAgentId = agents[0].id;
-  let guides = [];
   let effectDb = { mindscapes: {}, wEngines: {}, status: "unloaded" };
   let effectDbLoadStatus = "unloaded";
 
@@ -1302,9 +1322,12 @@
   }
 
   function dbSourceNote(item, verification) {
+    const sourceStatus = item.sourceStatus || (item.rawText ? "source-text" : item.mockValue ? "source-pending" : "structured");
+    if (sourceStatus === "structured") return "자동 파싱 적용";
+    if (sourceStatus === "source-text") return "원문 DB";
     return [
       verification === "mock" ? "mock DB" : "",
-      item.mockValue ? "수치 검증 대기" : "",
+      item.mockValue ? "원문 수집 대기" : "",
       item.condition || "",
       item.notes || "",
     ]
@@ -1319,6 +1342,8 @@
       note: dbSourceNote(buff, verification),
       isDbEffect: true,
       isMock: Boolean(buff.mockValue),
+      rawText: buff.rawText || "",
+      sourceStatus: buff.sourceStatus || (buff.rawText ? "source-text" : buff.mockValue ? "source-pending" : "structured"),
       ...normalizeDbStats(buff.stats),
     };
   }
@@ -1331,6 +1356,8 @@
       isDbEffect: true,
       isDamageHook: true,
       isMock: Boolean(hook.mockValue),
+      rawText: hook.rawText || "",
+      sourceStatus: hook.sourceStatus || (hook.rawText ? "source-text" : hook.mockValue ? "source-pending" : "structured"),
       ...normalizeDbStats({}),
     };
   }
@@ -1393,6 +1420,7 @@
       critDmg: "치명타 피해",
       penRatio: "관통률",
       flatPen: "관통 수치",
+      resShred: "저항 감소",
       defReduction: "방어 감소",
       anomalyProficiency: "이상 숙련",
       anomalyMastery: "이상 장악",
@@ -1409,12 +1437,20 @@
       });
   }
 
-  function effectText(source) {
+  function effectText(source, options = {}) {
     const parts = buffParts(source);
-    if (parts.length > 0) return parts.join(" / ");
+    if (parts.length > 0) return options.includeRaw && source.rawText ? `${parts.join(" / ")}\n${source.rawText}` : parts.join(" / ");
+    if (source.rawText) return source.rawText;
     if (source.isDamageHook) return source.note || "계수 테이블 연결 대기";
-    if (source.isMock) return source.note || "mock DB: 수치 검증 대기";
+    if (source.isMock) return source.note || "원문 효과 수집 대기";
     return source.note || "구조화된 효과 없음";
+  }
+
+  function sourceStatusText(source) {
+    if (!source.isDbEffect) return "";
+    if (source.sourceStatus === "source-text") return "원문";
+    if (source.sourceStatus === "structured" || buffParts(source).length > 0) return "계산 반영";
+    return "대기";
   }
 
   function renderEffectList(selector, sources, emptyText) {
@@ -1425,17 +1461,25 @@
         ? sources.map((source) => {
             const item = document.createElement("article");
             item.className = "buff-chip";
-            item.innerHTML = `
-              <div>
-                <strong>${source.label}</strong>
-                <span>${source.type}${source.isMock ? " / mock" : ""}</span>
-              </div>
-              <p>${effectText(source)}</p>
-            `;
+            const header = document.createElement("div");
+            const label = document.createElement("strong");
+            const meta = document.createElement("span");
+            const body = document.createElement("p");
+            const status = sourceStatusText(source);
+
+            label.textContent = source.label;
+            meta.textContent = status ? `${source.type} / ${status}` : source.type;
+            body.textContent = effectText(source, { includeRaw: true });
+            header.append(label, meta);
+            item.append(header, body);
             return item;
           })
         : [Object.assign(document.createElement("div"), { className: "empty-state", textContent: emptyText })]),
     );
+  }
+
+  function calculationReadyDbSources(sources) {
+    return sources.filter((source) => buffParts(source).length > 0);
   }
 
   function collectBuffSources(discFour) {
@@ -1456,8 +1500,8 @@
       sources.push(...selectedPartyDiscSources());
     }
 
-    sources.push(...selectedWEngineDbSources());
-    sources.push(...selectedMindscapeDbSources());
+    sources.push(...calculationReadyDbSources(selectedWEngineDbSources()));
+    sources.push(...calculationReadyDbSources(selectedMindscapeDbSources()));
 
     const mindscapeBuff = mindscapeBuffSource();
     if (mindscapeBuff) sources.push(mindscapeBuff);
@@ -1524,7 +1568,7 @@
 
   function selectAgent(id, shouldRender = true, shouldSyncParty = true) {
     selectedAgentId = getAgent(id).id;
-    ["#agent-select", "#growth-agent-select", "#guide-agent", "#guide-slot-1"].forEach((selector) => {
+    ["#agent-select", "#growth-agent-select"].forEach((selector) => {
       const field = $(selector);
       if (field) field.value = selectedAgentId;
     });
@@ -1640,18 +1684,11 @@
   }
 
   function applyTeam(team) {
-    $("#guide-agent").value = selectedAgentId;
-    $("#guide-slot-1").value = team.members[0] || selectedAgentId;
-    $("#guide-slot-2").value = team.members[1] || selectedAgentId;
-    $("#guide-slot-3").value = team.members[2] || selectedAgentId;
     const damageMembers = team.members.filter((id) => id !== selectedAgentId);
     $("#party-slot-1").value = damageMembers[0] || "none";
     $("#party-slot-2").value = damageMembers[1] || "none";
-    $("#guide-title").value = team.name;
-    $("#guide-body").value = team.note;
-    $("#guide-tags").value = `${roleLabels[getAgent(selectedAgentId).role]}, 추천 파티`;
-    updateIssueLink();
-    switchTab("community");
+    switchTab("damage");
+    renderAll();
   }
 
   function sumStatFromDiscs(discs, stat) {
@@ -1707,7 +1744,7 @@
     const enemyDefPart = Math.max((enemyLevel + 100) * (1 - defReduction / 100) * (1 - penRatio / 100) - flatPen, 1);
     const defMultiplier = levelCoef / (levelCoef + enemyDefPart);
 
-    const effectiveRes = number("#enemy-res") - number("#res-shred");
+    const effectiveRes = number("#enemy-res") - number("#res-shred") - buffTotals.resShred;
     const resMultiplier = clamp(1 - effectiveRes / 100, 0.05, 2);
     const stunMultiplier = $("#enemy-stunned").checked ? (number("#stun-multiplier") / 100) * (1 + buffTotals.stunDmg / 100) : 1;
 
@@ -1769,13 +1806,16 @@
         ? result.buffSources.map((buff) => {
             const item = document.createElement("article");
             item.className = "buff-chip";
-            item.innerHTML = `
-              <div>
-                <strong>${buff.label}</strong>
-                <span>${buff.type}${buff.note ? ` / ${buff.note}` : ""}</span>
-              </div>
-              <p>${effectText(buff)}</p>
-            `;
+            const header = document.createElement("div");
+            const label = document.createElement("strong");
+            const meta = document.createElement("span");
+            const body = document.createElement("p");
+
+            label.textContent = buff.label;
+            meta.textContent = `${buff.type}${buff.note ? ` / ${buff.note}` : ""}`;
+            body.textContent = effectText(buff);
+            header.append(label, meta);
+            item.append(header, body);
             return item;
           })
         : [Object.assign(document.createElement("div"), { className: "empty-state", textContent: "자동 버프가 없습니다." })]),
@@ -1786,6 +1826,7 @@
       ["치명타", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
       ["피해 보너스", `${fmt1.format(result.baseDmgBonus)}%`],
       ["관통 / 방어 감소", `${fmt1.format(result.penRatio)}% / ${fmt1.format(result.defReduction)}%`],
+      ["저항 감소", `${fmt1.format(result.buffTotals.resShred)}%`],
       ["방어 배율", fmt1.format(result.defMultiplier)],
       ["저항 배율", fmt1.format(result.resMultiplier)],
       ["그로기 배율", fmt1.format(result.stunMultiplier)],
@@ -1894,84 +1935,6 @@
         return row;
       });
     $("#resource-list").replaceChildren(...rows);
-  }
-
-  function loadGuides() {
-    try {
-      guides = JSON.parse(localStorage.getItem(GUIDE_STORAGE_KEY) || "[]");
-      if (!Array.isArray(guides)) guides = [];
-    } catch (_error) {
-      guides = [];
-      localStorage.removeItem(GUIDE_STORAGE_KEY);
-    }
-  }
-
-  function persistGuides() {
-    localStorage.setItem(GUIDE_STORAGE_KEY, JSON.stringify(guides));
-  }
-
-  function guidePayloadFromForm() {
-    return {
-      id: `guide-${Date.now()}`,
-      author: $("#guide-author").value.trim() || "익명",
-      title: $("#guide-title").value.trim() || `${getAgent($("#guide-agent").value).kr} 조합`,
-      agentId: $("#guide-agent").value,
-      team: [$("#guide-slot-1").value, $("#guide-slot-2").value, $("#guide-slot-3").value],
-      tags: $("#guide-tags").value.trim(),
-      body: $("#guide-body").value.trim(),
-      createdAt: new Date().toISOString(),
-    };
-  }
-
-  function renderGuides() {
-    if (guides.length === 0) {
-      $("#guide-list").innerHTML = `<div class="empty-state">저장된 공략이 없습니다.</div>`;
-      return;
-    }
-
-    $("#guide-list").replaceChildren(
-      ...guides.map((guide) => {
-        const card = document.createElement("article");
-        card.className = "guide-card";
-        const mainAgent = getAgent(guide.agentId);
-        card.innerHTML = `
-          <div class="section-heading compact">
-            <h3>${guide.title}</h3>
-            <button class="ghost-button delete-guide" type="button">삭제</button>
-          </div>
-          <div class="guide-meta">${guide.author} / ${mainAgent.kr}${guide.tags ? ` / ${guide.tags}` : ""}</div>
-          <div class="team-chip-row">${guide.team.map(teamMemberChip).join("")}</div>
-          <p>${guide.body || "내용 없음"}</p>
-        `;
-        card.querySelector(".delete-guide").addEventListener("click", () => {
-          guides = guides.filter((item) => item.id !== guide.id);
-          persistGuides();
-          renderGuides();
-        });
-        card.querySelectorAll("img").forEach((img) => {
-          img.addEventListener("error", (event) => event.currentTarget.classList.add("broken"));
-        });
-        return card;
-      }),
-    );
-  }
-
-  function updateIssueLink() {
-    const guide = guidePayloadFromForm();
-    const body = [
-      `작성자: ${guide.author}`,
-      `중심 에이전트: ${getAgent(guide.agentId).kr}`,
-      `파티: ${guide.team.map((id) => getAgent(id).kr).join(" / ")}`,
-      `태그: ${guide.tags}`,
-      "",
-      guide.body,
-    ].join("\n");
-    const params = new URLSearchParams({
-      title: `[공략] ${guide.title}`,
-      body,
-      labels: "community-guide",
-    });
-    $("#issue-link").href = `${REPO_ISSUE_URL}?${params.toString()}`;
   }
 
   function renderDatabase() {
@@ -2084,7 +2047,6 @@
     renderDamage();
     renderGrowth();
     renderDatabase();
-    updateIssueLink();
     saveSnapshot();
   }
 
@@ -2092,10 +2054,6 @@
     const agentLabel = (agent) => `${agent.kr} (${attributeLabels[agent.attribute]} / ${roleLabels[agent.role]})`;
     fillSelect($("#agent-select"), agents, agentLabel);
     fillSelect($("#growth-agent-select"), agents, agentLabel);
-    fillSelect($("#guide-agent"), agents, agentLabel);
-    fillSelect($("#guide-slot-1"), agents, (agent) => agent.kr);
-    fillSelect($("#guide-slot-2"), agents, (agent) => agent.kr);
-    fillSelect($("#guide-slot-3"), agents, (agent) => agent.kr);
     const partyOptions = [{ id: "none", kr: "없음" }, ...agents];
     fillSelect($("#party-slot-1"), partyOptions, (agent) => agent.kr);
     fillSelect($("#party-slot-2"), partyOptions, (agent) => agent.kr);
@@ -2134,8 +2092,6 @@
     $("#target-core").value = "6";
     $("#disc-four").value = "woodpecker-electro";
     $("#disc-two").value = "hormone-punk";
-    $("#guide-slot-2").value = agents[1].id;
-    $("#guide-slot-3").value = agents[2].id;
     syncDamagePartyFromAgent(selectedAgentId);
   }
 
@@ -2156,51 +2112,14 @@
 
     $("#agent-select").addEventListener("change", () => selectAgent($("#agent-select").value));
     $("#growth-agent-select").addEventListener("change", () => selectAgent($("#growth-agent-select").value));
-    $("#guide-agent").addEventListener("change", () => selectAgent($("#guide-agent").value));
     $("#reset-stats").addEventListener("click", resetStats);
     $("#download-data").addEventListener("click", downloadData);
     $("#copy-growth").addEventListener("click", copyGrowth);
-
-    $("#guide-form").addEventListener("submit", (event) => {
-      event.preventDefault();
-      const guide = guidePayloadFromForm();
-      guides.unshift(guide);
-      persistGuides();
-      renderGuides();
-      $("#guide-title").value = "";
-      $("#guide-body").value = "";
-      saveSnapshot();
-    });
-
-    $("#export-guides").addEventListener("click", () => {
-      downloadJson({ version: DATA_VERSION, guides }, "zzz-calc-guides.json");
-    });
-
-    $("#import-guides").addEventListener("change", async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-      const text = await file.text();
-      const payload = JSON.parse(text);
-      const imported = Array.isArray(payload) ? payload : payload.guides;
-      if (Array.isArray(imported)) {
-        guides = [...imported, ...guides];
-        persistGuides();
-        renderGuides();
-      }
-      event.target.value = "";
-    });
-
-    $("#clear-guides").addEventListener("click", () => {
-      guides = [];
-      persistGuides();
-      renderGuides();
-    });
   }
 
   async function init() {
     initSelects();
     await loadEffectDb();
-    loadGuides();
     restoreSnapshot();
     normalizeSelectValue("#engine-select", "manual");
     normalizeSelectValue("#engine-refinement", "1");
@@ -2209,7 +2128,6 @@
     normalizeSelectValue("#mindscape-level", "0");
     normalizeSelectValue("#agent-select", agents[0].id);
     normalizeSelectValue("#growth-agent-select", agents[0].id);
-    normalizeSelectValue("#guide-agent", agents[0].id);
     normalizeSelectValue("#party-slot-1", "none");
     normalizeSelectValue("#party-slot-2", "none");
     normalizeSelectValue("#party-disc-1", "none");
@@ -2217,7 +2135,6 @@
     selectAgent(selectedAgentId, false, false);
     bindEvents();
     renderAll();
-    renderGuides();
   }
 
   document.addEventListener("DOMContentLoaded", () => {

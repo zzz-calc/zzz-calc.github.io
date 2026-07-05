@@ -65,6 +65,7 @@
         "critDmg",
         "penRatio",
         "flatPen",
+        "resShred",
         "defReduction",
         "anomalyProficiency",
         "anomalyMastery",
@@ -83,6 +84,7 @@
         "critDmg": { "type": "number" },
         "penRatio": { "type": "number" },
         "flatPen": { "type": "number" },
+        "resShred": { "type": "number" },
         "defReduction": { "type": "number" },
         "anomalyProficiency": { "type": "number" },
         "anomalyMastery": { "type": "number" },
@@ -112,6 +114,8 @@
         "target": { "enum": ["self", "party", "enemy"] },
         "trigger": { "type": "string" },
         "condition": { "type": "string" },
+        "rawText": { "type": "string" },
+        "sourceStatus": { "enum": ["source-pending", "source-text", "structured"] },
         "appliesTo": {
           "type": "array",
           "items": { "type": "string" }
@@ -148,6 +152,8 @@
         "value": { "type": "number" },
         "formula": { "type": "string" },
         "condition": { "type": "string" },
+        "rawText": { "type": "string" },
+        "sourceStatus": { "enum": ["source-pending", "source-text", "structured"] },
         "sourceRefs": {
           "type": "array",
           "items": { "type": "string" }

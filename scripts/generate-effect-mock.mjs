@@ -124,6 +124,7 @@ const database = {
     "critDmg",
     "penRatio",
     "flatPen",
+    "resShred",
     "defReduction",
     "anomalyProficiency",
     "anomalyMastery",

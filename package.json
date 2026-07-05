@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
     "check": "node --check app.js",
-    "generate:effects": "node scripts/generate-effect-mock.mjs"
+    "generate:effects": "node scripts/generate-effect-mock.mjs",
+    "import:effects": "node scripts/import-nanoka-effects.mjs"
   }
 }

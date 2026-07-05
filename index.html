@@ -14,14 +14,13 @@
           <p class="eyebrow">Zenless Zone Zero</p>
           <h1>젠존제 계산기</h1>
         </div>
-        <div class="version-badge">3.0 KR - 40/93/21 데이터</div>
+        <div class="version-badge">3.0 KR - 40/93/28 데이터</div>
       </header>
 
       <nav class="tabs" aria-label="계산기 탭">
         <button class="tab-button active" type="button" data-tab="agents">에이전트</button>
         <button class="tab-button" type="button" data-tab="damage">딜량</button>
         <button class="tab-button" type="button" data-tab="growth">육성</button>
-        <button class="tab-button" type="button" data-tab="community">커뮤니티</button>
         <button class="tab-button" type="button" data-tab="database">데이터</button>
       </nav>
 
@@ -402,80 +401,6 @@
                 <button class="ghost-button" id="copy-growth" type="button">복사</button>
               </div>
               <div class="resource-list" id="resource-list"></div>
-            </aside>
-          </div>
-        </section>
-
-        <section class="tab-panel" id="community-panel">
-          <div class="workspace two-column">
-            <form class="tool-panel" id="guide-form">
-              <section class="form-section">
-                <div class="section-heading">
-                  <h2>조합/공략 등록</h2>
-                  <span>브라우저 저장</span>
-                </div>
-                <div class="inline-grid">
-                  <label>
-                    작성자
-                    <input id="guide-author" type="text" maxlength="24" placeholder="닉네임" />
-                  </label>
-                  <label>
-                    제목
-                    <input id="guide-title" type="text" maxlength="60" placeholder="예: Miyabi 혼돈 파티" />
-                  </label>
-                  <label>
-                    중심 에이전트
-                    <select id="guide-agent"></select>
-                  </label>
-                  <label>
-                    태그
-                    <input id="guide-tags" type="text" maxlength="80" placeholder="혼돈, 시유, 강습전" />
-                  </label>
-                </div>
-              </section>
-              <section class="form-section">
-                <div class="section-heading">
-                  <h2>파티</h2>
-                  <span>3인</span>
-                </div>
-                <div class="inline-grid three">
-                  <label>
-                    1번
-                    <select id="guide-slot-1"></select>
-                  </label>
-                  <label>
-                    2번
-                    <select id="guide-slot-2"></select>
-                  </label>
-                  <label>
-                    3번
-                    <select id="guide-slot-3"></select>
-                  </label>
-                </div>
-              </section>
-              <section class="form-section">
-                <label>
-                  공략
-                  <textarea id="guide-body" rows="8" maxlength="1200" placeholder="운용, 디스크, W-Engine, 주의점"></textarea>
-                </label>
-                <div class="action-row">
-                  <button class="primary-button" id="save-guide" type="submit">저장</button>
-                  <button class="ghost-button" id="export-guides" type="button">JSON 내보내기</button>
-                  <label class="file-button">
-                    JSON 가져오기
-                    <input id="import-guides" type="file" accept="application/json" />
-                  </label>
-                  <a class="ghost-link" id="issue-link" href="#" target="_blank" rel="noreferrer">GitHub 제보</a>
-                </div>
-              </section>
-            </form>
-
-            <aside class="results-panel">
-              <div class="section-heading">
-                <h2>저장된 공략</h2>
-                <button class="ghost-button" id="clear-guides" type="button">비우기</button>
-              </div>
-              <div class="guide-list" id="guide-list"></div>
             </aside>
           </div>
         </section>
