@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v1.5-rupture-sheer-force-input-3.0";
+  const DATA_VERSION = "2026-07-06-v1.6-defense-and-sheer-multipliers-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
     agents: 56,
@@ -1497,6 +1497,8 @@
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
   const fmt = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 });
   const fmt1 = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 1 });
+  const fmt2 = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 2 });
+  const fmt3 = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 3 });
   const normalizeSearchText = (value) => String(value ?? "").normalize("NFKC").toLowerCase().replace(/\s+/g, " ").trim();
 
   function getPreferredTheme() {
@@ -2345,8 +2347,12 @@
       sumStatFromDiscs(discs, "aftershockDmg") +
       number("#disc-conditional") +
       buffTotals.dmgBonus;
+    const sheerDmgBonus = usesHpScaling ? number("#sheer-dmg-bonus") : 0;
     const vulnerability = number("#vulnerability");
-    const damageBonusMultiplier = (1 + baseDmgBonus / 100) * (1 + vulnerability / 100);
+    const baseDmgMultiplier = 1 + baseDmgBonus / 100;
+    const sheerDmgMultiplier = 1 + sheerDmgBonus / 100;
+    const vulnerabilityMultiplier = 1 + vulnerability / 100;
+    const damageBonusMultiplier = baseDmgMultiplier * sheerDmgMultiplier * vulnerabilityMultiplier;
 
     const penRatio = clamp(
       number("#pen-ratio") + (engine.stats.penRatio || 0) + sumStatFromDiscs(discs, "penRatio") + agent.stats.penRatio + buffTotals.penRatio,
@@ -2356,7 +2362,9 @@
     const flatPen = number("#flat-pen") + buffTotals.flatPen;
     const defReduction = clamp(buffTotals.defReduction, 0, 95);
     const levelCoef = attackerLevel + 100;
-    const enemyDefPart = Math.max((enemyLevel + 100) * (1 - defReduction / 100) * (1 - penRatio / 100) - flatPen, 1);
+    const enemyDefenseInput = number("#enemy-defense");
+    const enemyDefenseBase = enemyDefenseInput > 0 ? enemyDefenseInput : enemyLevel + 100;
+    const enemyDefPart = Math.max(enemyDefenseBase * (1 - defReduction / 100) * (1 - penRatio / 100) - flatPen, 1);
     const defMultiplier = usesHpScaling ? 1 : levelCoef / (levelCoef + enemyDefPart);
 
     const effectiveRes = number("#enemy-res") - number("#res-shred") - buffTotals.resShred;
@@ -2364,9 +2372,11 @@
     const stunMultiplier = $("#enemy-stunned").checked ? (number("#stun-multiplier") / 100) * (1 + buffTotals.stunDmg / 100) : 1;
 
     const skillMultiplier = number("#skill-multiplier") / 100;
+    const critMultiplier = 1 + critDmg / 100;
+    const expectedCritMultiplier = 1 + (critRate / 100) * (critDmg / 100);
     const nonCrit = damageBase * skillMultiplier * damageBonusMultiplier * defMultiplier * resMultiplier * stunMultiplier;
-    const crit = nonCrit * (1 + critDmg / 100);
-    const expected = nonCrit * (1 + (critRate / 100) * (critDmg / 100));
+    const crit = nonCrit * critMultiplier;
+    const expected = nonCrit * expectedCritMultiplier;
 
     const anomalyProficiency =
       number("#anomaly-proficiency") +
@@ -2392,12 +2402,21 @@
       damageBase,
       damageBaseLabel,
       usesHpScaling,
+      skillMultiplier,
       critRate,
       critDmg,
+      critMultiplier,
+      expectedCritMultiplier,
       baseDmgBonus,
+      sheerDmgBonus,
+      baseDmgMultiplier,
+      sheerDmgMultiplier,
+      vulnerabilityMultiplier,
       penRatio,
       flatPen,
       defReduction,
+      enemyDefenseInput,
+      enemyDefenseBase,
       defMultiplier,
       resMultiplier,
       stunMultiplier,
@@ -2447,6 +2466,7 @@
 
     const lines = [
       ["피해 기준", result.damageBaseLabel],
+      ["스킬 계수", `${fmt2.format(result.skillMultiplier * 100)}% / ${fmt3.format(result.skillMultiplier)}x`],
       ...(result.usesHpScaling
         ? [
             ["관입력", fmt.format(result.totalSheerForce)],
@@ -2457,14 +2477,19 @@
       ["총 공격력", fmt.format(result.totalAtk)],
       ["총 HP", fmt.format(result.totalHp)],
       ["치명타", `${fmt1.format(result.critRate)}% / ${fmt1.format(result.critDmg)}%`],
+      ["치명타 계수", `${fmt3.format(result.critMultiplier)}x`],
+      ["기댓값 치명 계수", `${fmt3.format(result.expectedCritMultiplier)}x`],
       ["HP 보너스", `${fmt1.format(result.hpPct)}%`],
       ...(result.usesHpScaling ? [["추가 관입력", fmt.format(result.extraSheerForce)]] : []),
-      ["피해 보너스", `${fmt1.format(result.baseDmgBonus)}%`],
+      ...(result.usesHpScaling ? [["관입 피해 증가", `${fmt2.format(result.sheerDmgBonus)}% / ${fmt3.format(result.sheerDmgMultiplier)}x`]] : []),
+      ["피해 증가", `${fmt2.format(result.baseDmgBonus)}% / ${fmt3.format(result.baseDmgMultiplier)}x`],
+      ["받는 피해", `${fmt3.format(result.vulnerabilityMultiplier)}x`],
+      ["적 방어력", result.enemyDefenseInput > 0 ? fmt.format(result.enemyDefenseBase) : `${fmt.format(result.enemyDefenseBase)} (레벨 자동)`],
       ["관통 / 방어 감소", `${fmt1.format(result.penRatio)}% / ${fmt1.format(result.defReduction)}%`],
       ["저항 감소", `${fmt1.format(result.buffTotals.resShred)}%`],
-      ["방어 배율", fmt1.format(result.defMultiplier)],
-      ["저항 배율", fmt1.format(result.resMultiplier)],
-      ["그로기 배율", fmt1.format(result.stunMultiplier)],
+      ["방어 배율", fmt3.format(result.defMultiplier)],
+      ["저항 배율", fmt3.format(result.resMultiplier)],
+      ["그로기 배율", fmt3.format(result.stunMultiplier)],
       ["이상 장악", fmt1.format(result.anomalyMastery)],
       ["이상 숙련", fmt1.format(result.anomalyProficiency)],
     ];
@@ -2654,6 +2679,7 @@
     $("#sheer-force").value = 0;
     $("#flat-sheer-force").value = 0;
     $("#dmg-bonus").value = 46.6;
+    $("#sheer-dmg-bonus").value = 0;
     $("#pen-ratio").value = 0;
     $("#flat-pen").value = 0;
     $("#anomaly-proficiency").value = 0;
