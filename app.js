@@ -594,7 +594,7 @@
       id: "pyrois",
       kr: "Pyrois",
       en: "Pyrois",
-      rank: "I",
+      rank: "S",
       attribute: "ether",
       role: "attack",
       faction: "Phaethon",
