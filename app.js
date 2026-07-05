@@ -1043,6 +1043,15 @@
     "moonlight-lullaby": { label: "달빛 기사의 칭송 4세트", dmgBonus: 18, note: "지원 EX/궁극기" },
   };
 
+  const partyDiscBuffPresets = {
+    "fanged-metal": { label: "송곳니 메탈 4세트", dmgBonus: 35, note: "강타 후" },
+    "swing-jazz": { label: "스윙 재즈 4세트", dmgBonus: 15, note: "콤보/궁극기 후" },
+    "proto-punk": { label: "원시 펑크 4세트", dmgBonus: 15, note: "지원 방어/회피 지원 후" },
+    "astral-voice": { label: "고요 속의 별 4세트", dmgBonus: 24, note: "퀵 지원 진입 후" },
+    "king-summit": { label: "산림의 왕 4세트", critDmg: 30, note: "격파 캐릭터 발동 후" },
+    "moonlight-lullaby": { label: "달빛 기사의 칭송 4세트", dmgBonus: 18, note: "지원 EX/궁극기 후" },
+  };
+
   const teamBuffPresets = {
     astra: { label: "Astra Yao", atkPct: 15, dmgBonus: 30, note: "지원 버프 창" },
     nicole: { label: "Nicole Demara", defReduction: 40, dmgBonus: 10, note: "에테르 필드 / 방어 감소" },
@@ -1232,6 +1241,24 @@
       .filter((id) => id && id !== "none" && id !== $("#agent-select")?.value);
   }
 
+  function selectedPartyDiscSources() {
+    const usedDiscIds = new Set();
+    return [
+      { agentSelector: "#party-slot-1", discSelector: "#party-disc-1" },
+      { agentSelector: "#party-slot-2", discSelector: "#party-disc-2" },
+    ].flatMap(({ agentSelector, discSelector }) => {
+      const agentId = $(agentSelector)?.value;
+      const discId = $(discSelector)?.value;
+      if (!agentId || agentId === "none" || agentId === $("#agent-select")?.value) return [];
+      if (!discId || discId === "none" || usedDiscIds.has(discId)) return [];
+      const preset = partyDiscBuffPresets[discId];
+      if (!preset) return [];
+      usedDiscIds.add(discId);
+      const agent = getAgent(agentId);
+      return [{ type: "파티 디스크", ...preset, label: `${agent.kr} / ${preset.label}` }];
+    });
+  }
+
   function emptyBuffTotals() {
     return Object.fromEntries(buffFields.map((field) => [field, 0]));
   }
@@ -1279,6 +1306,10 @@
       });
     }
 
+    if ($("#auto-party-disc-buffs")?.checked) {
+      sources.push(...selectedPartyDiscSources());
+    }
+
     const manualBuff = {
       type: "수동",
       label: "수동 버프",
@@ -1304,6 +1335,10 @@
     const slot2 = $("#party-slot-2");
     if (slot1) slot1.value = members[0] || "none";
     if (slot2) slot2.value = members[1] || "none";
+    const disc1 = $("#party-disc-1");
+    const disc2 = $("#party-disc-2");
+    if (disc1) disc1.value = "none";
+    if (disc2) disc2.value = "none";
   }
 
   function option(label, value) {
@@ -1908,6 +1943,9 @@
     const partyOptions = [{ id: "none", kr: "없음" }, ...agents];
     fillSelect($("#party-slot-1"), partyOptions, (agent) => agent.kr);
     fillSelect($("#party-slot-2"), partyOptions, (agent) => agent.kr);
+    const partyDiscOptions = [{ id: "none", kr: "없음" }, ...driveDiscs.filter((disc) => partyDiscBuffPresets[disc.id])];
+    fillSelect($("#party-disc-1"), partyDiscOptions, (disc) => disc.kr);
+    fillSelect($("#party-disc-2"), partyDiscOptions, (disc) => disc.kr);
     fillSelect($("#engine-select"), engines, (engine) => `${engine.kr} / ${roleLabels[engine.role] || "전체"}`);
     fillSelect($("#disc-four"), driveDiscs, (disc) => disc.kr);
     fillSelect($("#disc-two"), driveDiscs, (disc) => disc.kr);
@@ -2011,6 +2049,8 @@
     normalizeSelectValue("#guide-agent", agents[0].id);
     normalizeSelectValue("#party-slot-1", "none");
     normalizeSelectValue("#party-slot-2", "none");
+    normalizeSelectValue("#party-disc-1", "none");
+    normalizeSelectValue("#party-disc-2", "none");
     selectAgent(selectedAgentId, false, false);
     bindEvents();
     renderAll();
