@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const DATA_VERSION = "2026-07-06-v1.3-searchable-selects-3.0";
+  const DATA_VERSION = "2026-07-06-v1.4-autocomplete-selects-3.0";
   const DATA_PROFILE = {
     label: "3.0 live",
     agents: 56,
@@ -1986,38 +1986,89 @@
     });
   }
 
-  function updateSearchableSelectStatus(select, visibleCount, totalCount) {
-    const status = select.parentElement?.querySelector(`[data-search-status-for="${select.id}"]`);
-    if (!status) return;
-    const query = select._searchQuery || "";
-    status.textContent = query ? `${visibleCount}/${totalCount}개 표시` : `${totalCount}개`;
+  function selectedSearchOption(select) {
+    return select?._searchOptions?.find((item) => item.value === select.value);
   }
 
-  function renderSearchableSelectOptions(select, query = select._searchQuery || "", preferredValue = select.value) {
-    if (!select?._searchOptions) return;
+  function searchableSelectParts(select) {
+    const combo = select?.parentElement?.querySelector(`[data-select-combo-for="${select.id}"]`);
+    return {
+      combo,
+      input: combo?.querySelector(".select-search"),
+      list: combo?.querySelector(".select-suggestions"),
+    };
+  }
+
+  function searchableMatches(select, query) {
     const normalizedQuery = normalizeSearchText(query);
-    const allOptions = select._searchOptions;
-    const selectedEntry = allOptions.find((item) => item.value === preferredValue);
-    let matches = normalizedQuery ? allOptions.filter((item) => item.normalized.includes(normalizedQuery)) : allOptions;
+    const options = select._searchOptions || [];
+    return normalizedQuery ? options.filter((item) => item.normalized.includes(normalizedQuery)) : options;
+  }
 
-    if (selectedEntry && !matches.some((item) => item.value === selectedEntry.value)) {
-      matches = [selectedEntry, ...matches];
-    }
+  function closeSearchableSelect(select) {
+    const { combo, input, list } = searchableSelectParts(select);
+    if (!combo || !list) return;
+    combo.dataset.open = "false";
+    list.hidden = true;
+    input?.setAttribute("aria-expanded", "false");
+  }
 
-    select._searchQuery = query;
-    select.replaceChildren(...matches.map((item) => option(item.label, item.value, item.searchText)));
-    if (selectedEntry) {
-      select.value = selectedEntry.value;
-    } else if (select.options.length > 0) {
-      select.selectedIndex = 0;
+  function closeAllSearchableSelects(exceptSelect = null) {
+    Object.keys(SEARCHABLE_SELECTS).forEach((id) => {
+      const select = document.getElementById(id);
+      if (select && select !== exceptSelect) closeSearchableSelect(select);
+    });
+  }
+
+  function syncSearchableSelectInput(select) {
+    const { input } = searchableSelectParts(select);
+    if (!input) return;
+    const selected = selectedSearchOption(select);
+    input.value = selected?.label || "";
+    input.title = selected?.label || "";
+  }
+
+  function renderSearchableSuggestions(select, query = "", shouldOpen = true) {
+    if (!select?._searchOptions) return;
+    const { combo, list } = searchableSelectParts(select);
+    if (!combo || !list) return;
+
+    const matches = searchableMatches(select, query).slice(0, 8);
+    const selectedValue = select.value;
+    const nodes =
+      matches.length > 0
+        ? matches.map((item) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = `select-suggestion ${item.value === selectedValue ? "selected" : ""}`;
+            button.dataset.value = item.value;
+            button.setAttribute("role", "option");
+            button.setAttribute("aria-selected", item.value === selectedValue ? "true" : "false");
+            button.textContent = item.label;
+            return button;
+          })
+        : [Object.assign(document.createElement("div"), { className: "select-suggestion-empty", textContent: "검색 결과 없음" })];
+
+    list.replaceChildren(...nodes);
+    list.hidden = !shouldOpen;
+    combo.dataset.open = shouldOpen ? "true" : "false";
+  }
+
+  function chooseSearchableSelectOption(select, value, shouldDispatch = false) {
+    if (!select?._searchOptions?.some((item) => item.value === value)) return;
+    select.value = value;
+    syncSearchableSelectInput(select);
+    closeSearchableSelect(select);
+    if (shouldDispatch) {
+      select.dispatchEvent(new Event("change", { bubbles: true }));
     }
-    updateSearchableSelectStatus(select, normalizedQuery ? matches.filter((item) => item.normalized.includes(normalizedQuery)).length : matches.length, allOptions.length);
   }
 
   function setSelectValue(select, value) {
     if (!select) return;
     if (select._searchOptions) {
-      renderSearchableSelectOptions(select, select._searchQuery || "", value);
+      chooseSearchableSelectOption(select, value, false);
+      return;
     }
     select.value = value;
   }
@@ -2029,6 +2080,13 @@
 
       cacheSearchableSelect(select);
       select.dataset.searchEnhanced = "true";
+      select.classList.add("native-select-hidden");
+      select.tabIndex = -1;
+
+      const combo = document.createElement("div");
+      combo.className = "select-combo";
+      combo.dataset.selectComboFor = id;
+      combo.dataset.open = "false";
 
       const search = document.createElement("input");
       search.type = "search";
@@ -2036,28 +2094,76 @@
       search.placeholder = placeholder;
       search.autocomplete = "off";
       search.setAttribute("aria-label", placeholder);
+      search.setAttribute("role", "combobox");
+      search.setAttribute("aria-autocomplete", "list");
+      search.setAttribute("aria-expanded", "false");
       search.dataset.selectSearchFor = id;
 
-      const status = document.createElement("span");
-      status.className = "select-search-status";
-      status.dataset.searchStatusFor = id;
+      const list = document.createElement("div");
+      list.className = "select-suggestions";
+      list.hidden = true;
+      list.setAttribute("role", "listbox");
 
-      select.before(search);
-      select.after(status);
-      updateSearchableSelectStatus(select, select._searchOptions.length, select._searchOptions.length);
+      combo.append(search, list);
+      select.before(combo);
+      syncSearchableSelectInput(select);
 
+      search.addEventListener("focus", () => {
+        closeAllSearchableSelects(select);
+        search.select();
+        renderSearchableSuggestions(select, search.value, true);
+        search.setAttribute("aria-expanded", "true");
+      });
       search.addEventListener("input", () => {
-        renderSearchableSelectOptions(select, search.value, select.value);
+        closeAllSearchableSelects(select);
+        renderSearchableSuggestions(select, search.value, true);
+        search.setAttribute("aria-expanded", "true");
       });
       search.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
-          search.value = "";
-          renderSearchableSelectOptions(select, "", select.value);
+          syncSearchableSelectInput(select);
+          closeSearchableSelect(select);
+          search.setAttribute("aria-expanded", "false");
+          search.blur();
+          return;
+        }
+        if (event.key === "Enter") {
+          const firstMatch = searchableMatches(select, search.value)[0];
+          if (firstMatch) {
+            event.preventDefault();
+            chooseSearchableSelectOption(select, firstMatch.value, true);
+            search.setAttribute("aria-expanded", "false");
+          }
         }
       });
-      select.addEventListener("change", () => {
-        renderSearchableSelectOptions(select, search.value, select.value);
+      search.addEventListener("blur", () => {
+        setTimeout(() => {
+          if (!combo.contains(document.activeElement)) {
+            syncSearchableSelectInput(select);
+            closeSearchableSelect(select);
+            search.setAttribute("aria-expanded", "false");
+          }
+        }, 120);
       });
+      list.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+      });
+      list.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-value]");
+        if (!button) return;
+        chooseSearchableSelectOption(select, button.dataset.value, true);
+        search.setAttribute("aria-expanded", "false");
+      });
+      select.addEventListener("change", () => {
+        syncSearchableSelectInput(select);
+        closeSearchableSelect(select);
+        search.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (event.target.closest(".select-combo")) return;
+      closeAllSearchableSelects();
     });
   }
 
