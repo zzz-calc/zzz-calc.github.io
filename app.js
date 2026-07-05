@@ -18,7 +18,16 @@
   const AGENT_API_BASE = `https://static.nanoka.cc/zzz/${AGENT_API_VERSION}`;
   const NANOKA_ASSET_BASE = "https://static.nanoka.cc/assets/zzz";
   const FANDOM_ENEMY_LIST_URL = "https://zenless-zone-zero.fandom.com/api.php?action=parse&page=Enemy/List&prop=text&format=json&origin=*";
-  const TRANSIENT_FIELD_IDS = new Set(["agent-name-filter", "agent-role-filter", "agent-attribute-filter", "agent-rank-filter", "database-search"]);
+  const TRANSIENT_FIELD_IDS = new Set([
+    "agent-name-filter",
+    "agent-role-filter",
+    "agent-attribute-filter",
+    "agent-rank-filter",
+    "enemy-tier-filter",
+    "enemy-type-filter",
+    "enemy-faction-filter",
+    "database-search",
+  ]);
   const SEARCHABLE_SELECTS = {
     "agent-select": "에이전트 검색",
     "growth-agent-select": "에이전트 검색",
